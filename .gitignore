@@ -1,3 +1,7 @@
+# Visual Studio Folders
+.vs
+
+# Binaries
 bin
 obj
-.vs
+packages
