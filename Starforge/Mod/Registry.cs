@@ -67,6 +67,66 @@ namespace Starforge.Mod {
         }
     }
 
+    public static class TriggerRegistry {
+        private static List<Type> RegisteredTypes
+            = new List<Type>();
+
+        public static Dictionary<string, TriggerCreator> Creators
+            = new Dictionary<string, TriggerCreator>();
+
+        public static void RegisterTrigger(Type type) {
+            if(RegisteredTypes.Contains(type))
+                return;
+
+            TriggerDefinitionAttribute attr = type.GetCustomAttribute<TriggerDefinitionAttribute>();
+            if(attr != null) {
+                string id = attr.ID;
+                TriggerCreator creator = null;
+
+                ConstructorInfo ctor = type.GetConstructor(new Type[] {
+                    typeof(Level),
+                    typeof(BinaryMapElement)
+                });
+                if(ctor != null) {
+                    creator = ((Level level, BinaryMapElement data) => (Trigger)ctor.Invoke(new object[] {
+                        level, data
+                    }));
+                }
+
+                if(creator != null) {
+                    Creators.Add(id, creator);
+                    RegisteredTypes.Add(type);
+                } else {
+                    Logger.Log(LogLevel.Warning, "No suitable constructor for trigger " + id);
+                }
+            } else {
+                Logger.Log(LogLevel.Warning, "Type " + type.ToString() + " does not contain an TriggerDefinition attribute.");
+            }
+        }
+
+        public static Trigger CreateTrigger(string id, Level level, BinaryMapElement el = null) {
+            if(Creators.ContainsKey(id)) {
+                if(el != null) {
+                    return Creators[id](level, el);
+                } else {
+                    return Creators[id](level, new BinaryMapElement()
+                    {
+                        Name = id
+                    });
+                }
+            } else {
+                if(el != null) {
+                    return new Trigger(level, el);
+                } else {
+                    return new Trigger(level, new BinaryMapElement()
+                    {
+                        Name = id
+                    });
+                }
+            }
+        }
+    }
+
     public static class EffectRegistry {
         private static List<Type> RegisteredTypes
             = new List<Type>();
@@ -127,6 +187,8 @@ namespace Starforge.Mod {
     }
 
     public delegate Entity EntityCreator(Level level, BinaryMapElement data);
+
+    public delegate Trigger TriggerCreator(Level level, BinaryMapElement data);
 
     public delegate Effect EffectCreator(BinaryMapElement data);
 }

@@ -5,3 +5,6 @@
 _bin
 _obj
 packages
+
+# Celeste Content
+*.bin

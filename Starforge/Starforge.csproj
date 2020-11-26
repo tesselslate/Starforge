@@ -39,6 +39,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <Compile Include="Core\Logger.cs" />
+    <Compile Include="MapStructure\Decal.cs" />
     <Compile Include="MapStructure\Entity.cs" />
     <Compile Include="MapStructure\Style.cs" />
     <None Include="packages.config" />

@@ -6,18 +6,36 @@ using System.Collections.Generic;
 
 namespace Starforge.MapStructure {
     public class Level : MapElement {
+        public int X { get; private set; }
+        public int Y { get; private set; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+
         public List<Entity> Entities;
         public List<Trigger> Triggers;
+        public List<Decal> BackgroundDecals;
+        public List<Decal> ForegroundDecals;
+
+        public LevelMeta Meta;
 
         public Level() {
             // Create empty lists for usual level elements (entities, etc)
             Entities = new List<Entity>();
             Triggers = new List<Trigger>();
+            BackgroundDecals = new List<Decal>();
+            ForegroundDecals = new List<Decal>();
         }
 
         public static Level FromBinary(BinaryMapElement element) {
             Level level = new Level();
             level.Attributes = element.Attributes;
+
+            level.X = element.GetInt("x");
+            level.Y = element.GetInt("y");
+            level.Width = element.GetInt("width");
+            level.Height = element.GetInt("height");
+
+            level.Meta = new LevelMeta(level);
 
             foreach(BinaryMapElement child in element.Children) {
                 if(child.Name == "entities") {
@@ -26,7 +44,27 @@ namespace Starforge.MapStructure {
                     }
                 } else if(child.Name == "triggers") {
                     foreach(BinaryMapElement trigger in child.Children) {
-                        level.Triggers.Add(EntityRegistry.CreateEntity(trigger.Name, level, trigger) as Trigger);
+                        level.Triggers.Add(TriggerRegistry.CreateTrigger(trigger.Name, level, trigger));
+                    }
+                } else if(child.Name == "bgdecals") {
+                    foreach(BinaryMapElement decal in child.Children) {
+                        level.BackgroundDecals.Add(new Decal(
+                            decal.GetInt("x"),
+                            decal.GetInt("y"),
+                            decal.GetInt("scaleX"),
+                            decal.GetInt("scaleY"),
+                            decal.GetString("texture")
+                        ));
+                    }
+                } else if(child.Name == "fgdecals") {
+                    foreach(BinaryMapElement decal in child.Children) {
+                        level.ForegroundDecals.Add(new Decal(
+                            decal.GetInt("x"),
+                            decal.GetInt("y"),
+                            decal.GetInt("scaleX"),
+                            decal.GetInt("scaleY"),
+                            decal.GetString("texture")
+                        ));
                     }
                 }
             }

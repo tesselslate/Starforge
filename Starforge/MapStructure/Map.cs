@@ -34,7 +34,7 @@ namespace Starforge.MapStructure {
         public static Style ParseStyle(BinaryMapElement style, BinaryMapElement parent) {
             if(parent != null && parent.Name == "apply") {
                 if(style.Name == "parallax") {
-                    // Apply parallax
+                    // Apply parallax styleground
                     Parallax p = Parallax.FromBinary(style);
                     p.MergeAttributes(parent);
 
@@ -50,7 +50,7 @@ namespace Starforge.MapStructure {
                 // Parallax styleground
                 return Parallax.FromBinary(style);
             } else {
-                // TODO: Add effect registry
+                // Effect
                 return EffectRegistry.CreateEffect(style.Name, style);
             }
         }

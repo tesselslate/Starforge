@@ -7,6 +7,32 @@ using System.Collections.Generic;
 
 namespace Starforge.MapStructure {
     public class Entity : MapElement {
+        public int X {
+            get => GetInt("x");
+            set => SetAttribute("x", value);
+        }
+
+        public int Y {
+            get => GetInt("y");
+            set => SetAttribute("y", value);
+        }
+
+        public int Width {
+            get => GetInt("width");
+            set {
+                SetAttribute("width", value);
+                SelectionHitbox = new Rectangle(X, Y, GetInt("width"), GetInt("height"));
+            }
+        }
+
+        public int Height {
+            get => GetInt("height");
+            set {
+                SetAttribute("height", value);
+                SelectionHitbox = new Rectangle(X, Y, GetInt("width"), GetInt("height"));
+            }
+        }
+
         public readonly string Name;
 
         public List<Node> Nodes;
@@ -63,17 +89,9 @@ namespace Starforge.MapStructure {
     }
 
     public class Trigger : Entity {
-        public int Width {
-            get => GetInt("width");
-            set => SetAttribute("width", value);
+        public Trigger(Level level, BinaryMapElement data) : base(level, data) {
+            SelectionHitbox = new Rectangle(X, Y, Width, Height);
         }
-
-        public int Height {
-            get => GetInt("height");
-            set => SetAttribute("height", value);
-        }
-
-        public Trigger(Level level, BinaryMapElement data) : base(level, data) { }
     }
 
     public struct Node {
