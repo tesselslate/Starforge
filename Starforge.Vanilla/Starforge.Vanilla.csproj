@@ -4,38 +4,39 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BCDEE3B9-122D-4C59-8D24-0361588357AB}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>Starforge.Updater</RootNamespace>
-    <AssemblyName>Starforge.Updater</AssemblyName>
+    <ProjectGuid>{72E25310-E160-4839-A0C5-1BA231A25658}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Starforge.Vanilla</RootNamespace>
+    <AssemblyName>Starforge.Vanilla</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>.\_bin\Debug\</OutputPath>
-	<BaseIntermediateOutputPath>.\_obj\Debug\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>.\_obj\Debug\</BaseIntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>.\_bin\Release\</OutputPath>
-	<BaseIntermediateOutputPath>.\obj\Release\</BaseIntermediateOutputPath
+    <BaseIntermediateOutputPath>.\_obj\Release\</BaseIntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <Reference Include="Starforge">
+      <HintPath>..\Starforge\_bin\Debug\Starforge.exe</HintPath>
+    </Reference>
+    <Reference Include="System" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

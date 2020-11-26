@@ -2,6 +2,6 @@
 .vs
 
 # Binaries
-bin
-obj
+_bin
+_obj
 packages
