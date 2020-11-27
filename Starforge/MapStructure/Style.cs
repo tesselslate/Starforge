@@ -1,7 +1,4 @@
 ﻿using Starforge.MapStructure.Encoding;
-using Starforge.Mod.API;
-using System;
-using System.Reflection;
 
 namespace Starforge.MapStructure {
     public class Style : MapElement {
@@ -163,8 +160,6 @@ namespace Starforge.MapStructure {
 
     public class Effect : Style {
         public string Name;
-
-        public bool CanSwitchLayer = false;
 
         public Effect() { }
 

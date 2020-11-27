@@ -1,5 +1,4 @@
 ﻿using Starforge.MapStructure.Encoding;
-using Starforge.Mod;
 using Starforge.Util;
 using System.Collections.Generic;
 
@@ -41,7 +40,7 @@ namespace Starforge.MapStructure {
                     return p;
                 } else {
                     // Apply effect
-                    Effect e = EffectRegistry.CreateEffect(style.Name, style);
+                    Effect e = new Effect(style);
                     e.MergeAttributes(parent);
 
                     return e;
@@ -51,7 +50,7 @@ namespace Starforge.MapStructure {
                 return Parallax.FromBinary(style);
             } else {
                 // Effect
-                return EffectRegistry.CreateEffect(style.Name, style);
+                return new Effect(style);
             }
         }
 
@@ -88,7 +87,7 @@ namespace Starforge.MapStructure {
                     map.Meta = new MapMeta(child);
                 } else if(child.Name == "levels") {
                     foreach(BinaryMapElement level in child.Children) {
-                        map.Levels.Add(Level.FromBinary(level));
+                        map.Levels.Add(Level.FromBinary(level, map));
                     }
                 } else if(child.Name == "Filler") {
                     foreach(BinaryMapElement filler in child.Children) {
@@ -142,7 +141,10 @@ namespace Starforge.MapStructure {
             };
 
             foreach(Rectangle filler in Fillers) {
-                BinaryMapElement rect = new BinaryMapElement();
+                BinaryMapElement rect = new BinaryMapElement()
+                {
+                    Name = "rect"
+                };
                 rect.SetAttribute("x", filler.X);
                 rect.SetAttribute("y", filler.Y);
                 rect.SetAttribute("w", filler.Width);

@@ -128,7 +128,7 @@ namespace Starforge.MapStructure.Encoding {
         }
 
         public static void AddLookupValue(string value) {
-            if(!StringValues.ContainsKey(value)) {
+            if(value != null && !StringValues.ContainsKey(value)) {
                 StringValues.Add(value, StringCounter);
                 StringCounter++;
             }
@@ -169,7 +169,7 @@ namespace Starforge.MapStructure.Encoding {
             writer.Write((byte)attributes);
             foreach(KeyValuePair<string, object> pair in element.Attributes) {
                 if(!IgnoreAttributes.Contains(pair.Key)) {
-                    if(pair.Key == "innerText" && children == 0) {
+                    if(pair.Key == "innerText") {
                         writer.Write(StringValues["innerText"]);
                         if(element.Name == "solids" || element.Name == "bg") {
                             byte[] array = RunLengthUtil.Encode(element.GetString("innerText"));

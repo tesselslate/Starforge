@@ -1,44 +1,33 @@
 ﻿using Starforge.Core;
-using Starforge.Mod.API;
 using Starforge.MapStructure.Encoding;
-using Starforge.Util;
-using System.Reflection;
 using System.Collections.Generic;
 
 namespace Starforge.MapStructure {
     public class Entity : MapElement {
-        public int X {
-            get => GetInt("x");
+        public float X {
+            get => GetFloat("x");
             set => SetAttribute("x", value);
         }
 
-        public int Y {
-            get => GetInt("y");
+        public float Y {
+            get => GetFloat("y");
             set => SetAttribute("y", value);
         }
 
-        public int Width {
-            get => GetInt("width");
-            set {
-                SetAttribute("width", value);
-                SelectionHitbox = new Rectangle(X, Y, GetInt("width"), GetInt("height"));
-            }
+        public float Width {
+            get => GetFloat("width");
+            set => SetAttribute("width", value);
         }
 
-        public int Height {
-            get => GetInt("height");
-            set {
-                SetAttribute("height", value);
-                SelectionHitbox = new Rectangle(X, Y, GetInt("width"), GetInt("height"));
-            }
+        public float Height {
+            get => GetFloat("height");
+            set => SetAttribute("height", value);
         }
 
         public readonly string Name;
 
         public List<Node> Nodes;
         public Level Level;
-
-        public Rectangle SelectionHitbox;
 
         public Entity(Level level, BinaryMapElement data) {
             Name = data.Name;
@@ -49,14 +38,6 @@ namespace Starforge.MapStructure {
                     Nodes.Add(new Node(node));
                 }
             }
-
-            // Create default selection hitbox for placeholder entities
-            SelectionHitbox = new Rectangle(
-                data.GetInt("x"),
-                data.GetInt("y"),
-                8,
-                8
-            );
 
             Level = level;
             Attributes = data.Attributes;
@@ -89,21 +70,19 @@ namespace Starforge.MapStructure {
     }
 
     public class Trigger : Entity {
-        public Trigger(Level level, BinaryMapElement data) : base(level, data) {
-            SelectionHitbox = new Rectangle(X, Y, Width, Height);
-        }
+        public Trigger(Level level, BinaryMapElement data) : base(level, data) { }
     }
 
     public struct Node {
-        public int X;
-        public int Y;
+        public float X;
+        public float Y;
 
         public Node(BinaryMapElement element) {
             if(element.Name != "node")
                 Logger.Log(LogLevel.Warning, "Attempted to create entity node from " + element.Name);
 
-            X = element.GetInt("x", 0);
-            Y = element.GetInt("y", 0);
+            X = element.GetFloat("x", 0);
+            Y = element.GetFloat("y", 0);
         }
     }
 }

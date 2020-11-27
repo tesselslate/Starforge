@@ -2,13 +2,13 @@
 
 namespace Starforge.MapStructure {
     public class Decal {
-        public int X;
-        public int Y;
-        public int ScaleX;
-        public int ScaleY;
+        public float X;
+        public float Y;
+        public float ScaleX;
+        public float ScaleY;
         public string Texture;
 
-        public Decal(int x, int y, int scaleX, int scaleY, string texture) {
+        public Decal(float x, float y, float scaleX, float scaleY, string texture) {
             X = x;
             Y = y;
             ScaleX = scaleX;
