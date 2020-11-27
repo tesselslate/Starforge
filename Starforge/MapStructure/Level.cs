@@ -49,6 +49,7 @@ namespace Starforge.MapStructure {
         }
 
         private void CreateTileGrids() {
+            // This is just used to ensure the TileGrids aren't null when resaving (some rooms don't have these.)
             BackgroundTiles = new TileGrid(Width / 8, Height / 8);
             ForegroundTiles = new TileGrid(Width / 8, Height / 8);
             ObjectTiles = new TileGrid(Width / 8, Height / 8);

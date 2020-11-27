@@ -62,6 +62,10 @@ namespace Starforge.MapStructure {
                 for(int j = 0; j < Width; j++) {
                     resultArray[i] += (char)Tiles[j, i];
                 }
+
+                while(resultArray[i].EndsWith("0")) {
+                    resultArray[i] = resultArray[i].TrimEnd('0');
+                }
             }
 
             return string.Join("\n", resultArray);
