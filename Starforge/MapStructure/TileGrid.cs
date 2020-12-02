@@ -60,25 +60,20 @@ namespace Starforge.MapStructure {
             int[] filledTiles = new int[Height];
 
             for(int i = 0; i < Height; i++) {
-                for(int j = Width - 1; j > 0; j--) {
-                    if(Tiles[j, i] == 48) {
-                        filledTiles[i] = j + 1;
-                    } else {
-                        filledTiles[i] = j + 1;
-                        break;
-                    }
-                }
-            }
-
-            for(int i = 0; i < Height; i++) {
                 resultArray[i] = string.Empty;
+                
+
+                for(int j = Width - 1; j >= 0; j--) {
+                    filledTiles[i] = j + 1;
+                    if(Tiles[j, i] != 48) break;
+                }
+
+                if(filledTiles[i] == 1) continue;
+
                 for(int j = 0; j < filledTiles[i]; j++) {
                     resultArray[i] += (char)Tiles[j, i];
                 }
             }
-
-            int x = 0;
-            x = x + 1;
 
             return string.Join("\n", resultArray);
         }
@@ -88,16 +83,17 @@ namespace Starforge.MapStructure {
             int[] filledTiles = new int[Height];
 
             for(int i = 0; i < Height; i++) {
-                for(int j = Width - 1; j > 0; j--) {
-                    if(Tiles[j, i] == -1) {
-                        filledTiles[i] = j + 1;
-                    } else {
+                resultArray[i] = string.Empty;
+                
+                for(int j = Width - 1; j >= 0; j--) {
+                    filledTiles[i] = j + 1;
+                    if(Tiles[j, i] != -1) {
                         break;
                     }
                 }
-            }
 
-            for(int i = 0; i < Height; i++) {
+                if(filledTiles[i] == 1) continue;
+
                 for(int j = 0; j < filledTiles[i]; j++) {
                     resultArray[i] += Tiles[j, i].ToString();
                     if(j < filledTiles[i] - 1)

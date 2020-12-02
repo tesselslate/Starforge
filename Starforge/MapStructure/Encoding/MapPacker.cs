@@ -132,7 +132,7 @@ namespace Starforge.MapStructure.Encoding {
         public static void CreateLookupTable(BinaryMapElement element) {
             AddLookupValue(element.Name);
             foreach(KeyValuePair<string, object> pair in element.Attributes) {
-                if(element.Name == "solids" || element.Name == "bg" && pair.Key == "innerText") {
+                if((element.Name == "solids" || element.Name == "bg" || element.Name == "objtiles") && pair.Key == "innerText") {
                     AddLookupValue(pair.Key);
                     return;
                 }
