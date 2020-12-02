@@ -24,7 +24,7 @@ namespace Starforge.MapStructure {
 
         public TileGrid(int width, int height) {
             Tiles = new int[Width = width, Height = height];
-            FillEmpty();
+            Empty();
         }
 
         public TileGrid(int[,] matrix, int width, int height) {
@@ -35,7 +35,7 @@ namespace Starforge.MapStructure {
 
         public TileGrid(string matrix, int width, int height) {
             Tiles = new int[Width = width, Height = height];
-            FillEmpty();
+            Empty();
 
             Regex splitReg = new Regex("\\r\\n|\\n\\r|\\n|\\r");
             string[] rows = splitReg.Split(matrix);
@@ -47,7 +47,7 @@ namespace Starforge.MapStructure {
             }
         }
 
-        public void FillEmpty() {
+        public void Empty() {
             for(int i = 0; i < Width; i++) {
                 for(int j = 0; j < Height; j++) {
                     Tiles[i, j] = 48;
@@ -57,32 +57,51 @@ namespace Starforge.MapStructure {
 
         public override string ToString() {
             string[] resultArray = new string[Height];
+            int[] filledTiles = new int[Height];
 
             for(int i = 0; i < Height; i++) {
-                for(int j = 0; j < Width; j++) {
-                    resultArray[i] += (char)Tiles[j, i];
-                }
-
-                while(resultArray[i].EndsWith("0")) {
-                    resultArray[i] = resultArray[i].TrimEnd('0');
+                for(int j = Width - 1; j > 0; j--) {
+                    if(Tiles[j, i] == 48) {
+                        filledTiles[i] = j + 1;
+                    } else {
+                        filledTiles[i] = j + 1;
+                        break;
+                    }
                 }
             }
+
+            for(int i = 0; i < Height; i++) {
+                resultArray[i] = string.Empty;
+                for(int j = 0; j < filledTiles[i]; j++) {
+                    resultArray[i] += (char)Tiles[j, i];
+                }
+            }
+
+            int x = 0;
+            x = x + 1;
 
             return string.Join("\n", resultArray);
         }
 
         public string ToCSV() {
             string[] resultArray = new string[Height];
+            int[] filledTiles = new int[Height];
 
             for(int i = 0; i < Height; i++) {
-                for(int j = 0; j < Width; j++) {
-                    resultArray[i] += Tiles[j, i].ToString();
-                    if(j < Width - 1)
-                        resultArray[i] += ",";
+                for(int j = Width - 1; j > 0; j--) {
+                    if(Tiles[j, i] == -1) {
+                        filledTiles[i] = j + 1;
+                    } else {
+                        break;
+                    }
                 }
+            }
 
-                while(resultArray[i].EndsWith(",-1")) {
-                    resultArray[i] = resultArray[i].Substring(0, resultArray[i].Length - 3);
+            for(int i = 0; i < Height; i++) {
+                for(int j = 0; j < filledTiles[i]; j++) {
+                    resultArray[i] += Tiles[j, i].ToString();
+                    if(j < filledTiles[i] - 1)
+                        resultArray[i] += ",";
                 }
             }
 

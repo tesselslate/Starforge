@@ -19,10 +19,10 @@ namespace Starforge.MapStructure {
         }
 
         protected object GetAttribute(string name, object defaultValue = null) {
-            object obj = null;
+            object obj;
 
             if(!Attributes.TryGetValue(name, out obj)) {
-                obj = defaultValue;
+                return defaultValue;
             }
 
             return obj;

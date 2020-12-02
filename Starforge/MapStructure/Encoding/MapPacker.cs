@@ -6,16 +6,11 @@ using System.IO;
 
 namespace Starforge.MapStructure.Encoding {
     public static class MapPacker {
-        public static HashSet<string> IgnoreAttributes;
         public static Dictionary<string, short> StringValues;
         public static short StringCounter;
         public static string[] Lookup;
 
         static MapPacker() {
-            IgnoreAttributes = new HashSet<string>{
-                "_eid"
-            };
-
             StringValues = new Dictionary<string, short>();
         }
 
@@ -137,17 +132,15 @@ namespace Starforge.MapStructure.Encoding {
         public static void CreateLookupTable(BinaryMapElement element) {
             AddLookupValue(element.Name);
             foreach(KeyValuePair<string, object> pair in element.Attributes) {
-                if(!IgnoreAttributes.Contains(pair.Key)) {
-                    if(element.Name == "solids" || element.Name == "bg" && pair.Key == "innerText") {
-                        AddLookupValue(pair.Key);
-                        return;
-                    }
-
+                if(element.Name == "solids" || element.Name == "bg" && pair.Key == "innerText") {
                     AddLookupValue(pair.Key);
-                    AddLookupValue(element.Name);
-                    if(pair.Value is string) {
-                        AddLookupValue(pair.Value.ToString());
-                    }
+                    return;
+                }
+
+                AddLookupValue(pair.Key);
+                AddLookupValue(element.Name);
+                if(pair.Value is string) {
+                    AddLookupValue(pair.Value.ToString());
                 }
             }
             foreach(BinaryMapElement child in element.Children) {
@@ -160,56 +153,52 @@ namespace Starforge.MapStructure.Encoding {
             int attributes = 0;
 
             foreach(string key in element.Attributes.Keys) {
-                if(!IgnoreAttributes.Contains(key)) {
-                    attributes++;
-                }
+                attributes++;
             }
 
             writer.Write(StringValues[element.Name]);
             writer.Write((byte)attributes);
             foreach(KeyValuePair<string, object> pair in element.Attributes) {
-                if(!IgnoreAttributes.Contains(pair.Key)) {
-                    if(pair.Key == "innerText") {
-                        writer.Write(StringValues["innerText"]);
-                        if(element.Name == "solids" || element.Name == "bg") {
-                            byte[] array = RunLengthUtil.Encode(element.GetString("innerText"));
-                            writer.Write((byte)ValueTypes.RLEString);
-                            writer.Write((short)array.Length);
-                            writer.Write(array);
-                        } else {
-                            writer.Write((byte)ValueTypes.String);
-                            writer.Write(element.GetString("innerText"));
-                        }
+                if(pair.Key == "innerText") {
+                    writer.Write(StringValues["innerText"]);
+                    if(element.Name == "solids" || element.Name == "bg") {
+                        byte[] array = RunLengthUtil.Encode(element.GetString("innerText"));
+                        writer.Write((byte)ValueTypes.RLEString);
+                        writer.Write((short)array.Length);
+                        writer.Write(array);
                     } else {
-                        byte type;
-                        object result;
-                        ParseValue(pair.Value.ToString(), out type, out result);
+                        writer.Write((byte)ValueTypes.String);
+                        writer.Write(element.GetString("innerText"));
+                    }
+                } else {
+                    byte type;
+                    object result;
+                    ParseValue(pair.Value.ToString(), out type, out result);
 
-                        writer.Write(StringValues[pair.Key]);
-                        writer.Write(type);
+                    writer.Write(StringValues[pair.Key]);
+                    writer.Write(type);
 
-                        ValueTypes value = (ValueTypes)type;
+                    ValueTypes value = (ValueTypes)type;
 
-                        switch(value) {
-                            case ValueTypes.Bool:
-                                writer.Write((bool)result);
-                                break;
-                            case ValueTypes.Byte:
-                                writer.Write((byte)result);
-                                break;
-                            case ValueTypes.Short:
-                                writer.Write((short)result);
-                                break;
-                            case ValueTypes.Int:
-                                writer.Write((int)result);
-                                break;
-                            case ValueTypes.Float:
-                                writer.Write((float)result);
-                                break;
-                            case ValueTypes.LookupString:
-                                writer.Write(StringValues[(string)result]);
-                                break;
-                        }
+                    switch(value) {
+                        case ValueTypes.Bool:
+                            writer.Write((bool)result);
+                            break;
+                        case ValueTypes.Byte:
+                            writer.Write((byte)result);
+                            break;
+                        case ValueTypes.Short:
+                            writer.Write((short)result);
+                            break;
+                        case ValueTypes.Int:
+                            writer.Write((int)result);
+                            break;
+                        case ValueTypes.Float:
+                            writer.Write((float)result);
+                            break;
+                        case ValueTypes.LookupString:
+                            writer.Write(StringValues[(string)result]);
+                            break;
                     }
                 }
             }
@@ -225,7 +214,6 @@ namespace Starforge.MapStructure.Encoding {
             StringCounter = 0;
 
             CreateLookupTable(element);
-            AddLookupValue("innerText");
 
             writer.Write("CELESTE MAP");
             writer.Write(package);
