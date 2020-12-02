@@ -6,64 +6,115 @@ using System.IO;
 namespace Starforge.Mod.Assets {
     public class Atlas {
         private Dictionary<string, Texture> Textures = new Dictionary<string, Texture>();
-        private Bitmap Image;
-        public string Path;
-        public string DataPath;
+
+        public Bitmap Image {
+            get;
+            private set;
+        }
 
         public Texture this[string id] {
             get => Textures[id];
             set => Textures[id] = value;
         }
 
-        public static Atlas UnpackAtlasMeta(string path) {
+        public static Atlas Unpack(string path, AtlasFormat format) {
             Atlas atlas = new Atlas();
-            atlas.Path = path;
 
-            using(FileStream stream = File.OpenRead(path)) {
-                using(BinaryReader reader = new BinaryReader(stream)) {
-                    reader.ReadInt32();
-                    reader.ReadString();
-                    reader.ReadInt32();
-                    short textures = reader.ReadInt16();
-                    for(int i = 0; i < textures; i++) {
-                        string DataPath = reader.ReadString();
-                        short images = reader.ReadInt16();
-                        for(int j = 0; j < images; j++) {
-                            string AtlasPath = reader.ReadString();
-                            short x = reader.ReadInt16();
-                            short y = reader.ReadInt16();
-                            short w = reader.ReadInt16();
-                            short h = reader.ReadInt16();
-                            short frameX = reader.ReadInt16();
-                            short frameY = reader.ReadInt16();
-                            short frameW = reader.ReadInt16();
-                            short frameH = reader.ReadInt16();
-                            atlas[AtlasPath] = new PackerTexture(atlas, AtlasPath, DataPath, x, y, w, h, frameX, frameY, frameW, frameH);
+            switch(format) {
+                case AtlasFormat.Packer:
+                    using(FileStream stream = File.OpenRead(path)) {
+                        using(BinaryReader reader = new BinaryReader(stream)) {
+                            reader.ReadInt32();
+                            reader.ReadString();
+                            reader.ReadInt32();
+                            short textures = reader.ReadInt16();
+                            for(int i = 0; i < textures; i++) {
+                                string DataPath = reader.ReadString();
+                                short images = reader.ReadInt16();
+                                for(int j = 0; j < images; j++) {
+                                    string AtlasPath = reader.ReadString();
+                                    short x = reader.ReadInt16();
+                                    short y = reader.ReadInt16();
+                                    short w = reader.ReadInt16();
+                                    short h = reader.ReadInt16();
+                                    short frameX = reader.ReadInt16();
+                                    short frameY = reader.ReadInt16();
+                                    short frameW = reader.ReadInt16();
+                                    short frameH = reader.ReadInt16();
+                                    atlas[AtlasPath] = new PackerTexture(atlas, AtlasPath, x, y, w, h, frameX, frameY, frameW, frameH);
+                                }
+                            }
+
+                            // The LINKS section seems to be unused in the Gameplay atlas, so it's not decoded.
                         }
                     }
+                    break;
+                case AtlasFormat.PackerNoAtlas:
+                    // NoAtlas is only used for misc.
+                    using(FileStream stream = File.OpenRead(path)) {
+                        using(BinaryReader reader = new BinaryReader(stream)) {
+                            reader.ReadInt32();
+                            reader.ReadString();
+                            reader.ReadInt32();
+                            short subatlases = reader.ReadInt16();
+                            for(int i = 0; i < subatlases; i++) {
+                                string DataFolder = Path.Combine(
+                                    Path.GetDirectoryName(path),
+                                    reader.ReadString()
+                                );
 
-                    // The LINKS section seems to be unused in the Gameplay atlas, so it's not decoded.
-                }
+                                short textures = reader.ReadInt16();
+                                for(int j = 0; j < textures; j++) {
+                                    string AtlasName = reader.ReadString().Replace('\\', '/');
+
+                                    // Skip useless data
+                                    reader.ReadInt16();
+                                    reader.ReadInt16();
+                                    reader.ReadInt16();
+                                    reader.ReadInt16();
+                                    short x = reader.ReadInt16();
+                                    short y = reader.ReadInt16();
+                                    short w = reader.ReadInt16();
+                                    short h = reader.ReadInt16();
+
+                                    Bitmap img = new Bitmap(w, h);
+                                    atlas[AtlasName] = new Texture(AtlasName, w, h)
+                                    {
+                                        Image = UnpackData(Path.Combine(
+                                            DataFolder,
+                                            AtlasName + ".data"
+                                        ))
+                                    };
+                                }
+                            }
+                        }
+                    }
+                    break;
             }
 
             return atlas;
         }
 
-        public static Atlas UnpackAtlasData(Atlas atlas, string path) {
-            using(FileStream stream = File.OpenRead(atlas.DataPath = path)) {
+        public static Bitmap UnpackData(string path, int inX = 0, int inY = 0, int inW = 0, int inH = 0) {
+            Bitmap img;
+
+            using(FileStream stream = File.OpenRead(path)) {
                 using(BinaryReader reader = new BinaryReader(stream)) {
                     int width = reader.ReadInt32();
                     int height = reader.ReadInt32();
                     bool alpha = reader.ReadBoolean();
 
+                    if(inW != 0) width = inW;
+                    if(inH != 0) height = inH;
+
                     int loop = 0;
                     int r, g, b, a;
-                    r = g = b = a = 0;
+                    r = g = b = a = 255;
 
-                    atlas.Image = new Bitmap(width, height);
+                    img = new Bitmap(width, height);
 
-                    for(int y = 0; y < height; y++) {
-                        for(int x = 0; x < width; x++) {
+                    for(int y = inY; y < height; y++) {
+                        for(int x = inX; x < width; x++) {
                             if(loop == 0) {
                                 loop = reader.ReadByte() - 1;
 
@@ -75,7 +126,7 @@ namespace Starforge.Mod.Assets {
                                         g = reader.ReadByte();
                                         r = reader.ReadByte();
 
-                                        atlas.Image.SetPixel(x, y, Color.FromArgb(a, r, g, b));
+                                        img.SetPixel(x, y, Color.FromArgb(a, r, g, b));
                                     } else {
                                         a = r = g = b = 0;
                                     }
@@ -84,10 +135,10 @@ namespace Starforge.Mod.Assets {
                                     g = reader.ReadByte();
                                     r = reader.ReadByte();
 
-                                    atlas.Image.SetPixel(x, y, Color.FromArgb(byte.MaxValue, r, g, b));
+                                    img.SetPixel(x, y, Color.FromArgb(byte.MaxValue, r, g, b));
                                 }
                             } else {
-                                atlas.Image.SetPixel(x, y, Color.FromArgb(a, r, g, b));
+                                img.SetPixel(x, y, Color.FromArgb(a, r, g, b));
                                 loop--;
                             }
                         }
@@ -95,7 +146,12 @@ namespace Starforge.Mod.Assets {
                 }
             }
 
-            return atlas;
+            return img;
         }
+    }
+
+    public enum AtlasFormat {
+        Packer,
+        PackerNoAtlas
     }
 }

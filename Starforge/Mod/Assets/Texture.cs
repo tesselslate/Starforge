@@ -17,7 +17,6 @@ namespace Starforge.Mod.Assets {
 
     public class PackerTexture : Texture {
         public Atlas Parent;
-        public string DataPath;
         public int X;
         public int Y;
         public int FrameX;
@@ -25,6 +24,6 @@ namespace Starforge.Mod.Assets {
         public int FrameWidth;
         public int FrameHeight;
 
-        public PackerTexture(Atlas parent, string name, string path, int x, int y, int w, int h, int fx, int fy, int fw, int fh) : base(name, w, h) { }
+        public PackerTexture(Atlas parent, string name, int x, int y, int w, int h, int fx, int fy, int fw, int fh) : base(name, w, h) { }
     }
 }
