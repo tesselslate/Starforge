@@ -135,25 +135,27 @@ namespace Starforge.MapStructure {
             bin.Children.Add(levelsElement);
 
             // Add fillers
-            BinaryMapElement fillersElement = new BinaryMapElement()
-            {
-                Name = "Filler"
-            };
-
-            foreach(Rectangle filler in Fillers) {
-                BinaryMapElement rect = new BinaryMapElement()
+            if(Fillers.Count > 0) {
+                BinaryMapElement fillersElement = new BinaryMapElement()
                 {
-                    Name = "rect"
+                    Name = "Filler"
                 };
-                rect.SetAttribute("x", filler.X);
-                rect.SetAttribute("y", filler.Y);
-                rect.SetAttribute("w", filler.Width);
-                rect.SetAttribute("h", filler.Height);
 
-                fillersElement.Children.Add(rect);
+                foreach(Rectangle filler in Fillers) {
+                    BinaryMapElement rect = new BinaryMapElement()
+                    {
+                        Name = "rect"
+                    };
+                    rect.SetAttribute("x", filler.X);
+                    rect.SetAttribute("y", filler.Y);
+                    rect.SetAttribute("w", filler.Width);
+                    rect.SetAttribute("h", filler.Height);
+
+                    fillersElement.Children.Add(rect);
+                }
+
+                bin.Children.Add(fillersElement);
             }
-
-            bin.Children.Add(fillersElement);
 
             // Add styles
             BinaryMapElement stylesElement = new BinaryMapElement() { Name = "Style" };

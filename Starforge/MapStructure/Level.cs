@@ -137,39 +137,51 @@ namespace Starforge.MapStructure {
             };
 
             // Add entities
-            BinaryMapElement entities = new BinaryMapElement()
-            {
-                Name = "entities"
-            };
-            foreach(Entity entity in Entities) {
-                entities.Children.Add(entity.ToBinary());
+            if(Entities.Count > 0) {
+                BinaryMapElement entities = new BinaryMapElement()
+                {
+                    Name = "entities"
+                };
+                foreach(Entity entity in Entities) {
+                    entities.Children.Add(entity.ToBinary());
+                }
+                bin.Children.Add(entities);
             }
 
             // Add triggers
-            BinaryMapElement triggers = new BinaryMapElement()
-            {
-                Name = "triggers"
-            };
-            foreach(Trigger trigger in Triggers) {
-                triggers.Children.Add(trigger.ToBinary());
+            if(Triggers.Count > 0) {
+                BinaryMapElement triggers = new BinaryMapElement()
+                {
+                    Name = "triggers"
+                };
+                foreach(Trigger trigger in Triggers) {
+                    triggers.Children.Add(trigger.ToBinary());
+                }
+                bin.Children.Add(triggers);
             }
 
             // Add background decals
-            BinaryMapElement bgDecals = new BinaryMapElement()
-            {
-                Name = "bgdecals"
-            };
-            foreach(Decal decal in BackgroundDecals) {
-                bgDecals.Children.Add(decal.ToBinary());
+            if(BackgroundDecals.Count > 0) {
+                BinaryMapElement bgDecals = new BinaryMapElement()
+                {
+                    Name = "bgdecals"
+                };
+                foreach(Decal decal in BackgroundDecals) {
+                    bgDecals.Children.Add(decal.ToBinary());
+                }
+                bin.Children.Add(bgDecals);
             }
 
             // Add foreground decals
-            BinaryMapElement fgDecals = new BinaryMapElement()
-            {
-                Name = "fgdecals"
-            };
-            foreach(Decal decal in ForegroundDecals) {
-                fgDecals.Children.Add(decal.ToBinary());
+            if(ForegroundDecals.Count > 0) {
+                BinaryMapElement fgDecals = new BinaryMapElement()
+                {
+                    Name = "fgdecals"
+                };
+                foreach(Decal decal in ForegroundDecals) {
+                    fgDecals.Children.Add(decal.ToBinary());
+                }
+                bin.Children.Add(fgDecals);
             }
 
             // Add background tiles
@@ -178,6 +190,7 @@ namespace Starforge.MapStructure {
                 Name = "bg"
             };
             bgTiles.SetAttribute("innerText", BackgroundTiles.ToString());
+            bin.Children.Add(bgTiles);
 
             // Add foreground tiles
             BinaryMapElement fgTiles = new BinaryMapElement()
@@ -185,6 +198,7 @@ namespace Starforge.MapStructure {
                 Name = "solids"
             };
             fgTiles.SetAttribute("innerText", ForegroundTiles.ToString());
+            bin.Children.Add(fgTiles);
 
             // Add object tiles
             BinaryMapElement objTiles = new BinaryMapElement()
@@ -192,14 +206,6 @@ namespace Starforge.MapStructure {
                 Name = "objtiles"
             };
             objTiles.SetAttribute("innerText", ObjectTiles.ToCSV());
-
-            // Add all the elements
-            bin.Children.Add(entities);
-            bin.Children.Add(triggers);
-            bin.Children.Add(bgDecals);
-            bin.Children.Add(fgDecals);
-            bin.Children.Add(bgTiles);
-            bin.Children.Add(fgTiles);
             bin.Children.Add(objTiles);
 
             return bin;
