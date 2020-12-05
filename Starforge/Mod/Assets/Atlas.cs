@@ -1,6 +1,6 @@
-﻿using Eto.Drawing;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 
 namespace Starforge.Mod.Assets {
@@ -77,7 +77,7 @@ namespace Starforge.Mod.Assets {
                                     short w = reader.ReadInt16();
                                     short h = reader.ReadInt16();
 
-                                    Bitmap img = new Bitmap(new Size(w, h), PixelFormat.Format32bppRgba);
+                                    Bitmap img = new Bitmap(w, h);
                                     atlas[AtlasName] = new Texture(AtlasName, w, h)
                                     {
                                         Image = UnpackData(Path.Combine(
@@ -108,7 +108,7 @@ namespace Starforge.Mod.Assets {
                     int r, g, b, a;
                     r = g = b = a = 255;
 
-                    img = new Bitmap(new Size(width, height), PixelFormat.Format32bppRgba);
+                    img = new Bitmap(width, height);
 
                     for(int y = 0; y < height; y++) {
                         for(int x = 0; x < width; x++) {

@@ -1,4 +1,4 @@
-﻿using Eto.Drawing;
+﻿using System.Drawing;
 
 namespace Starforge.Mod.Assets {
     public class Texture {
