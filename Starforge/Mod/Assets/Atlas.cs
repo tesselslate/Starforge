@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+﻿using Eto.Drawing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -77,7 +77,7 @@ namespace Starforge.Mod.Assets {
                                     short w = reader.ReadInt16();
                                     short h = reader.ReadInt16();
 
-                                    Bitmap img = new Bitmap(w, h);
+                                    Bitmap img = new Bitmap(new Size(w, h), PixelFormat.Format32bppRgba);
                                     atlas[AtlasName] = new Texture(AtlasName, w, h)
                                     {
                                         Image = UnpackData(Path.Combine(
@@ -95,7 +95,7 @@ namespace Starforge.Mod.Assets {
             return atlas;
         }
 
-        public static Bitmap UnpackData(string path, int inX = 0, int inY = 0, int inW = 0, int inH = 0) {
+        public static Bitmap UnpackData(string path) {
             Bitmap img;
 
             using(FileStream stream = File.OpenRead(path)) {
@@ -104,17 +104,14 @@ namespace Starforge.Mod.Assets {
                     int height = reader.ReadInt32();
                     bool alpha = reader.ReadBoolean();
 
-                    if(inW != 0) width = inW;
-                    if(inH != 0) height = inH;
-
                     int loop = 0;
                     int r, g, b, a;
                     r = g = b = a = 255;
 
-                    img = new Bitmap(width, height);
+                    img = new Bitmap(new Size(width, height), PixelFormat.Format32bppRgba);
 
-                    for(int y = inY; y < height; y++) {
-                        for(int x = inX; x < width; x++) {
+                    for(int y = 0; y < height; y++) {
+                        for(int x = 0; x < width; x++) {
                             if(loop == 0) {
                                 loop = reader.ReadByte() - 1;
 
