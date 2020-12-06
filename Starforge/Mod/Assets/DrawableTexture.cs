@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Starforge.Core;
+using System;
 
 namespace Starforge.Mod.Assets {
     public class DrawableTexture {
@@ -50,6 +51,15 @@ namespace Starforge.Mod.Assets {
             Center = new Vector2(Width, Height) * 0.5f;
         }
 
+        public DrawableTexture(DrawableTexture parent, int x, int y, int w, int h) {
+            Texture = parent.Texture;
+            ClipRect = parent.GetRelativeRect(x, y, w, h);
+            DrawOffset = new Vector2(-Math.Min(x - parent.DrawOffset.X, 0f), -Math.Min(y - parent.DrawOffset.Y, 0f));
+            Width = w;
+            Height = h;
+            Center = new Vector2(Width, Height) * 0.5f;
+        }
+
         public void Draw(Vector2 position) {
             Engine.Batch.Draw(Texture.Texture, position, new Rectangle?(ClipRect), Color.White);
         }
@@ -60,6 +70,16 @@ namespace Starforge.Mod.Assets {
 
         public void Draw(Rectangle destination, Color color) {
             Engine.Batch.Draw(Texture.Texture, destination, new Rectangle?(ClipRect), color);
+        }
+
+        public Rectangle GetRelativeRect(int x, int y, int w, int h) {
+            int x0 = (int)(ClipRect.X - DrawOffset.X + x);
+            int y0 = (int)(ClipRect.Y - DrawOffset.Y + y);
+            int x1 = (int)MathHelper.Clamp(x0, ClipRect.Left, ClipRect.Right);
+            int y1 = (int)MathHelper.Clamp(y0, ClipRect.Top, ClipRect.Bottom);
+            int w0 = Math.Max(0, Math.Min(x0 + w, ClipRect.Right) - x1);
+            int h0 = Math.Max(0, Math.Min(y0 + h, ClipRect.Bottom) - y1);
+            return new Rectangle(x1, y1, w0, h0);
         }
     }
 }

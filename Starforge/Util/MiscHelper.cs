@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Starforge.Util {
     public static class MiscHelper {
+        public static Random Rand = new Random();
+
         public static int[,] ReadCSV(string csv, int width, int height) {
             int[,] array = new int[width, height];
 
@@ -31,6 +34,10 @@ namespace Starforge.Util {
             }
 
             return array;
+        }
+
+        public static T Choose<T>(List<T> toChoose) {
+            return toChoose[Rand.Next(toChoose.Count)];
         }
     }
 }

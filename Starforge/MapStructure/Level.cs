@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Starforge.Core;
 using Starforge.MapStructure.Encoding;
+using Starforge.Mod.Assets;
 using Starforge.Util;
 using System.Collections.Generic;
 
@@ -32,23 +34,8 @@ namespace Starforge.MapStructure {
         }
 
         public Rectangle Bounds {
-            get => new Rectangle(X, Y, Width, Height);
-        }
-
-        public Point BottomLeft {
-            get => new Point(Bounds.X, Bounds.Y + Height);
-        }
-
-        public Point BottomRight {
-            get => new Point(Bounds.X + Width, Bounds.Y + Height);
-        }
-
-        public Point TopLeft {
-            get => new Point(Bounds.X, Bounds.Y);
-        }
-
-        public Point TopRight {
-            get => new Point(Bounds.X + Width, Bounds.Y);
+            get;
+            private set;
         }
 
         public List<Entity> Entities;
@@ -58,6 +45,10 @@ namespace Starforge.MapStructure {
         public TileGrid BackgroundTiles;
         public TileGrid ForegroundTiles;
         public TileGrid ObjectTiles;
+
+        private DrawableTexture[,] FgGrid;
+        private DrawableTexture[,] BgGrid;
+        private bool TilesDirty = true;
 
         public LevelMeta Meta;
         public Map Parent;
@@ -148,6 +139,8 @@ namespace Starforge.MapStructure {
                 }
             }
 
+            level.Update();
+
             return level;
         }
 
@@ -231,6 +224,30 @@ namespace Starforge.MapStructure {
             bin.Children.Add(objTiles);
 
             return bin;
+        }
+
+        public void Update() {
+            Bounds = new Rectangle(X, Y, Width, Height);
+        }
+
+        private void RegenerateTileGrids() {
+            BgGrid = Engine.Scene.BGAutotiler.GenerateTextureMap(BackgroundTiles.Tiles);
+            FgGrid = Engine.Scene.FGAutotiler.GenerateTextureMap(ForegroundTiles.Tiles);
+        }
+
+        public void Render() {
+            if(TilesDirty) RegenerateTileGrids();
+
+            GFX.Pixel.Draw(Bounds, Engine.Config.RoomColor);
+
+            for(int i = 0; i < FgGrid.GetLength(0); i++) {
+                for(int j = 0; j < FgGrid.GetLength(1); j++) {
+                    if(BgGrid[i, j] != null)
+                        BgGrid[i, j].Draw(new Vector2(X + i * 8, Y + j * 8));
+                    if(FgGrid[i, j] != null)
+                        FgGrid[i, j].Draw(new Vector2(X + i * 8, Y + j * 8));
+                }
+            }
         }
     }
 

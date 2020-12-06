@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
 using Starforge.MapStructure;
+using Starforge.MapStructure.Tiling;
 using System.Collections.Generic;
 
 namespace Starforge.Editor {
@@ -13,6 +14,10 @@ namespace Starforge.Editor {
         }
 
         public Map LoadedMap;
+
+        public Autotiler BGAutotiler;
+
+        public Autotiler FGAutotiler;
 
         public KeyboardState PreviousKeyboardState {
             get;
@@ -44,6 +49,9 @@ namespace Starforge.Editor {
 
         public void LoadMap(Map map) {
             LoadedMap = map;
+
+            BGAutotiler = new Autotiler("./Content/Graphics/BackgroundTiles.xml");
+            FGAutotiler = new Autotiler("./Content/Graphics/ForegroundTiles.xml");
         }
 
         public void Update() {
@@ -79,12 +87,7 @@ namespace Starforge.Editor {
             if(LoadedMap != null) {
                 List<Level> visible = new List<Level>();
                 foreach(Level level in LoadedMap.Levels) {
-                    if(
-                        Camera.VisibleArea.Contains(level.TopLeft) ||
-                        Camera.VisibleArea.Contains(level.TopRight) ||
-                        Camera.VisibleArea.Contains(level.BottomLeft) ||
-                        Camera.VisibleArea.Contains(level.BottomRight)
-                     ) {
+                    if(Camera.VisibleArea.Intersects(level.Bounds)) {
                         visible.Add(level);
                     }
                 }
@@ -100,7 +103,7 @@ namespace Starforge.Editor {
                                Camera.Transform);
 
             foreach(Level level in VisibleLevels) {
-                GFX.Pixel.Draw(level.Bounds, Color.SlateGray);
+                level.Render();
             }
 
             Engine.Batch.End();

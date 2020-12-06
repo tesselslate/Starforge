@@ -1,9 +1,10 @@
-﻿using System.Text.RegularExpressions;
+﻿using Microsoft.Xna.Framework;
+using System.Text.RegularExpressions;
 
 namespace Starforge.MapStructure {
     public class TileGrid {
         public int this[int x, int y] {
-            get => Tiles[x, y];
+            get => Tiles[(int)MathHelper.Clamp(x, 0, Width), (int)MathHelper.Clamp(y, 0, Height)];
             set => Tiles[x, y] = value;
         }
 
