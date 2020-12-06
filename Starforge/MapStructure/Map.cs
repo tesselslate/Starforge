@@ -1,5 +1,5 @@
-﻿using Starforge.MapStructure.Encoding;
-using Starforge.Util;
+﻿using Microsoft.Xna.Framework;
+using Starforge.MapStructure.Encoding;
 using System.Collections.Generic;
 
 namespace Starforge.MapStructure {
