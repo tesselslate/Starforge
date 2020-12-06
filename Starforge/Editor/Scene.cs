@@ -49,13 +49,26 @@ namespace Starforge.Editor {
             if(kbd.IsKeyDown(Keys.D)) {
                 Camera.Move(new Vector2(10, 0));
             }
+            if(kbd.IsKeyDown(Keys.Down)) {
+                Camera.Zoom -= 0.1f;
+            }
+            if(kbd.IsKeyDown(Keys.Up)) {
+                Camera.Zoom += 0.1f;
+            }
         }
 
         public void UpdateVisibleLevels() {
             if(LoadedMap != null) {
                 List<Level> visible = new List<Level>();
                 foreach(Level level in LoadedMap.Levels) {
-                    if(level.Bounds.Contains(Camera.VisibleArea)) visible.Add(level);
+                    if(
+                        Camera.VisibleArea.Contains(level.TopLeft) ||
+                        Camera.VisibleArea.Contains(level.TopRight) ||
+                        Camera.VisibleArea.Contains(level.BottomLeft) ||
+                        Camera.VisibleArea.Contains(level.BottomRight)
+                     ) {
+                        visible.Add(level);
+                    }
                 }
 
                 VisibleLevels = visible;
@@ -68,8 +81,8 @@ namespace Starforge.Editor {
                                null, null, null, null,
                                Camera.Transform);
 
-            foreach(Level level in LoadedMap.Levels) {
-                GFX.Pixel.Draw(level.Bounds, Color.Gray);
+            foreach(Level level in VisibleLevels) {
+                GFX.Pixel.Draw(level.Bounds, Color.SlateGray);
             }
 
             Engine.Batch.End();

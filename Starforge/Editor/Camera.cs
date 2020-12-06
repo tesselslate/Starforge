@@ -39,6 +39,25 @@ namespace Starforge.Editor {
             set => zoom = MathHelper.Clamp(value, 0.1f, 5f);
         }
 
+        public Point BottomLeft {
+            get;
+            private set;
+        }
+
+        public Point BottomRight {
+            get;
+            private set;
+        }
+        public Point TopLeft {
+            get;
+            private set;
+        }
+
+        public Point TopRight {
+            get;
+            private set;
+        }
+
         public Camera(Viewport viewport) {
             Zoom = 1f;
             Position = Vector2.Zero;
@@ -57,8 +76,6 @@ namespace Starforge.Editor {
         }
 
         public void Update() {
-            Logger.Log(Position.ToString());
-
             Transform = Matrix.CreateTranslation(new Vector3(Position.X, Position.Y, 0))
                     * Matrix.CreateScale(Zoom)
                     * Matrix.CreateTranslation(new Vector3(Viewport.Width, Viewport.Height, 0));
@@ -67,9 +84,9 @@ namespace Starforge.Editor {
 
             // Visible area calculations
             Vector2 tl = Vector2.Transform(Vector2.Zero, Inverse);
-            Vector2 tr = Vector2.Transform(new Vector2(Viewport.X, 0), Inverse);
-            Vector2 bl = Vector2.Transform(new Vector2(0, Viewport.Y), Inverse);
-            Vector2 br = Vector2.Transform(new Vector2(Viewport.X, Viewport.Y), Inverse);
+            Vector2 tr = Vector2.Transform(new Vector2(Viewport.Width, 0), Inverse);
+            Vector2 bl = Vector2.Transform(new Vector2(0, Viewport.Height), Inverse);
+            Vector2 br = Vector2.Transform(new Vector2(Viewport.Width, Viewport.Height), Inverse);
 
             Vector2 min = new Vector2(
                 MathHelper.Min(tl.X, MathHelper.Min(tr.X, MathHelper.Min(bl.X, br.X))),

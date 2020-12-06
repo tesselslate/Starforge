@@ -35,6 +35,22 @@ namespace Starforge.MapStructure {
             get => new Rectangle(X, Y, Width, Height);
         }
 
+        public Point BottomLeft {
+            get => new Point(Bounds.X, Bounds.Y + Height);
+        }
+
+        public Point BottomRight {
+            get => new Point(Bounds.X + Width, Bounds.Y + Height);
+        }
+
+        public Point TopLeft {
+            get => new Point(Bounds.X, Bounds.Y);
+        }
+
+        public Point TopRight {
+            get => new Point(Bounds.X + Width, Bounds.Y);
+        }
+
         public List<Entity> Entities;
         public List<Trigger> Triggers;
         public List<Decal> BackgroundDecals;
