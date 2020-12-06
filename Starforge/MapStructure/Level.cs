@@ -1,4 +1,6 @@
-﻿using Starforge.MapStructure.Encoding;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Starforge.MapStructure.Encoding;
 using Starforge.Util;
 using System.Collections.Generic;
 
@@ -27,6 +29,10 @@ namespace Starforge.MapStructure {
         public string Name {
             get => GetString("name");
             set => SetAttribute("name", value);
+        }
+
+        public Rectangle Bounds {
+            get => new Rectangle(X, Y, Width, Height);
         }
 
         public List<Entity> Entities;
@@ -103,7 +109,7 @@ namespace Starforge.MapStructure {
                     }
                 } else if(child.Name == "objtiles") {
                     level.ObjectTiles = new TileGrid(
-                        MathHelper.ReadCSV(
+                        MiscHelper.ReadCSV(
                             child.GetString("innerText"),
                             level.Width / 8,
                             level.Height / 8

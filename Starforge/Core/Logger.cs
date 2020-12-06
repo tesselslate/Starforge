@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace Starforge.Core {
@@ -12,19 +13,35 @@ namespace Starforge.Core {
 
         public static void LogException(Exception e) {
             Writer.WriteLine(e.ToString());
-            Writer.Flush(); // In case the application doesn't manage to cleanly shut down,
-                            // flush the writer's contents to be sure the error is logged.
+            Writer.Flush();
         }
 
         public static void Log(string msg) {
             if(Level >= LogLevel.Info) {
                 Writer.WriteLine($"[{DateTime.Now.ToString()}] | [Info] {msg}");
+                Writer.Flush();
             }
         }
 
         public static void Log(LogLevel level, string msg) {
             if(level >= Level) {
                 Writer.WriteLine($"[{DateTime.Now.ToString()}] | [{level.ToString()}] {msg}");
+                Writer.Flush();
+            }
+        }
+
+        public static void OpenLog(string path) {
+            if(File.Exists(path)) {
+                try {
+                    // Attempt to open the file at the specified path.
+                    // If it's a txt file (which it should be, if it's a log file),
+                    // it will open with the text editor on the user's system.
+                    // This way the user can see there was an error and give the necessary
+                    // info to get assistance.
+                    Process.Start(path);
+                } catch (Exception e) {
+                    LogException(e);
+                }
             }
         }
 

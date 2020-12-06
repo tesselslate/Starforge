@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Starforge.Core;
 
 namespace Starforge.Mod.Assets {
     public class DrawableTexture {
@@ -47,6 +48,18 @@ namespace Starforge.Mod.Assets {
             Width = w;
             Height = h;
             Center = new Vector2(Width, Height) * 0.5f;
+        }
+
+        public void Draw(Vector2 position) {
+            Engine.Batch.Draw(Texture.Texture, position, new Rectangle?(ClipRect), Color.White);
+        }
+
+        public void Draw(Rectangle destination) {
+            Engine.Batch.Draw(Texture.Texture, destination, new Rectangle?(ClipRect), Color.White);
+        }
+
+        public void Draw(Rectangle destination, Color color) {
+            Engine.Batch.Draw(Texture.Texture, destination, new Rectangle?(ClipRect), color);
         }
     }
 }

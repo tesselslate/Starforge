@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Starforge.Util {
-    public static class MathHelper {
+    public static class MiscHelper {
         public static int[,] ReadCSV(string csv, int width, int height) {
             int[,] array = new int[width, height];
 

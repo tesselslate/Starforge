@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Starforge.Core;
 using System;
 using System.IO;
 
@@ -19,6 +20,12 @@ namespace Starforge.Mod.Assets {
 
         public Texture2D Texture;
 
+        public VirtualTexture(Texture2D texture) {
+            Texture = texture;
+            Width = texture.Width;
+            Height = texture.Height;
+        }
+
         internal VirtualTexture(string path) {
             Path = path;
             Name = path;
@@ -35,13 +42,13 @@ namespace Starforge.Mod.Assets {
 
         public static VirtualTexture CreateTexture(string path) {
             VirtualTexture text = new VirtualTexture(path);
-            Core.Starforge.Instance.VirtualContent.Add(text);
+            Engine.Instance.VirtualContent.Add(text);
             return text;
         }
 
         public static VirtualTexture CreateTexture(string path, int width, int height) {
             VirtualTexture text = new VirtualTexture(path, width, height);
-            Core.Starforge.Instance.VirtualContent.Add(text);
+            Engine.Instance.VirtualContent.Add(text);
             return text;
         }
 
@@ -55,7 +62,7 @@ namespace Starforge.Mod.Assets {
         internal unsafe void Reload() {
             Dispose();
             if(string.IsNullOrEmpty(Path)) {
-                Texture = new Texture2D(Core.Starforge.Instance.GraphicsDevice, Width, Height);
+                Texture = new Texture2D(Engine.Instance.GraphicsDevice, Width, Height);
                 Color[] array = new Color[Width * Height];
                 
                 for(int i = 0; i < array.Length; i++) {
@@ -77,7 +84,7 @@ namespace Starforge.Mod.Assets {
                         int r, g, b, a;
                         r = g = b = a = 255;
 
-                        Texture = new Texture2D(Core.Starforge.Instance.GraphicsDevice, width, height);
+                        Texture = new Texture2D(Engine.Instance.GraphicsDevice, width, height);
 
                         Color[] c = new Color[width * height];
                         int pos = 0;
@@ -117,13 +124,9 @@ namespace Starforge.Mod.Assets {
                         Texture.SetData(c);
                     }
                 }
-                using(FileStream stream2 = File.OpenWrite($"./content/{System.IO.Path.GetFileNameWithoutExtension(Name)}.png")) {
-                    Texture.SaveAsPng(stream2, Width, Height);
-                }
-
             } else if(System.IO.Path.GetExtension(Path) == ".png") {
                 using(FileStream stream = File.OpenRead(Path)) {
-                    Texture = Texture2D.FromStream(Core.Starforge.Instance.GraphicsDevice, stream);
+                    Texture = Texture2D.FromStream(Engine.Instance.GraphicsDevice, stream);
                 }
             }
         }

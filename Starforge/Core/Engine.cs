@@ -2,7 +2,7 @@
 using System.IO;
 
 namespace Starforge.Core {
-    public partial class Starforge {
+    public partial class Engine {
         public static readonly string StarforgeDirectory;
 
         public static bool Loaded {
@@ -10,9 +10,9 @@ namespace Starforge.Core {
             private set;
         }
 
-        public static Starforge Instance;
+        public static Engine Instance;
 
-        static Starforge() {
+        static Engine() {
             StarforgeDirectory = Environment.CurrentDirectory;
             Loaded = false;
         }
@@ -26,17 +26,20 @@ namespace Starforge.Core {
 
             Logger.SetOutputStream(new StreamWriter(logStream));
 
-            using(Starforge sf = new Starforge()) {
+            using(Engine sf = new Engine()) {
+                Logger.Log("Beginning game loop");
                 Instance = sf;
                 sf.Run();
             }
         }
 
-        public static void Exit(int code = 0) {
+        public static void Exit(int code = 0, bool exit = true) {
             Logger.Log("Closing Starforge.");
             Logger.Close();
 
-            Environment.Exit(code);
+            if(exit) {
+                Environment.Exit(code);
+            }
         }
     }
 }

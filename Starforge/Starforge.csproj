@@ -46,8 +46,11 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <Compile Include="Core\Drawing.cs" />
-    <Compile Include="Core\Starforge.Engine.cs" />
+    <Compile Include="Core\Engine.Settings.cs" />
+    <Compile Include="Core\Engine.Game.cs" />
+    <Compile Include="Core\GFX.cs" />
+    <Compile Include="Editor\Camera.cs" />
+    <Compile Include="Editor\Scene.cs" />
     <Compile Include="Mod\Assets\Atlas.cs" />
     <Compile Include="Core\Logger.cs" />
     <Compile Include="MapStructure\Decal.cs" />
@@ -85,14 +88,13 @@
     <Compile Include="MapStructure\Level.cs" />
     <Compile Include="MapStructure\Map.cs" />
     <Compile Include="MapStructure\TileGrid.cs" />
-    <Compile Include="Core\Starforge.cs" />
+    <Compile Include="Core\Engine.cs" />
     <Compile Include="Mod\Assets\DrawableTexture.cs" />
     <Compile Include="Mod\Assets\VirtualTexture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Util\MathHelper.cs" />
+    <Compile Include="Util\MiscHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Editor\" />
     <Folder Include="Platform\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
