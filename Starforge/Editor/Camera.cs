@@ -36,26 +36,10 @@ namespace Starforge.Editor {
 
         public float Zoom {
             get => zoom;
-            set => zoom = MathHelper.Clamp(value, 0.1f, 5f);
-        }
-
-        public Point BottomLeft {
-            get;
-            private set;
-        }
-
-        public Point BottomRight {
-            get;
-            private set;
-        }
-        public Point TopLeft {
-            get;
-            private set;
-        }
-
-        public Point TopRight {
-            get;
-            private set;
+            set {
+                zoom = MathHelper.Clamp(value, 0.1f, 5f);
+                Update();
+            }
         }
 
         public Camera(Viewport viewport) {
@@ -73,6 +57,10 @@ namespace Starforge.Editor {
         public void Goto(Vector2 position) {
             Position = new Vector2(position.X, position.Y);
             Update();
+        }
+
+        public void GotoCentered(Vector2 position) {
+            Position = new Vector2(VisibleArea.Center.X, VisibleArea.Center.Y);
         }
 
         public void Update() {

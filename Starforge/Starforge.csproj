@@ -95,6 +95,7 @@
     <Compile Include="Util\MiscHelper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="MapStructure\Tiling\" />
     <Folder Include="Platform\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

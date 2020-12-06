@@ -14,6 +14,16 @@ namespace Starforge.Editor {
 
         public Map LoadedMap;
 
+        public KeyboardState PreviousKeyboardState {
+            get;
+            private set;
+        }
+
+        public MouseState PreviousMouseState {
+            get;
+            private set;
+        }
+
         public List<Level> VisibleLevels {
             get;
             private set;
@@ -27,6 +37,9 @@ namespace Starforge.Editor {
             // Update visible level list when the camera is moved
             Camera.PositionChange += UpdateVisibleLevels;
             Camera.Update();
+
+            PreviousKeyboardState = new KeyboardState();
+            PreviousMouseState = new MouseState();
         }
 
         public void LoadMap(Map map) {
@@ -37,24 +50,29 @@ namespace Starforge.Editor {
             Camera.Update();
 
             KeyboardState kbd = Keyboard.GetState();
-            if(kbd.IsKeyDown(Keys.W)) {
-                Camera.Move(new Vector2(0, -10));
-            }
-            if(kbd.IsKeyDown(Keys.A)) {
-                Camera.Move(new Vector2(-10, 0));
-            }
-            if(kbd.IsKeyDown(Keys.S)) {
-                Camera.Move(new Vector2(0, 10));
-            }
-            if(kbd.IsKeyDown(Keys.D)) {
-                Camera.Move(new Vector2(10, 0));
-            }
-            if(kbd.IsKeyDown(Keys.Down)) {
+            MouseState m = Mouse.GetState();
+
+            if(m.ScrollWheelValue > PreviousMouseState.ScrollWheelValue) {
+                // Scrolled up
+                Camera.Zoom += 0.1f;
+            } else if(m.ScrollWheelValue < PreviousMouseState.ScrollWheelValue) {
+                // Scrolled down
                 Camera.Zoom -= 0.1f;
             }
-            if(kbd.IsKeyDown(Keys.Up)) {
-                Camera.Zoom += 0.1f;
+
+            if(m.LeftButton == ButtonState.Pressed) {
+                if(m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
+                    // User is dragging mouse
+                    Camera.Move(new Vector2(PreviousMouseState.X - m.X, PreviousMouseState.Y - m.Y) / Camera.Zoom);
+                } else {
+                    // User clicked mouse
+                    
+                }
             }
+
+            // Set previous keyboard/mouse state
+            PreviousKeyboardState = kbd;
+            PreviousMouseState = m;
         }
 
         public void UpdateVisibleLevels() {
