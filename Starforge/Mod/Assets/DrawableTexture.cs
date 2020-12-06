@@ -9,6 +9,8 @@ namespace Starforge.Mod.Assets {
 
         public Rectangle ClipRect { get; private set; }
 
+        private Rectangle? Clip;
+
         public Vector2 DrawOffset { get; private set; }
 
         public VirtualTexture Texture { get; private set; }
@@ -24,6 +26,8 @@ namespace Starforge.Mod.Assets {
             Width = ClipRect.Width;
             Height = ClipRect.Height;
             Center = new Vector2(Width, Height) * 0.5f;
+
+            Clip = new Rectangle?(ClipRect);
         }
 
         public DrawableTexture(VirtualTexture texture, int x, int y, int w, int h) {
@@ -32,6 +36,8 @@ namespace Starforge.Mod.Assets {
             Width = w;
             Height = h;
             Center = new Vector2(Width, Height) * 0.5f;
+
+            Clip = new Rectangle?(ClipRect);
         }
         public DrawableTexture(VirtualTexture texture, Rectangle clipRect, Vector2 drawOffset, int w, int h) {
             Texture = texture;
@@ -40,6 +46,8 @@ namespace Starforge.Mod.Assets {
             Width = w;
             Height = h;
             Center = new Vector2(Width, Height) * 0.5f;
+
+            Clip = new Rectangle?(ClipRect);
         }
 
         public DrawableTexture(VirtualTexture texture, Vector2 drawOffset, int w, int h) {
@@ -49,6 +57,8 @@ namespace Starforge.Mod.Assets {
             Width = w;
             Height = h;
             Center = new Vector2(Width, Height) * 0.5f;
+
+            Clip = new Rectangle?(ClipRect);
         }
 
         public DrawableTexture(DrawableTexture parent, int x, int y, int w, int h) {
@@ -58,18 +68,20 @@ namespace Starforge.Mod.Assets {
             Width = w;
             Height = h;
             Center = new Vector2(Width, Height) * 0.5f;
+
+            Clip = new Rectangle?(ClipRect);
         }
 
         public void Draw(Vector2 position) {
-            Engine.Batch.Draw(Texture.Texture, position, new Rectangle?(ClipRect), Color.White);
+            Engine.Batch.Draw(Texture.Texture, position, Clip, Color.White);
         }
 
         public void Draw(Rectangle destination) {
-            Engine.Batch.Draw(Texture.Texture, destination, new Rectangle?(ClipRect), Color.White);
+            Engine.Batch.Draw(Texture.Texture, destination, Clip, Color.White);
         }
 
         public void Draw(Rectangle destination, Color color) {
-            Engine.Batch.Draw(Texture.Texture, destination, new Rectangle?(ClipRect), color);
+            Engine.Batch.Draw(Texture.Texture, destination, Clip, color);
         }
 
         public Rectangle GetRelativeRect(int x, int y, int w, int h) {

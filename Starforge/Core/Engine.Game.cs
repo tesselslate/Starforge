@@ -47,7 +47,7 @@ namespace Starforge.Core {
             base.Initialize();
 
             Scene = new Scene();
-            using(FileStream stream = File.OpenRead("./Content/Maps/0-Intro.bin")) {
+            using(FileStream stream = File.OpenRead("./Content/Maps/7-Summit.bin")) {
                 using(BinaryReader reader = new BinaryReader(stream)) {
                     Scene.LoadMap(Map.FromBinary(MapPacker.ReadMapBinary(reader)));
                 }

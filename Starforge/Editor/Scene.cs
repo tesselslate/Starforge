@@ -5,6 +5,7 @@ using Starforge.Core;
 using Starforge.MapStructure;
 using Starforge.MapStructure.Tiling;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Starforge.Editor {
     public class Scene {
@@ -97,6 +98,9 @@ namespace Starforge.Editor {
         }
 
         public void Render() {
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+
             Engine.Batch.Begin(SpriteSortMode.Deferred,
                                BlendState.AlphaBlend,
                                null, null, null, null,
@@ -107,6 +111,9 @@ namespace Starforge.Editor {
             }
 
             Engine.Batch.End();
+
+            watch.Stop();
+            Logger.Log($"Rendered in {watch.ElapsedTicks} ticks");
         }
     }
 }

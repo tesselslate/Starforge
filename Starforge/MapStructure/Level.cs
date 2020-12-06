@@ -240,12 +240,17 @@ namespace Starforge.MapStructure {
 
             GFX.Pixel.Draw(Bounds, Engine.Config.RoomColor);
 
+            Vector2 tilePos = new Vector2();
+
             for(int i = 0; i < FgGrid.GetLength(0); i++) {
+                tilePos.X = X + i * 8;
                 for(int j = 0; j < FgGrid.GetLength(1); j++) {
+                    tilePos.Y = Y + j * 8;
+
                     if(BgGrid[i, j] != null)
-                        BgGrid[i, j].Draw(new Vector2(X + i * 8, Y + j * 8));
+                        BgGrid[i, j].Draw(tilePos);
                     if(FgGrid[i, j] != null)
-                        FgGrid[i, j].Draw(new Vector2(X + i * 8, Y + j * 8));
+                        FgGrid[i, j].Draw(tilePos);
                 }
             }
         }
