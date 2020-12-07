@@ -56,8 +56,6 @@ namespace Starforge.Editor {
         }
 
         public void Update() {
-            Camera.Update();
-
             KeyboardState kbd = Keyboard.GetState();
             MouseState m = Mouse.GetState();
 
@@ -105,6 +103,8 @@ namespace Starforge.Editor {
                                BlendState.AlphaBlend,
                                null, null, null, null,
                                Camera.Transform);
+
+            LoadedMap.Render();
 
             foreach(Level level in VisibleLevels) {
                 level.Render();

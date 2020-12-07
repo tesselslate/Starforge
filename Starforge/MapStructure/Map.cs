@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Starforge.Core;
 using Starforge.MapStructure.Encoding;
 using System.Collections.Generic;
 
@@ -92,10 +93,10 @@ namespace Starforge.MapStructure {
                 } else if(child.Name == "Filler") {
                     foreach(BinaryMapElement filler in child.Children) {
                         map.Fillers.Add(new Rectangle(
-                            filler.GetInt("x"),
-                            filler.GetInt("y"),
-                            filler.GetInt("w"),
-                            filler.GetInt("h")
+                            filler.GetInt("x") * 8,
+                            filler.GetInt("y") * 8,
+                            filler.GetInt("w") * 8,
+                            filler.GetInt("h") * 8
                         ));
                     }
                 } else if(child.Name == "Style") {
@@ -146,10 +147,10 @@ namespace Starforge.MapStructure {
                     {
                         Name = "rect"
                     };
-                    rect.SetAttribute("x", filler.X);
-                    rect.SetAttribute("y", filler.Y);
-                    rect.SetAttribute("w", filler.Width);
-                    rect.SetAttribute("h", filler.Height);
+                    rect.SetAttribute("x", filler.X / 8);
+                    rect.SetAttribute("y", filler.Y / 8);
+                    rect.SetAttribute("w", filler.Width / 8);
+                    rect.SetAttribute("h", filler.Height / 8);
 
                     fillersElement.Children.Add(rect);
                 }
@@ -176,6 +177,12 @@ namespace Starforge.MapStructure {
             bin.Children.Add(stylesElement);
 
             return bin;
+        }
+
+        public void Render() {
+            for(int i = 0; i < Fillers.Count; i++) {
+                GFX.Pixel.Draw(Fillers[i], Color.DarkCyan);
+            }
         }
     }
 
