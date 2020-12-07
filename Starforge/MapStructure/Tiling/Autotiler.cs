@@ -1,4 +1,5 @@
-﻿using Starforge.Core;
+﻿using Microsoft.Xna.Framework;
+using Starforge.Core;
 using Starforge.Mod.Assets;
 using Starforge.Util;
 using System;
@@ -78,23 +79,20 @@ namespace Starforge.MapStructure.Tiling {
             }
         }
 
-        public DrawableTexture[,] GenerateTextureMap(int[,] grid) {
-            DrawableTexture[,] textures = new DrawableTexture[grid.GetLength(0), grid.GetLength(1)];
+        public DrawableTexture[] GenerateTextureMap(int[,] grid, int offsetX, int offsetY) {
+            List<DrawableTexture> textures = new List<DrawableTexture>();
 
             for(int i = 0; i < grid.GetLength(0); i++) {
                 for(int j = 0; j < grid.GetLength(1); j++) {
-                    textures[i, j] = GetTextureAtLocation(i, j, grid);
+                    if(grid[i, j] != 48) {
+                        DrawableTexture tex = Tilesets[(char)grid[i, j]][0,0];
+                        tex.PregeneratedPosition = new Vector2(i * 8 + offsetX, j * 8 + offsetY);
+                        textures.Add(tex);
+                    }
                 }
             }
 
-            return textures;
-        }
-
-        private DrawableTexture GetTextureAtLocation(int x, int y, int[,] grid) {
-            if(grid[x, y] == 48) return null;
-
-            Tileset t = Tilesets[(char)grid[x, y]];
-            return t[0, 0];
+            return textures.ToArray();
         }
     }
 }

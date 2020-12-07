@@ -46,8 +46,8 @@ namespace Starforge.MapStructure {
         public TileGrid ForegroundTiles;
         public TileGrid ObjectTiles;
 
-        private DrawableTexture[,] FgGrid;
-        private DrawableTexture[,] BgGrid;
+        private DrawableTexture[] FgGrid;
+        private DrawableTexture[] BgGrid;
         private bool TilesDirty = true;
 
         public LevelMeta Meta;
@@ -231,8 +231,9 @@ namespace Starforge.MapStructure {
         }
 
         private void RegenerateTileGrids() {
-            BgGrid = Engine.Scene.BGAutotiler.GenerateTextureMap(BackgroundTiles.Tiles);
-            FgGrid = Engine.Scene.FGAutotiler.GenerateTextureMap(ForegroundTiles.Tiles);
+            BgGrid = Engine.Scene.BGAutotiler.GenerateTextureMap(BackgroundTiles.Tiles, X, Y);
+            FgGrid = Engine.Scene.FGAutotiler.GenerateTextureMap(ForegroundTiles.Tiles, X, Y);
+            TilesDirty = false;
         }
 
         public void Render() {
@@ -240,18 +241,11 @@ namespace Starforge.MapStructure {
 
             GFX.Pixel.Draw(Bounds, Engine.Config.RoomColor);
 
-            Vector2 tilePos = new Vector2();
-
-            for(int i = 0; i < FgGrid.GetLength(0); i++) {
-                tilePos.X = X + i * 8;
-                for(int j = 0; j < FgGrid.GetLength(1); j++) {
-                    tilePos.Y = Y + j * 8;
-
-                    if(BgGrid[i, j] != null)
-                        BgGrid[i, j].Draw(tilePos);
-                    if(FgGrid[i, j] != null)
-                        FgGrid[i, j].Draw(tilePos);
-                }
+            for(int pos = 0; pos < BgGrid.Length; pos++) {
+                BgGrid[pos].PregeneratedDraw();
+            }
+            for(int pos = 0; pos < FgGrid.Length; pos++) {
+                FgGrid[pos].PregeneratedDraw();
             }
         }
     }

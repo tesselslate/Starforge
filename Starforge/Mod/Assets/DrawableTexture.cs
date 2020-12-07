@@ -4,7 +4,7 @@ using Starforge.Core;
 using System;
 
 namespace Starforge.Mod.Assets {
-    public class DrawableTexture {
+    public struct DrawableTexture {
         public Vector2 Center { get; private set; }
 
         public Rectangle ClipRect { get; private set; }
@@ -12,6 +12,8 @@ namespace Starforge.Mod.Assets {
         private Rectangle? Clip;
 
         public Vector2 DrawOffset { get; private set; }
+
+        public Vector2 PregeneratedPosition;
 
         public VirtualTexture Texture { get; private set; }
 
@@ -28,6 +30,7 @@ namespace Starforge.Mod.Assets {
             Center = new Vector2(Width, Height) * 0.5f;
 
             Clip = new Rectangle?(ClipRect);
+            PregeneratedPosition = Vector2.Zero;
         }
 
         public DrawableTexture(VirtualTexture texture, int x, int y, int w, int h) {
@@ -38,6 +41,8 @@ namespace Starforge.Mod.Assets {
             Center = new Vector2(Width, Height) * 0.5f;
 
             Clip = new Rectangle?(ClipRect);
+            DrawOffset = Vector2.Zero;
+            PregeneratedPosition = Vector2.Zero;
         }
         public DrawableTexture(VirtualTexture texture, Rectangle clipRect, Vector2 drawOffset, int w, int h) {
             Texture = texture;
@@ -48,6 +53,7 @@ namespace Starforge.Mod.Assets {
             Center = new Vector2(Width, Height) * 0.5f;
 
             Clip = new Rectangle?(ClipRect);
+            PregeneratedPosition = Vector2.Zero;
         }
 
         public DrawableTexture(VirtualTexture texture, Vector2 drawOffset, int w, int h) {
@@ -59,6 +65,7 @@ namespace Starforge.Mod.Assets {
             Center = new Vector2(Width, Height) * 0.5f;
 
             Clip = new Rectangle?(ClipRect);
+            PregeneratedPosition = Vector2.Zero;
         }
 
         public DrawableTexture(DrawableTexture parent, int x, int y, int w, int h) {
@@ -70,6 +77,7 @@ namespace Starforge.Mod.Assets {
             Center = new Vector2(Width, Height) * 0.5f;
 
             Clip = new Rectangle?(ClipRect);
+            PregeneratedPosition = Vector2.Zero;
         }
 
         public void Draw(Vector2 position) {
@@ -82,6 +90,10 @@ namespace Starforge.Mod.Assets {
 
         public void Draw(Rectangle destination, Color color) {
             Engine.Batch.Draw(Texture.Texture, destination, Clip, color);
+        }
+
+        public void PregeneratedDraw() {
+            Engine.Batch.Draw(Texture.Texture, PregeneratedPosition, Clip, Color.White);
         }
 
         public Rectangle GetRelativeRect(int x, int y, int w, int h) {

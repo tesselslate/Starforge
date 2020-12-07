@@ -101,7 +101,7 @@ namespace Starforge.Editor {
 
             Engine.Batch.Begin(SpriteSortMode.Deferred,
                                BlendState.AlphaBlend,
-                               null, null, null, null,
+                               SamplerState.PointClamp, null, null, null,
                                Camera.Transform);
 
             LoadedMap.Render();
@@ -113,7 +113,6 @@ namespace Starforge.Editor {
             Engine.Batch.End();
 
             watch.Stop();
-            Logger.Log($"Rendered in {watch.ElapsedTicks} ticks");
         }
     }
 }

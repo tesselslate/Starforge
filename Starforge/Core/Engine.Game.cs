@@ -30,6 +30,8 @@ namespace Starforge.Core {
             private set;
         }
 
+        private int Timer = 100;
+
         private Engine() {
             GraphicsDeviceManager gdm = new GraphicsDeviceManager(this);
 
@@ -69,9 +71,10 @@ namespace Starforge.Core {
         }
 
         protected override void Draw(GameTime gameTime) {
+            base.Draw(gameTime);
+
             GraphicsDevice.Clear(Config.BackgroundColor);
             Scene.Render();
-            base.Draw(gameTime);
         }
 
         protected override void Update(GameTime gameTime) {
