@@ -53,27 +53,33 @@ namespace Starforge.Editor {
 
             BGAutotiler = new Autotiler("./Content/Graphics/BackgroundTiles.xml");
             FGAutotiler = new Autotiler("./Content/Graphics/ForegroundTiles.xml");
+
+            Camera.Zoom = 1f;
+            Camera.GotoCentered(Vector2.Zero);
+            Camera.Update();
         }
 
         public void Update() {
             KeyboardState kbd = Keyboard.GetState();
             MouseState m = Mouse.GetState();
 
-            if(m.ScrollWheelValue > PreviousMouseState.ScrollWheelValue) {
-                // Scrolled up
-                Camera.Zoom += 0.1f;
-            } else if(m.ScrollWheelValue < PreviousMouseState.ScrollWheelValue) {
-                // Scrolled down
-                Camera.Zoom -= 0.1f;
-            }
+            if(Engine.Instance.IsActive) {
+                if(m.ScrollWheelValue > PreviousMouseState.ScrollWheelValue) {
+                    // Scrolled up
+                    Camera.ZoomIn(new Vector2(m.X, m.Y));
+                } else if(m.ScrollWheelValue < PreviousMouseState.ScrollWheelValue) {
+                    // Scrolled down
+                    Camera.ZoomOut(new Vector2(m.X, m.Y));
+                }
 
-            if(m.LeftButton == ButtonState.Pressed) {
-                if(m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
-                    // User is dragging mouse
-                    Camera.Move(new Vector2(PreviousMouseState.X - m.X, PreviousMouseState.Y - m.Y) / Camera.Zoom);
-                } else {
-                    // User clicked mouse
-                    
+                if(m.RightButton == ButtonState.Pressed) {
+                    if(m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
+                        // User is dragging mouse
+                        Camera.Move(new Vector2(PreviousMouseState.X - m.X, PreviousMouseState.Y - m.Y) / Camera.Zoom);
+                    } else {
+                        // User clicked mouse
+
+                    }
                 }
             }
 

@@ -37,7 +37,7 @@ namespace Starforge.Editor {
         public float Zoom {
             get => zoom;
             set {
-                zoom = MathHelper.Clamp(value, 0.1f, 2.5f);
+                zoom = MathHelper.Clamp(value, 0.125f, 4f);
                 Update();
             }
         }
@@ -60,7 +60,7 @@ namespace Starforge.Editor {
         }
 
         public void GotoCentered(Vector2 position) {
-            Position = new Vector2(VisibleArea.Center.X, VisibleArea.Center.Y);
+            Position = new Vector2(position.X - Bounds.Width / 2, position.Y - Bounds.Height / 2);
         }
 
         public void Update() {
@@ -100,6 +100,26 @@ namespace Starforge.Editor {
         // Convert a position on the screen to a position on the map.
         public Vector2 ScreenToReal(Vector2 position) {
             return Vector2.Transform(position, Matrix.Invert(Transform));
+        }
+
+        public void ZoomOut(Vector2 pos) {
+            GotoCentered(ScreenToReal(pos));
+
+            Zoom /= 2f;
+            Update();
+
+            GotoCentered(ScreenToReal(pos));
+            Update();
+        }
+
+        public void ZoomIn(Vector2 pos) {
+            GotoCentered(ScreenToReal(pos));
+
+            Zoom *= 2f;
+            Update();
+
+            GotoCentered(ScreenToReal(pos));
+            Update();
         }
     }
 }

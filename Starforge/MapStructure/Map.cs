@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Starforge.Core;
 using Starforge.MapStructure.Encoding;
+using Starforge.Util;
+using System;
 using System.Collections.Generic;
 
 namespace Starforge.MapStructure {
@@ -14,6 +16,11 @@ namespace Starforge.MapStructure {
         public List<Level> Levels;
         public List<Style> BackgroundStyles;
         public List<Style> ForegroundStyles;
+
+        // This seed is generated based off the map name.
+        // It's not the exact same as Celeste's, but it just needs to be
+        // a consistent seed.
+        private static int RNGSeed = 0;
 
         public Map(string package) {
             Name = "Map";
@@ -29,6 +36,13 @@ namespace Starforge.MapStructure {
             Levels = new List<Level>();
             BackgroundStyles = new List<Style>();
             ForegroundStyles = new List<Style>();
+
+            // Generate map RNG seed
+            int seed = 0;
+            foreach(char c in package) seed += c;
+
+            RNGSeed = seed;
+            ResetRNG();
         }
 
         public static Style ParseStyle(BinaryMapElement style, BinaryMapElement parent) {
@@ -183,6 +197,10 @@ namespace Starforge.MapStructure {
             for(int i = 0; i < Fillers.Count; i++) {
                 GFX.Pixel.Draw(Fillers[i], Color.DarkCyan);
             }
+        }
+
+        public void ResetRNG() {
+            MiscHelper.Rand = new Random(RNGSeed);
         }
     }
 

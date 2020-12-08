@@ -231,8 +231,10 @@ namespace Starforge.MapStructure {
         }
 
         private void RegenerateTileGrids() {
-            BgGrid = Engine.Scene.BGAutotiler.GenerateTextureMap(BackgroundTiles.Tiles, X, Y);
-            FgGrid = Engine.Scene.FGAutotiler.GenerateTextureMap(ForegroundTiles.Tiles, X, Y);
+            Parent.ResetRNG();
+
+            BgGrid = Engine.Scene.BGAutotiler.GenerateTextureMap(BackgroundTiles, X, Y);
+            FgGrid = Engine.Scene.FGAutotiler.GenerateTextureMap(ForegroundTiles, X, Y);
             TilesDirty = false;
         }
 

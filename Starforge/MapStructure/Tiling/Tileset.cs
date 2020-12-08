@@ -34,7 +34,7 @@ namespace Starforge.MapStructure.Tiling {
 
         public List<DrawableTexture> Center;
 
-        public Dictionary<string, List<DrawableTexture>> Masks;
+        public List<TileMask> Masks;
 
         public List<DrawableTexture> Padding;
 
@@ -61,5 +61,11 @@ namespace Starforge.MapStructure.Tiling {
 
             return list;
         }
+    }
+
+    public class TileMask {
+        public byte[] Mask = new byte[9];
+
+        public List<DrawableTexture> Textures = new List<DrawableTexture>();
     }
 }

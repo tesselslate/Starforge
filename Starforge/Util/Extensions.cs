@@ -8,7 +8,7 @@ namespace Starforge.Util {
         }
 
         public static char AttrChar(this XmlElement el, string attributeName) {
-            return Convert.ToChar(el.Attributes[attributeName].InnerText);
+            return Convert.ToChar(el.Attributes[attributeName].Value);
         }
     }
 }

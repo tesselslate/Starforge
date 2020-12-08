@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 namespace Starforge.MapStructure {
     public class TileGrid {
         public int this[int x, int y] {
-            get => Tiles[(int)MathHelper.Clamp(x, 0, Width), (int)MathHelper.Clamp(y, 0, Height)];
+            get => Tiles[x, y];
             set => Tiles[x, y] = value;
         }
 

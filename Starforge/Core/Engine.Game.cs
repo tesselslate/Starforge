@@ -30,8 +30,6 @@ namespace Starforge.Core {
             private set;
         }
 
-        private int Timer = 100;
-
         private Engine() {
             GraphicsDeviceManager gdm = new GraphicsDeviceManager(this);
 
