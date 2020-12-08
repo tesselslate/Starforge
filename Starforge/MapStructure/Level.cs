@@ -38,6 +38,11 @@ namespace Starforge.MapStructure {
             private set;
         }
 
+        public Vector2 Position {
+            get;
+            private set;
+        }
+
         public List<Entity> Entities;
         public List<Trigger> Triggers;
         public List<Decal> BackgroundDecals;
@@ -49,6 +54,14 @@ namespace Starforge.MapStructure {
         private DrawableTexture[] FgGrid;
         private DrawableTexture[] BgGrid;
         private bool TilesDirty = true;
+
+        public RenderTarget2D Target { get; private set; }
+        public bool Dirty {
+            get => NeedsRerender;
+            set => NeedsRerender = value;
+         }
+
+        private bool NeedsRerender = true;
 
         public LevelMeta Meta;
         public Map Parent;
@@ -228,6 +241,13 @@ namespace Starforge.MapStructure {
 
         public void Update() {
             Bounds = new Rectangle(X, Y, Width, Height);
+            Position = new Vector2(X, Y);
+
+            Target = new RenderTarget2D(
+                Engine.Instance.GraphicsDevice,
+                Width, Height, false,
+                SurfaceFormat.Color, DepthFormat.None,
+                0, RenderTargetUsage.PreserveContents);
         }
 
         private void RegenerateTileGrids() {
@@ -239,9 +259,15 @@ namespace Starforge.MapStructure {
         }
 
         public void Render() {
+            Engine.Instance.GraphicsDevice.SetRenderTarget(Target);
+            Engine.Instance.GraphicsDevice.Clear(Engine.Config.RoomColor);
+
+            Engine.Batch.Begin(SpriteSortMode.Deferred,
+                               BlendState.AlphaBlend,
+                               SamplerState.PointClamp, null, RasterizerState.CullNone, null);
+
             if(TilesDirty) RegenerateTileGrids();
 
-            GFX.Pixel.Draw(Bounds, Engine.Config.RoomColor);
 
             for(int pos = 0; pos < BgGrid.Length; pos++) {
                 BgGrid[pos].PregeneratedDraw();
@@ -249,6 +275,9 @@ namespace Starforge.MapStructure {
             for(int pos = 0; pos < FgGrid.Length; pos++) {
                 FgGrid[pos].PregeneratedDraw();
             }
+
+            Engine.Batch.End();
+            Dirty = false;
         }
     }
 

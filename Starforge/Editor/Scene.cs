@@ -35,6 +35,8 @@ namespace Starforge.Editor {
             private set;
         }
 
+        private List<Level> LevelTargets;
+
         public Scene() {
             VisibleLevels = new List<Level>();
 
@@ -102,23 +104,30 @@ namespace Starforge.Editor {
         }
 
         public void Render() {
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
+            LevelTargets = new List<Level>();
+
+            // Rerender "dirty" levels (those which need to be rerendered)
+            foreach(Level level in VisibleLevels) {
+                if(level.Dirty) level.Render();
+                LevelTargets.Add(level);
+            }
+
+            Engine.Instance.GraphicsDevice.SetRenderTarget(null);
+            Engine.Instance.GraphicsDevice.Clear(Engine.Config.BackgroundColor);
 
             Engine.Batch.Begin(SpriteSortMode.Deferred,
-                               BlendState.AlphaBlend,
-                               SamplerState.PointClamp, null, null, null,
-                               Camera.Transform);
+                BlendState.AlphaBlend,
+                SamplerState.PointWrap, null, 
+                RasterizerState.CullNone, null,
+                Camera.Transform);
 
             LoadedMap.Render();
 
-            foreach(Level level in VisibleLevels) {
-                level.Render();
+            foreach(Level level in LevelTargets) {
+                Engine.Batch.Draw(level.Target, level.Position, Color.White);
             }
 
             Engine.Batch.End();
-
-            watch.Stop();
         }
     }
 }

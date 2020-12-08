@@ -37,7 +37,7 @@ namespace Starforge.Editor {
         public float Zoom {
             get => zoom;
             set {
-                zoom = MathHelper.Clamp(value, 0.125f, 4f);
+                zoom = MathHelper.Clamp(value, 0.015625f, 4f);
                 Update();
             }
         }

@@ -70,8 +70,6 @@ namespace Starforge.Core {
 
         protected override void Draw(GameTime gameTime) {
             base.Draw(gameTime);
-
-            GraphicsDevice.Clear(Config.BackgroundColor);
             Scene.Render();
         }
 

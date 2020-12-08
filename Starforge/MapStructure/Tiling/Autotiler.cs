@@ -149,7 +149,7 @@ namespace Starforge.MapStructure.Tiling {
                         }
 
                         // Texture generation
-                        tex.PregeneratedPosition = new Vector2(i * 8 + offsetX, j * 8 + offsetY);
+                        tex.PregeneratedPosition = new Vector2(i * 8, j * 8);
                         textures.Add(tex);
                     }
                 }
