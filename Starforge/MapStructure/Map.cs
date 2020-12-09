@@ -195,7 +195,7 @@ namespace Starforge.MapStructure {
 
         public void Render() {
             for(int i = 0; i < Fillers.Count; i++) {
-                GFX.Pixel.Draw(Fillers[i], Color.DarkCyan);
+                GFX.Pixel.Draw(Fillers[i], Color.Gray);
             }
         }
 

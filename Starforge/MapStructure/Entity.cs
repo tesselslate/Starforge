@@ -1,5 +1,8 @@
-﻿using Starforge.Core;
+﻿using Microsoft.Xna.Framework;
+using Starforge.Core;
 using Starforge.MapStructure.Encoding;
+using Starforge.Mod;
+using Starforge.Mod.Assets;
 using System.Collections.Generic;
 
 namespace Starforge.MapStructure {
@@ -26,21 +29,23 @@ namespace Starforge.MapStructure {
 
         public readonly string Name;
 
-        public List<Node> Nodes;
+        public List<Vector2> Nodes;
         public Level Level;
 
-        public Entity(Level level, BinaryMapElement data) {
+        public Entity(Level level, EntityData data) {
             Name = data.Name;
+            Nodes = new List<Vector2>();
 
-            if(data.Children.Count > 0) {
-                Nodes = new List<Node>();
-                foreach(BinaryMapElement node in data.Children) {
-                    Nodes.Add(new Node(node));
-                }
+            if(data.Nodes.Count > 0) {
+                foreach(Vector2 node in data.Nodes) Nodes.Add(node);
             }
 
             Level = level;
-            Attributes = data.Attributes;
+            foreach(KeyValuePair<string, object> pair in data.Attributes) Attributes.Add(pair.Key, pair.Value);
+        }
+
+        public Entity(string name) {
+            Name = name;
         }
 
         public override BinaryMapElement ToBinary() {
@@ -49,10 +54,10 @@ namespace Starforge.MapStructure {
                 Name = Name
             };
 
-            bin.Attributes = Attributes;
+            foreach(KeyValuePair<string, object> pair in Attributes) bin.Attributes.Add(pair.Key, pair.Value);
 
-            if(Nodes != null) {
-                foreach(Node node in Nodes) {
+            if(Nodes.Count > 0) {
+                foreach(Vector2 node in Nodes) {
                     BinaryMapElement binNode = new BinaryMapElement()
                     {
                         Name = "node"
@@ -67,22 +72,24 @@ namespace Starforge.MapStructure {
 
             return bin;
         }
+
+        public virtual void Render() { }
     }
 
     public class Trigger : Entity {
-        public Trigger(Level level, BinaryMapElement data) : base(level, data) { }
+        public Trigger(Level level, EntityData data) : base(level, data) { }
     }
 
-    public struct Node {
-        public float X;
-        public float Y;
+    [EntityDefinition("player")]
+    public class Player : Entity {
+        private static DrawableTexture Sprite = GFX.Gameplay["characters/player/sitDown00"];
 
-        public Node(BinaryMapElement element) {
-            if(element.Name != "node")
-                Logger.Log(LogLevel.Warning, "Attempted to create entity node from " + element.Name);
+        public Player(Level level, EntityData data) : base(level, data) { }
 
-            X = element.GetFloat("x", 0);
-            Y = element.GetFloat("y", 0);
+        public override void Render() {
+            base.Render();
+
+            Sprite.Draw(new Vector2(X, Y));
         }
     }
 }

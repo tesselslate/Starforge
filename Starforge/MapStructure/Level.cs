@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Starforge.Core;
 using Starforge.MapStructure.Encoding;
+using Starforge.Mod;
 using Starforge.Mod.Assets;
 using Starforge.Util;
 using System.Collections.Generic;
@@ -101,11 +102,11 @@ namespace Starforge.MapStructure {
             foreach(BinaryMapElement child in element.Children) {
                 if(child.Name == "entities") {
                     foreach(BinaryMapElement entity in child.Children) {
-                        level.Entities.Add(new Entity(level, entity));
+                        level.Entities.Add(EntityRegistry.Create(level, entity));
                     }
                 } else if(child.Name == "triggers") {
                     foreach(BinaryMapElement trigger in child.Children) {
-                        level.Triggers.Add(new Trigger(level, trigger));
+                        level.Triggers.Add(EntityRegistry.CreateTrigger(level, trigger));
                     }
                 } else if(child.Name == "bgdecals") {
                     foreach(BinaryMapElement decal in child.Children) {
@@ -276,6 +277,11 @@ namespace Starforge.MapStructure {
             // Background decals
             for(int pos = 0; pos < BackgroundDecals.Count; pos++) {
                 BackgroundDecals[pos].Texture.PregeneratedDrawCentered();
+            }
+
+            // Entities
+            for(int pos = 0; pos < Entities.Count; pos++) {
+                Entities[pos].Render();
             }
 
             // Foreground tiles

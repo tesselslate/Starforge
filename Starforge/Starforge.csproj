@@ -93,6 +93,9 @@
     <Compile Include="Core\Engine.cs" />
     <Compile Include="Mod\Assets\DrawableTexture.cs" />
     <Compile Include="Mod\Assets\VirtualTexture.cs" />
+    <Compile Include="Mod\DefinitionAttributes.cs" />
+    <Compile Include="Mod\EntityData.cs" />
+    <Compile Include="Mod\Registry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\MiscHelper.cs" />
