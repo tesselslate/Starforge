@@ -57,12 +57,7 @@ namespace Starforge.MapStructure {
         private bool TilesDirty = true;
 
         public RenderTarget2D Target { get; private set; }
-        public bool Dirty {
-            get => NeedsRerender;
-            set => NeedsRerender = value;
-         }
-
-        private bool NeedsRerender = true;
+        public bool Dirty = true;
 
         public LevelMeta Meta;
         public Map Parent;

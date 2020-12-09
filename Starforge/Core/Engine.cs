@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Starforge.Mod;
+using System;
 using System.IO;
 
 namespace Starforge.Core {
@@ -18,6 +19,9 @@ namespace Starforge.Core {
         }
 
         public static void Main(string[] args) {
+            if(File.Exists("./log_old.txt")) File.Delete("./log_old.txt");
+            File.Move("./log.txt", "./log_old.txt");
+
             // Set log stream
             FileStream logStream = File.OpenWrite(Path.Combine(
                 StarforgeDirectory,
@@ -25,6 +29,9 @@ namespace Starforge.Core {
             ));
 
             Logger.SetOutputStream(new StreamWriter(logStream));
+
+            // Load plugins (first stage mod loading)
+            Loader.LoadPluginAssemblies();
 
             using(Engine sf = new Engine()) {
                 Logger.Log("Beginning game loop");

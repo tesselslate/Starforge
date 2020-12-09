@@ -46,6 +46,7 @@ namespace Starforge.Core {
         protected override void Initialize() {
             base.Initialize();
 
+            // Load map
             Scene = new Scene();
             using(FileStream stream = File.OpenRead("./Content/Maps/7-Summit.bin")) {
                 using(BinaryReader reader = new BinaryReader(stream)) {
