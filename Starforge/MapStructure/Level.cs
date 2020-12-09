@@ -112,8 +112,8 @@ namespace Starforge.MapStructure {
                         level.BackgroundDecals.Add(new Decal(
                             decal.GetFloat("x"),
                             decal.GetFloat("y"),
-                            decal.GetFloat("scaleX"),
-                            decal.GetFloat("scaleY"),
+                            decal.GetFloat("scaleX", 1),
+                            decal.GetFloat("scaleY", 1),
                             decal.GetString("texture")
                         ));
                     }
@@ -122,8 +122,8 @@ namespace Starforge.MapStructure {
                         level.ForegroundDecals.Add(new Decal(
                             decal.GetFloat("x"),
                             decal.GetFloat("y"),
-                            decal.GetFloat("scaleX"),
-                            decal.GetFloat("scaleY"),
+                            decal.GetFloat("scaleX", 1),
+                            decal.GetFloat("scaleY", 1),
                             decal.GetString("texture")
                         ));
                     }
@@ -268,12 +268,24 @@ namespace Starforge.MapStructure {
 
             if(TilesDirty) RegenerateTileGrids();
 
-
+            // Background tiles
             for(int pos = 0; pos < BgGrid.Length; pos++) {
                 BgGrid[pos].PregeneratedDraw();
             }
+
+            // Background decals
+            for(int pos = 0; pos < BackgroundDecals.Count; pos++) {
+                BackgroundDecals[pos].Texture.PregeneratedDrawCentered();
+            }
+
+            // Foreground tiles
             for(int pos = 0; pos < FgGrid.Length; pos++) {
                 FgGrid[pos].PregeneratedDraw();
+            }
+
+            // Foreground decals
+            for(int pos = 0; pos < ForegroundDecals.Count; pos++) {
+                ForegroundDecals[pos].Texture.PregeneratedDrawCentered();
             }
 
             Engine.Batch.End();

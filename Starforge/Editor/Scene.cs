@@ -35,8 +35,6 @@ namespace Starforge.Editor {
             private set;
         }
 
-        private List<Level> LevelTargets;
-
         public Scene() {
             VisibleLevels = new List<Level>();
 
@@ -104,12 +102,9 @@ namespace Starforge.Editor {
         }
 
         public void Render() {
-            LevelTargets = new List<Level>();
-
             // Rerender "dirty" levels (those which need to be rerendered)
             foreach(Level level in VisibleLevels) {
                 if(level.Dirty) level.Render();
-                LevelTargets.Add(level);
             }
 
             Engine.Instance.GraphicsDevice.SetRenderTarget(null);
@@ -123,7 +118,7 @@ namespace Starforge.Editor {
 
             LoadedMap.Render();
 
-            foreach(Level level in LevelTargets) {
+            foreach(Level level in VisibleLevels) {
                 Engine.Batch.Draw(level.Target, level.Position, Color.White);
             }
 

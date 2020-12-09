@@ -9,17 +9,25 @@ namespace Starforge.Mod.Assets {
 
         public Rectangle ClipRect { get; private set; }
 
-        private Rectangle? Clip;
-
         public Vector2 DrawOffset { get; private set; }
-
-        public Vector2 PregeneratedPosition;
 
         public VirtualTexture Texture { get; private set; }
 
         public int Width { get; private set; }
         
         public int Height { get; private set; }
+
+        // Used in PregeneratedDraw for sprites which have a destination rectangle.
+        public Rectangle PregeneratedDestination;
+
+        // Used in PregeneratedDraw so that positions don't need to be regenerated often.
+        public Vector2 PregeneratedPosition;
+
+        // Used in PregeneratedDraw
+        public Vector2 PregeneratedScale;
+
+        // Used so that ClipRect isn't converted to a nullable rectangle on each draw call.
+        private Rectangle? NullableClipRect;
 
         public DrawableTexture(VirtualTexture texture) {
             Texture = texture;
@@ -29,8 +37,10 @@ namespace Starforge.Mod.Assets {
             Height = ClipRect.Height;
             Center = new Vector2(Width, Height) * 0.5f;
 
-            Clip = new Rectangle?(ClipRect);
             PregeneratedPosition = Vector2.Zero;
+            NullableClipRect = new Rectangle?(ClipRect);
+            PregeneratedDestination = default;
+            PregeneratedScale = Vector2.One;
         }
 
         public DrawableTexture(VirtualTexture texture, int x, int y, int w, int h) {
@@ -39,10 +49,12 @@ namespace Starforge.Mod.Assets {
             Width = w;
             Height = h;
             Center = new Vector2(Width, Height) * 0.5f;
-
-            Clip = new Rectangle?(ClipRect);
             DrawOffset = Vector2.Zero;
+
             PregeneratedPosition = Vector2.Zero;
+            NullableClipRect = new Rectangle?(ClipRect);
+            PregeneratedDestination = default;
+            PregeneratedScale = Vector2.One;
         }
         public DrawableTexture(VirtualTexture texture, Rectangle clipRect, Vector2 drawOffset, int w, int h) {
             Texture = texture;
@@ -52,8 +64,10 @@ namespace Starforge.Mod.Assets {
             Height = h;
             Center = new Vector2(Width, Height) * 0.5f;
 
-            Clip = new Rectangle?(ClipRect);
             PregeneratedPosition = Vector2.Zero;
+            NullableClipRect = new Rectangle?(ClipRect);
+            PregeneratedDestination = default;
+            PregeneratedScale = Vector2.One;
         }
 
         public DrawableTexture(VirtualTexture texture, Vector2 drawOffset, int w, int h) {
@@ -64,8 +78,10 @@ namespace Starforge.Mod.Assets {
             Height = h;
             Center = new Vector2(Width, Height) * 0.5f;
 
-            Clip = new Rectangle?(ClipRect);
             PregeneratedPosition = Vector2.Zero;
+            NullableClipRect = new Rectangle?(ClipRect);
+            PregeneratedDestination = default;
+            PregeneratedScale = Vector2.One;
         }
 
         public DrawableTexture(DrawableTexture parent, int x, int y, int w, int h) {
@@ -76,24 +92,30 @@ namespace Starforge.Mod.Assets {
             Height = h;
             Center = new Vector2(Width, Height) * 0.5f;
 
-            Clip = new Rectangle?(ClipRect);
             PregeneratedPosition = Vector2.Zero;
+            NullableClipRect = new Rectangle?(ClipRect);
+            PregeneratedDestination = default;
+            PregeneratedScale = Vector2.One;
         }
 
         public void Draw(Vector2 position) {
-            Engine.Batch.Draw(Texture.Texture, position, Clip, Color.White);
+            Engine.Batch.Draw(Texture.Texture, position, NullableClipRect, Color.White);
         }
 
         public void Draw(Rectangle destination) {
-            Engine.Batch.Draw(Texture.Texture, destination, Clip, Color.White);
+            Engine.Batch.Draw(Texture.Texture, destination, NullableClipRect, Color.White);
         }
 
         public void Draw(Rectangle destination, Color color) {
-            Engine.Batch.Draw(Texture.Texture, destination, Clip, color);
+            Engine.Batch.Draw(Texture.Texture, destination, NullableClipRect, color);
         }
 
         public void PregeneratedDraw() {
-            Engine.Batch.Draw(Texture.Texture, PregeneratedPosition, Clip, Color.White);
+            Engine.Batch.Draw(Texture.Texture, PregeneratedPosition, NullableClipRect, Color.White);
+        }
+
+        public void PregeneratedDrawCentered() {
+            Engine.Batch.Draw(Texture.Texture, PregeneratedPosition, NullableClipRect, Color.White, 0f, Center - DrawOffset, PregeneratedScale, SpriteEffects.None, 0f);
         }
 
         public Rectangle GetRelativeRect(int x, int y, int w, int h) {
