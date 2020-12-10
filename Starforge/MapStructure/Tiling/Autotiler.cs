@@ -95,8 +95,8 @@ namespace Starforge.MapStructure.Tiling {
             }
         }
 
-        public DrawableTexture[] GenerateTextureMap(TileGrid grid, int offsetX, int offsetY) {
-            List<DrawableTexture> textures = new List<DrawableTexture>();
+        public StaticTexture[] GenerateTextureMap(TileGrid grid, int offsetX, int offsetY) {
+            List<StaticTexture> textures = new List<StaticTexture>();
 
             for(int i = 0; i < grid.Tiles.GetLength(0); i++) {
                 for(int j = 0; j < grid.Tiles.GetLength(1); j++) {
@@ -149,8 +149,10 @@ namespace Starforge.MapStructure.Tiling {
                         }
 
                         // Texture generation
-                        tex.PregeneratedPosition = new Vector2(i * 8, j * 8);
-                        textures.Add(tex);
+                        textures.Add(new StaticTexture(
+                            tex,
+                            new Vector2(i * 8, j * 8)
+                         ));
                     }
                 }
             }

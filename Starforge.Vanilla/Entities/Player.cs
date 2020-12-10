@@ -7,14 +7,12 @@ using Starforge.Mod.Assets;
 namespace Starforge.Vanilla.Entities {
     [EntityDefinition("player")]
     public class Player : Entity {
-        private DrawableTexture Sprite = GFX.Gameplay["characters/player/sitDown00"];
+        private static DrawableTexture Sprite = GFX.Gameplay["characters/player/sitDown00"];
 
-        public Player(Level level, EntityData data) : base(level, data) {
-            Sprite.PregeneratedPosition = new Vector2(Position.X, Position.Y - 16);
-        }
+        public Player(Level level, EntityData data) : base(level, data) { }
 
         public override void Render() {
-            Sprite.PregeneratedDrawCentered();
+            Sprite.DrawCentered(new Vector2(X, Y - 16));
         }
     }
 }

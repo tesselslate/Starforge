@@ -57,8 +57,8 @@ namespace Starforge.MapStructure {
         public LevelMeta Meta;
         public Map Parent;
 
-        private DrawableTexture[] FgGrid;
-        private DrawableTexture[] BgGrid;
+        private StaticTexture[] FgGrid;
+        private StaticTexture[] BgGrid;
         private bool TilesDirty = true;
 
         public RenderTarget2D Target { get; private set; }
@@ -276,12 +276,12 @@ namespace Starforge.MapStructure {
 
             // Background tiles
             for(int pos = 0; pos < BgGrid.Length; pos++) {
-                BgGrid[pos].PregeneratedDraw();
+                BgGrid[pos].Draw();
             }
 
             // Background decals
             for(int pos = 0; pos < BackgroundDecals.Count; pos++) {
-                BackgroundDecals[pos].Texture.PregeneratedDrawCentered();
+                BackgroundDecals[pos].Texture.DrawCentered();
             }
 
             // Entities
@@ -291,12 +291,12 @@ namespace Starforge.MapStructure {
 
             // Foreground tiles
             for(int pos = 0; pos < FgGrid.Length; pos++) {
-                FgGrid[pos].PregeneratedDraw();
+                FgGrid[pos].Draw();
             }
 
             // Foreground decals
             for(int pos = 0; pos < ForegroundDecals.Count; pos++) {
-                ForegroundDecals[pos].Texture.PregeneratedDrawCentered();
+                ForegroundDecals[pos].Texture.DrawCentered();
             }
 
             Engine.Batch.End();

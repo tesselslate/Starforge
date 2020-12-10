@@ -11,7 +11,7 @@ namespace Starforge.MapStructure {
         public float ScaleY;
         public string Name;
         
-        public DrawableTexture Texture {
+        public StaticTexture Texture {
             get;
             private set;
         }
@@ -42,9 +42,12 @@ namespace Starforge.MapStructure {
         }
 
         public void Update() {
-            DrawableTexture tex = GFX.Gameplay["decals/" + Name.Substring(0, Name.Length - 4).Replace('\\', '/')];
-            tex.PregeneratedPosition = new Vector2(X, Y);
-            tex.PregeneratedScale = new Vector2(ScaleX, ScaleY);
+            StaticTexture tex = new StaticTexture(
+                GFX.Gameplay["decals/" + Name.Substring(0, Name.Length - 4).Replace('\\', '/')],
+                new Vector2(X, Y),
+                new Vector2(ScaleX, ScaleY)
+            );
+
             Texture = tex;
         }
     }

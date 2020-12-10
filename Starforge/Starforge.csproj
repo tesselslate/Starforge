@@ -92,6 +92,7 @@
     <Compile Include="MapStructure\TileGrid.cs" />
     <Compile Include="Core\Engine.cs" />
     <Compile Include="Mod\Assets\DrawableTexture.cs" />
+    <Compile Include="Mod\Assets\StaticTexture.cs" />
     <Compile Include="Mod\Assets\VirtualTexture.cs" />
     <Compile Include="Mod\DefinitionAttributes.cs" />
     <Compile Include="Mod\EntityData.cs" />
