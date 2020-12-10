@@ -110,6 +110,10 @@ namespace Starforge.Mod.Assets {
             Engine.Batch.Draw(Texture.Texture, destination, NullableClipRect, color);
         }
 
+        public void DrawCentered(Vector2 position) {
+            Engine.Batch.Draw(Texture.Texture, position, NullableClipRect, Color.White, 0f, Center - DrawOffset, 1f, SpriteEffects.None, 0f);
+        }
+
         public void PregeneratedDraw() {
             Engine.Batch.Draw(Texture.Texture, PregeneratedPosition, NullableClipRect, Color.White);
         }

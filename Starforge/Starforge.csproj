@@ -102,6 +102,7 @@
     <Compile Include="Util\MiscHelper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Editor\Tools\" />
     <Folder Include="Platform\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

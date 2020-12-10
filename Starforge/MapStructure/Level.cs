@@ -1,10 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
 using Starforge.MapStructure.Encoding;
 using Starforge.Mod;
 using Starforge.Mod.Assets;
 using Starforge.Util;
+using System;
 using System.Collections.Generic;
 
 namespace Starforge.MapStructure {
@@ -52,6 +54,9 @@ namespace Starforge.MapStructure {
         public TileGrid ForegroundTiles;
         public TileGrid ObjectTiles;
 
+        public LevelMeta Meta;
+        public Map Parent;
+
         private DrawableTexture[] FgGrid;
         private DrawableTexture[] BgGrid;
         private bool TilesDirty = true;
@@ -59,8 +64,7 @@ namespace Starforge.MapStructure {
         public RenderTarget2D Target { get; private set; }
         public bool Dirty = true;
 
-        public LevelMeta Meta;
-        public Map Parent;
+        public bool Selected = false;
 
         public Level() {
             // Create empty lists for usual level elements (entities, etc)
@@ -148,7 +152,7 @@ namespace Starforge.MapStructure {
                 }
             }
 
-            level.Update();
+            level.UpdateBounds();
 
             return level;
         }
@@ -235,7 +239,12 @@ namespace Starforge.MapStructure {
             return bin;
         }
 
-        public void Update() {
+        public void Update(KeyboardState kbd, MouseState m) {
+            Point roomPos = new Point(m.X - X, m.Y - Y);
+            Point tile = new Point((int)Math.Floor(roomPos.X / 8f), (int)Math.Floor(roomPos.Y / 8f));
+        }
+
+        public void UpdateBounds() {
             Bounds = new Rectangle(X, Y, Width, Height);
             Position = new Vector2(X, Y);
 
@@ -256,7 +265,8 @@ namespace Starforge.MapStructure {
 
         public void Render() {
             Engine.Instance.GraphicsDevice.SetRenderTarget(Target);
-            Engine.Instance.GraphicsDevice.Clear(Engine.Config.RoomColor);
+            if(Selected) Engine.Instance.GraphicsDevice.Clear(Engine.Config.SelectedRoomColor);
+            else Engine.Instance.GraphicsDevice.Clear(Engine.Config.RoomColor);
 
             Engine.Batch.Begin(SpriteSortMode.Deferred,
                                BlendState.AlphaBlend,

@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Starforge", "Starforge\Starforge.csproj", "{F4DD5DF9-6688-4667-A13D-6E6FD3FC7369}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Starforge.Vanilla", "Starforge.Vanilla\Starforge.Vanilla.csproj", "{72E25310-E160-4839-A0C5-1BA231A25658}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F4DD5DF9-6688-4667-A13D-6E6FD3FC7369} = {F4DD5DF9-6688-4667-A13D-6E6FD3FC7369}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

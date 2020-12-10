@@ -35,6 +35,11 @@ namespace Starforge.Editor {
             private set;
         }
 
+        public Level SelectedLevel {
+            get;
+            private set;
+        }
+
         public Scene() {
             VisibleLevels = new List<Level>();
 
@@ -50,12 +55,16 @@ namespace Starforge.Editor {
 
         public void LoadMap(Map map) {
             LoadedMap = map;
+            if(LoadedMap.Levels.Count > 0) {
+                SelectedLevel = LoadedMap.Levels[0];
+                SelectedLevel.Selected = true;
+            }
 
             BGAutotiler = new Autotiler("./Content/Graphics/BackgroundTiles.xml");
             FGAutotiler = new Autotiler("./Content/Graphics/ForegroundTiles.xml");
 
             Camera.Zoom = 1f;
-            Camera.GotoCentered(Vector2.Zero);
+            Camera.GotoCentered(new Vector2(SelectedLevel.Bounds.Center.X, SelectedLevel.Bounds.Center.Y));
             Camera.Update();
         }
 
@@ -80,7 +89,29 @@ namespace Starforge.Editor {
                         // User clicked mouse
 
                     }
+                } else if(m.LeftButton == ButtonState.Pressed) {
+                    Vector2 realPos = Camera.ScreenToReal(new Vector2(m.X, m.Y));
+                    Point point = new Point((int)realPos.X, (int)realPos.Y);
+
+                    if(LoadedMap.Levels.Count > 0) {
+                        foreach(Level level in VisibleLevels) {
+                            if(level.Bounds.Contains(point)) {
+                                if(level == SelectedLevel) break;
+
+                                SelectedLevel.Selected = false;
+                                SelectedLevel.Render();
+
+                                SelectedLevel = level;
+                                SelectedLevel.Selected = true;
+                                SelectedLevel.Render();
+
+                                break;
+                            }
+                        }
+                    }
                 }
+
+                SelectedLevel.Update(kbd, m);
             }
 
             // Set previous keyboard/mouse state

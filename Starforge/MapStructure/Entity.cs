@@ -27,6 +27,10 @@ namespace Starforge.MapStructure {
             set => SetAttribute("height", value);
         }
 
+        public Vector2 Position {
+            get => new Vector2(X, Y);
+        }
+
         public readonly string Name;
 
         public List<Vector2> Nodes;
