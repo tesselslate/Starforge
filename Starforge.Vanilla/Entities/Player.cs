@@ -9,10 +9,12 @@ namespace Starforge.Vanilla.Entities {
     public class Player : Entity {
         private static DrawableTexture Sprite = GFX.Gameplay["characters/player/sitDown00"];
 
-        public Player(Level level, EntityData data) : base(level, data) { }
+        public Player(Level level, EntityData data) : base(level, data) {
+            Sprite.PregeneratedPosition = new Vector2(X, Y);
+        }
 
         public override void Render() {
-            Sprite.Draw(new Vector2(X, Y));
+            Sprite.PregeneratedDraw();
         }
     }
 }
