@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Starforge.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +8,10 @@ using System.IO;
 namespace Starforge.Mod.Assets {
     public class Atlas : IDisposable {
         public DrawableTexture this[string id] {
-            get => Textures[id];
+            get {
+                if(Textures.ContainsKey(id)) return Textures[id];
+                return GFX.Empty;
+            }
             set => Textures[id] = value;
         }
 

@@ -85,6 +85,10 @@ namespace Starforge.Mod.Assets {
             Engine.Batch.Draw(Texture.Texture, position, NullableClipRect, Color.White, 0f, Center - DrawOffset, 1f, SpriteEffects.None, 0f);
         }
 
+        public void DrawCenteredScaling(Vector2 position, Vector2 scale) {
+            Engine.Batch.Draw(Texture.Texture, position, NullableClipRect, Color.White, 0f, Center - DrawOffset, scale, SpriteEffects.None, 0f);
+        }
+
         public Rectangle GetRelativeRect(int x, int y, int w, int h) {
             int x0 = (int)(ClipRect.X - DrawOffset.X + x);
             int y0 = (int)(ClipRect.Y - DrawOffset.Y + y);

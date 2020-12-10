@@ -54,7 +54,7 @@ namespace Starforge.Mod.Assets {
         }
 
         public void DrawCentered() {
-            Texture.DrawCentered(Position);
+            Texture.DrawCenteredScaling(Position, Scale);
         }
     }
 }
