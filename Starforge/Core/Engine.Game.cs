@@ -84,7 +84,7 @@ namespace Starforge.Core {
         }
 
         protected override void Update(GameTime gameTime) {
-            Scene.Update();
+            Scene.Update(gameTime);
             base.Update(gameTime);
         }
 

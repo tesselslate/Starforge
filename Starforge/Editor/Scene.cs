@@ -68,7 +68,7 @@ namespace Starforge.Editor {
             Camera.Update();
         }
 
-        public void Update() {
+        public void Update(GameTime gt) {
             KeyboardState kbd = Keyboard.GetState();
             MouseState m = Mouse.GetState();
 
@@ -104,12 +104,12 @@ namespace Starforge.Editor {
                             foreach(Level level in VisibleLevels) {
                                 if(level.Bounds.Contains(point)) {
                                     if(level == SelectedLevel) break;
-
                                     SelectedLevel.Selected = false;
                                     SelectedLevel.Render();
 
                                     SelectedLevel = level;
                                     SelectedLevel.Selected = true;
+                                    SelectedLevel.WasSelected = false;
                                     SelectedLevel.Render();
 
                                     SelectedUpdate = true;
@@ -124,7 +124,7 @@ namespace Starforge.Editor {
                 if(!SelectedUpdate) {
                     // User did not change selected level
                     // Send inputs to level for further processing
-                    SelectedLevel.Update(kbd, m);
+                    SelectedLevel.Update(kbd, m, gt);
                 }
             }
 

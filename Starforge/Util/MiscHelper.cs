@@ -11,7 +11,7 @@ namespace Starforge.Util {
         }
 
         public static T Choose<T>(int x, int y, List<T> toChoose) {
-            return toChoose[(x ^ y * x + y) % toChoose.Count];
+            return toChoose[(x ^ 2 + y * x) % toChoose.Count];
         }
 
         public static byte HexCharToByte(char c) {
