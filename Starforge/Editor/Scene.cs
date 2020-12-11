@@ -2,10 +2,10 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
+using Starforge.Editor.UI;
 using Starforge.MapStructure;
 using Starforge.MapStructure.Tiling;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Starforge.Editor {
     public class Scene {
@@ -146,7 +146,7 @@ namespace Starforge.Editor {
             }
         }
 
-        public void Render() {
+        public void Render(GameTime gt) {
             // Rerender "dirty" levels (those which need to be rerendered)
             foreach(Level level in VisibleLevels) {
                 if(level.Dirty) level.Render();
@@ -168,6 +168,11 @@ namespace Starforge.Editor {
             }
 
             Engine.Batch.End();
+
+            // Render ImGUI content
+            Engine.GUI.BeforeLayout(gt);
+            if(Engine.Config.Debug) DebugWindow.Render();
+            Engine.GUI.AfterLayout();
         }
     }
 }

@@ -50,7 +50,9 @@
     <Compile Include="Core\Engine.Game.cs" />
     <Compile Include="Core\GFX.cs" />
     <Compile Include="Editor\Camera.cs" />
+    <Compile Include="Editor\ImGUIHandler.cs" />
     <Compile Include="Editor\Scene.cs" />
+    <Compile Include="Editor\UI\DebugWindow.cs" />
     <Compile Include="MapStructure\Tiling\Autotiler.cs" />
     <Compile Include="MapStructure\Tiling\Tileset.cs" />
     <Compile Include="Mod\Assets\Atlas.cs" />

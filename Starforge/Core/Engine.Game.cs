@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Starforge.Editor;
+using Starforge.Editor.UI;
 using Starforge.MapStructure;
 using Starforge.MapStructure.Encoding;
 using Starforge.Mod.Assets;
@@ -10,14 +11,11 @@ using System.IO;
 
 namespace Starforge.Core {
     public partial class Engine : Game {
+        public static ImGUIHandler GUI;
+
         public static SpriteBatch Batch { 
             get; 
             private set; 
-        }
-
-        public static SpriteBatch GUIBatch {
-            get;
-            private set;
         }
 
         public static Scene Scene {
@@ -30,20 +28,28 @@ namespace Starforge.Core {
             private set;
         }
 
+        public GraphicsDeviceManager GDM {
+            get;
+            private set;
+        }
+
         private Engine() {
-            GraphicsDeviceManager gdm = new GraphicsDeviceManager(this);
+            GDM = new GraphicsDeviceManager(this);
 
             // Default graphics settings
-            gdm.IsFullScreen = false;
-            gdm.PreferredBackBufferWidth = 1280;
-            gdm.PreferredBackBufferHeight = 720;
-            gdm.PreferMultiSampling = true;
-            gdm.SynchronizeWithVerticalRetrace = true;
+            GDM.IsFullScreen = false;
+            GDM.PreferredBackBufferWidth = 1280;
+            GDM.PreferredBackBufferHeight = 720;
+            GDM.PreferMultiSampling = true;
+            GDM.SynchronizeWithVerticalRetrace = true;
 
             IsMouseVisible = true;
         }
 
         protected override void Initialize() {
+            GUI = new ImGUIHandler(this);
+            GUI.BuildFontAtlas();
+
             base.Initialize();
 
             // Load map
@@ -56,38 +62,37 @@ namespace Starforge.Core {
         }
 
         protected override void LoadContent() {
-            base.LoadContent();
-
             Batch = new SpriteBatch(GraphicsDevice);
-            GUIBatch = new SpriteBatch(GraphicsDevice);
             VirtualContent = new List<VirtualTexture>();
 
             GFX.Load();
+
+            base.LoadContent();
         }
 
         protected override void UnloadContent() {
-            base.UnloadContent();
-
             foreach(VirtualTexture t in VirtualContent) {
                 t.Dispose();
             }
+
+            base.UnloadContent();
         }
 
         protected override void Draw(GameTime gameTime) {
+            Scene.Render(gameTime);
             base.Draw(gameTime);
-            Scene.Render();
         }
 
         protected override void Update(GameTime gameTime) {
-            base.Update(gameTime);
             Scene.Update();
+            base.Update(gameTime);
         }
 
         protected override void OnExiting(object sender, EventArgs args) {
-            base.OnExiting(sender, args);
-
             // Perform cleanup actions.
             Exit(0, false);
+
+            base.OnExiting(sender, args);
         }
     }
 }

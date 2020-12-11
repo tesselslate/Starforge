@@ -20,7 +20,7 @@ namespace Starforge.Core {
 
         public static void Main(string[] args) {
             if(File.Exists("./log_old.txt")) File.Delete("./log_old.txt");
-            File.Move("./log.txt", "./log_old.txt");
+            if(File.Exists("./log.txt")) File.Move("./log.txt", "./log_old.txt");
 
             // Set log stream
             FileStream logStream = File.OpenWrite(Path.Combine(

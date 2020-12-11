@@ -12,6 +12,8 @@ namespace Starforge.Core {
 
             // Temporary for testing. Proper content directory detection later.
             public static string ContentDirectory = "./Content/";
+
+            public static bool Debug = true;
         }
     }
 }
