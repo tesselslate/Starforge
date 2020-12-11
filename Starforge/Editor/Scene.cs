@@ -72,6 +72,8 @@ namespace Starforge.Editor {
             KeyboardState kbd = Keyboard.GetState();
             MouseState m = Mouse.GetState();
 
+            bool SelectedUpdate = false;
+
             if(Engine.Instance.IsActive) {
                 if(m.ScrollWheelValue > PreviousMouseState.ScrollWheelValue) {
                     // Scrolled up
@@ -93,25 +95,37 @@ namespace Starforge.Editor {
                     Vector2 realPos = Camera.ScreenToReal(new Vector2(m.X, m.Y));
                     Point point = new Point((int)realPos.X, (int)realPos.Y);
 
-                    if(LoadedMap.Levels.Count > 0) {
-                        foreach(Level level in VisibleLevels) {
-                            if(level.Bounds.Contains(point)) {
-                                if(level == SelectedLevel) break;
+                    if(m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
+                        // User is dragging mouse
+                        
+                    } else if(PreviousMouseState.LeftButton != ButtonState.Pressed) {
+                        // User clicked mouse
+                        if(LoadedMap.Levels.Count > 0) {
+                            foreach(Level level in VisibleLevels) {
+                                if(level.Bounds.Contains(point)) {
+                                    if(level == SelectedLevel) break;
 
-                                SelectedLevel.Selected = false;
-                                SelectedLevel.Render();
+                                    SelectedLevel.Selected = false;
+                                    SelectedLevel.Render();
 
-                                SelectedLevel = level;
-                                SelectedLevel.Selected = true;
-                                SelectedLevel.Render();
+                                    SelectedLevel = level;
+                                    SelectedLevel.Selected = true;
+                                    SelectedLevel.Render();
 
-                                break;
+                                    SelectedUpdate = true;
+
+                                    break;
+                                }
                             }
                         }
                     }
                 }
 
-                SelectedLevel.Update(kbd, m);
+                if(!SelectedUpdate) {
+                    // User did not change selected level
+                    // Send inputs to level for further processing
+                    SelectedLevel.Update(kbd, m);
+                }
             }
 
             // Set previous keyboard/mouse state

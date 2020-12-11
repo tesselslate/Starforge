@@ -56,6 +56,11 @@ namespace Starforge.MapStructure {
             }
         }
 
+        public void SetTile(int x, int y, int t) {
+            if(x < 0 || y < 0 || x > Width - 1 || y > Height - 1) return;
+            this[x, y] = t;
+        }
+
         public override string ToString() {
             string[] resultArray = new string[Height];
             int[] filledTiles = new int[Height];

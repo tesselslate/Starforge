@@ -83,17 +83,4 @@ namespace Starforge.MapStructure {
     public class Trigger : Entity {
         public Trigger(Level level, EntityData data) : base(level, data) { }
     }
-
-    [EntityDefinition("player")]
-    public class Player : Entity {
-        private static DrawableTexture Sprite = GFX.Gameplay["characters/player/sitDown00"];
-
-        public Player(Level level, EntityData data) : base(level, data) { }
-
-        public override void Render() {
-            base.Render();
-
-            Sprite.Draw(new Vector2(X, Y));
-        }
-    }
 }

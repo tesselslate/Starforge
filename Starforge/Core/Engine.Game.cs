@@ -67,6 +67,10 @@ namespace Starforge.Core {
 
         protected override void UnloadContent() {
             base.UnloadContent();
+
+            foreach(VirtualTexture t in VirtualContent) {
+                t.Dispose();
+            }
         }
 
         protected override void Draw(GameTime gameTime) {

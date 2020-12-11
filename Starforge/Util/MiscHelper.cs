@@ -10,6 +10,10 @@ namespace Starforge.Util {
             return toChoose[Rand.Next(toChoose.Count)];
         }
 
+        public static T Choose<T>(int x, int y, List<T> toChoose) {
+            return toChoose[(x ^ y * x + y) % toChoose.Count];
+        }
+
         public static byte HexCharToByte(char c) {
             return (byte)"0123456789ABCDEF".IndexOf(char.ToUpper(c));
         }

@@ -95,76 +95,96 @@ namespace Starforge.MapStructure.Tiling {
             }
         }
 
-        public StaticTexture[] GenerateTextureMap(TileGrid grid, int offsetX, int offsetY) {
-            List<StaticTexture> textures = new List<StaticTexture>();
-
-            for(int i = 0; i < grid.Tiles.GetLength(0); i++) {
-                for(int j = 0; j < grid.Tiles.GetLength(1); j++) {
-                    if(grid[i, j] != 48) {
-                        int num = 0;
-                        byte[] adjacent = new byte[9];
-                        bool center = true;
-
-                        Tileset t = Tilesets[(char)grid[i, j]];
-                        DrawableTexture tex;
-
-                        for(int y = -1; y < 2; y++) {
-                            for(int x = -1; x < 2; x++) {
-                                bool res = CheckTile(grid, t, i + x, j + y);
-                                if(res) {
-                                    adjacent[num++] = 1;
-                                } else {
-                                    adjacent[num++] = 0;
-                                    center = false;
-                                }
-                            }
-                        }
-
-                        if(center) {
-                            if(!CheckTile(grid, t, i - 2, j) 
-                                || !CheckTile(grid, t, i + 2, j) 
-                                || !CheckTile(grid, t, i, j - 2) 
-                                || !CheckTile(grid, t, i, j + 2)) 
-                            {
-                                tex = MiscHelper.Choose(t.Padding);
-                            } else {
-                                tex = MiscHelper.Choose(t.Center);
-                            }
-                        } else {
-                            tex = GFX.Pixel; // Set to arbitrary texture incase there isn't a valid mask.
-                            foreach(TileMask m in t.Masks) {
-                                bool found = true;
-                                int index = 0;
-                                while(index < 9 && found) {
-                                    if(m.Mask[index] != 2 && m.Mask[index] != adjacent[index]) found = false;
-
-                                    index++;
-                                }
-
-                                if(found) {
-                                    tex = MiscHelper.Choose(m.Textures);
-                                    break;
-                                }
-                            }
-                        }
-
-                        // Texture generation
-                        textures.Add(new StaticTexture(
-                            tex,
-                            new Vector2(i * 8, j * 8)
-                         ));
-                    }
-                }
-            }
-
-            return textures.ToArray();
-        }
-
         public bool CheckTile(TileGrid grid, Tileset t, int x, int y) {
             // If position is out of bounds in a given TileGrid, assume there is a tile there
             if(x < 0 || x > grid.Width - 1 || y < 0 || y > grid.Height - 1) return true;
 
             return grid[x, y] != 48 && !(t.ID != grid[x, y] && (t.Ignores.Contains((char)grid[x, y]) || t.Ignores.Contains('*')));
+        }
+
+
+        public StaticTexture[] GenerateTextureMap(TileGrid grid, int offsetX, int offsetY) {
+            StaticTexture[] textures = new StaticTexture[grid.Width * grid.Height];
+
+            for(int i = 0; i < grid.Tiles.GetLength(0); i++) {
+                for(int j = 0; j < grid.Tiles.GetLength(1); j++) {
+                    StaticTexture tex = new StaticTexture(GFX.Empty);
+                    if(grid[i, j] != 48) {
+                        textures[j * grid.Width + i] = GenerateTileTexture(grid, i, j);
+                    }
+                }
+            }
+
+            return textures;
+        }
+
+        public StaticTexture GenerateTileTexture(TileGrid grid, int i, int j) {
+            StaticTexture tex = new StaticTexture(GFX.Empty);
+            if(grid[i, j] != 48) {
+                int num = 0;
+                byte[] adjacent = new byte[9];
+                bool center = true;
+
+                Tileset t = Tilesets[(char)grid[i, j]];
+
+                for(int y = -1; y < 2; y++) {
+                    for(int x = -1; x < 2; x++) {
+                        bool res = CheckTile(grid, t, i + x, j + y);
+                        if(res) {
+                            adjacent[num++] = 1;
+                        } else {
+                            adjacent[num++] = 0;
+                            center = false;
+                        }
+                    }
+                }
+
+                if(center) {
+                    if(!CheckTile(grid, t, i - 2, j)
+                        || !CheckTile(grid, t, i + 2, j)
+                        || !CheckTile(grid, t, i, j - 2)
+                        || !CheckTile(grid, t, i, j + 2)) {
+                        tex.Texture = MiscHelper.Choose(i, j, t.Padding);
+                    } else {
+                        tex.Texture = MiscHelper.Choose(i, j, t.Center);
+                    }
+                } else {
+                    tex.Texture = GFX.Empty; // Set to arbitrary texture incase there isn't a valid mask.
+                    tex.Visible = false;
+                    foreach(TileMask m in t.Masks) {
+                        bool found = true;
+                        int index = 0;
+                        while(index < 9 && found) {
+                            if(m.Mask[index] != 2 && m.Mask[index] != adjacent[index]) found = false;
+
+                            index++;
+                        }
+
+                        if(found) {
+                            tex.Texture = MiscHelper.Choose(i, j, m.Textures);
+                            tex.Visible = true;
+                            break;
+                        }
+                    }
+                }
+
+                tex.Position = new Vector2(i * 8, j * 8);
+            }
+
+            return tex;
+        }
+
+        public void Update(TileGrid grid, StaticTexture[] texArray, Point point) {
+            Update(grid, texArray, new Rectangle(point.X - 1, point.Y - 1, 3, 3));
+        }
+
+        public void Update(TileGrid grid, StaticTexture[] texArray, Rectangle r) {
+            for(int x = 0; x < r.Width; x++) {
+                for(int y = 0; y < r.Height; y++) {
+                    if(x + r.X < 0 || x + r.X > grid.Width - 1 || y + r.Y < 0 || y + r.Y > grid.Height - 1) continue;
+                    texArray[(y + r.Y) * grid.Width + x + r.X] = GenerateTileTexture(grid, x + r.X, y + r.Y);
+                }
+            }
         }
     }
 }

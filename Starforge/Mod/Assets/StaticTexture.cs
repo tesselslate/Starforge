@@ -14,11 +14,14 @@ namespace Starforge.Mod.Assets {
 
         public Vector2 Scale;
 
+        public bool Visible;
+
         public StaticTexture(DrawableTexture tex) {
             Texture = tex;
             Destination = default;
             Position = Vector2.Zero;
             Scale = Vector2.One;
+            Visible = true;
         }
 
         public StaticTexture(DrawableTexture tex, Rectangle destination) {
@@ -26,6 +29,7 @@ namespace Starforge.Mod.Assets {
             Destination = destination;
             Position = Vector2.Zero;
             Scale = Vector2.One;
+            Visible = true;
         }
 
         public StaticTexture(DrawableTexture tex, Rectangle destination, Vector2 scale) {
@@ -33,6 +37,7 @@ namespace Starforge.Mod.Assets {
             Destination = destination;
             Position = Vector2.Zero;
             Scale = scale;
+            Visible = true;
         }
 
         public StaticTexture(DrawableTexture tex, Vector2 position) {
@@ -40,6 +45,7 @@ namespace Starforge.Mod.Assets {
             Destination = default;
             Position = position;
             Scale = Vector2.One;
+            Visible = true;
         }
 
         public StaticTexture(DrawableTexture tex, Vector2 position, Vector2 scale) {
@@ -47,6 +53,7 @@ namespace Starforge.Mod.Assets {
             Destination = default;
             Position = position;
             Scale = scale;
+            Visible = true;
         }
 
         public void Draw() {

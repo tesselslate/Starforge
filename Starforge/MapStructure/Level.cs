@@ -66,6 +66,8 @@ namespace Starforge.MapStructure {
 
         public bool Selected = false;
 
+        private Point PreviousTile = new Point(0, 0);
+
         public Level() {
             // Create empty lists for usual level elements (entities, etc)
             Entities = new List<Entity>();
@@ -240,8 +242,24 @@ namespace Starforge.MapStructure {
         }
 
         public void Update(KeyboardState kbd, MouseState m) {
-            Point roomPos = new Point(m.X - X, m.Y - Y);
+            Vector2 rm = Engine.Scene.Camera.ScreenToReal(new Vector2(m.X, m.Y));
+            Point roomPos = new Point(
+                (int)rm.X - X, 
+                (int)rm.Y - Y
+            );
             Point tile = new Point((int)Math.Floor(roomPos.X / 8f), (int)Math.Floor(roomPos.Y / 8f));
+
+            MouseState prevMouse = Engine.Scene.PreviousMouseState;
+
+            if(m.LeftButton == ButtonState.Pressed) {
+                if(PreviousTile != tile) {
+                    ForegroundTiles.SetTile(tile.X, tile.Y, '6');
+                    Engine.Scene.FGAutotiler.Update(ForegroundTiles, FgGrid, tile);
+
+                    Dirty = true;
+                    PreviousTile = tile;
+                }
+            }
         }
 
         public void UpdateBounds() {
@@ -276,7 +294,7 @@ namespace Starforge.MapStructure {
 
             // Background tiles
             for(int pos = 0; pos < BgGrid.Length; pos++) {
-                BgGrid[pos].Draw();
+                if(BgGrid[pos].Visible) BgGrid[pos].Draw();
             }
 
             // Background decals
@@ -291,7 +309,7 @@ namespace Starforge.MapStructure {
 
             // Foreground tiles
             for(int pos = 0; pos < FgGrid.Length; pos++) {
-                FgGrid[pos].Draw();
+                if(FgGrid[pos].Visible) FgGrid[pos].Draw();
             }
 
             // Foreground decals
