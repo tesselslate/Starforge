@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Starforge.MapStructure;
 using Starforge.MapStructure.Encoding;
 using System.Collections.Generic;
 
@@ -15,17 +16,17 @@ namespace Starforge.Mod {
             Name = Element.Name;
             Nodes = new List<Vector2>();
 
-            foreach (BinaryMapElement child in bin.Children) {
-                if (child.Name == "nodes") {
-                    foreach (BinaryMapElement el in child.Children) Nodes.Add(new Vector2(
-                         el.GetFloat("x"),
-                         el.GetFloat("y")
-                     ));
+            foreach(BinaryMapElement child in bin.Children) {
+                if(child.Name == "nodes") {
+                    foreach(BinaryMapElement el in child.Children) Nodes.Add(new Vector2(
+                        el.GetFloat("x"),
+                        el.GetFloat("y")
+                    ));
                 }
             }
 
             Attributes = new Dictionary<string, object>();
-            foreach (KeyValuePair<string, object> pair in bin.Attributes) {
+            foreach(KeyValuePair<string, object> pair in bin.Attributes) {
                 Attributes.Add(pair.Key, pair.Value);
             }
         }
@@ -44,7 +45,7 @@ namespace Starforge.Mod {
         protected object GetAttribute(string name, object defaultValue = null) {
             object obj;
 
-            if (!Attributes.TryGetValue(name, out obj)) {
+            if(!Attributes.TryGetValue(name, out obj)) {
                 return defaultValue;
             }
 

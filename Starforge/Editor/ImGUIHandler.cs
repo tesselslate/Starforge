@@ -39,7 +39,8 @@ namespace Starforge.Editor {
             GraphicsDevice = Engine.GraphicsDevice;
             Textures = new Dictionary<IntPtr, Texture2D>();
 
-            RasterizerState = new RasterizerState() {
+            RasterizerState = new RasterizerState()
+            {
                 CullMode = CullMode.None,
                 DepthBias = 0,
                 FillMode = FillMode.Solid,
@@ -67,7 +68,7 @@ namespace Starforge.Editor {
             fontTex.SetData(pixels);
 
             // Deallocate and unbind any previously built font texture
-            if (FontTextureID.HasValue) UnbindTexture(FontTextureID.Value);
+            if(FontTextureID.HasValue) UnbindTexture(FontTextureID.Value);
 
             // Bind font texture to ImGUI
             FontTextureID = BindTexture(fontTex);
@@ -119,7 +120,7 @@ namespace Starforge.Editor {
             ImGUIKeys.Add(io.KeyMap[(int)ImGuiKey.Space] = (int)Keys.Space);
 
             TextInputEXT.TextInput += c => {
-                if (c == '\t') return;
+                if(c == '\t') return;
                 ImGui.GetIO().AddInputCharacter(c);
             };
 
@@ -146,7 +147,7 @@ namespace Starforge.Editor {
             MouseState m = Mouse.GetState();
             KeyboardState kbd = Keyboard.GetState();
 
-            for (int i = 0; i < ImGUIKeys.Count; i++) {
+            for(int i = 0; i < ImGUIKeys.Count; i++) {
                 io.KeysDown[ImGUIKeys[i]] = kbd.IsKeyDown((Keys)ImGUIKeys[i]);
             }
 
@@ -188,19 +189,19 @@ namespace Starforge.Editor {
         }
 
         private unsafe void UpdateBuffers(ImDrawDataPtr ptr) {
-            if (ptr.TotalVtxCount == 0) return;
+            if(ptr.TotalVtxCount == 0) return;
 
             // Make vertex/index buffers larger if needed
-            if (ptr.TotalVtxCount > VertexBufferSize) {
-                if (VertexBuffer != null) VertexBuffer.Dispose();
+            if(ptr.TotalVtxCount > VertexBufferSize) {
+                if(VertexBuffer != null) VertexBuffer.Dispose();
 
                 VertexBufferSize = (int)(ptr.TotalVtxCount * 1.5f);
                 VertexBuffer = new VertexBuffer(GraphicsDevice, DrawVertDeclaration.Declaration, VertexBufferSize, BufferUsage.None);
                 VertexData = new byte[VertexBufferSize * DrawVertDeclaration.Size];
             }
 
-            if (ptr.TotalIdxCount > IndexBufferSize) {
-                if (IndexBuffer != null) IndexBuffer.Dispose();
+            if(ptr.TotalIdxCount > IndexBufferSize) {
+                if(IndexBuffer != null) IndexBuffer.Dispose();
 
                 IndexBufferSize = (int)(ptr.TotalIdxCount * 1.5f);
                 IndexBuffer = new IndexBuffer(GraphicsDevice, IndexElementSize.SixteenBits, IndexBufferSize, BufferUsage.None);
@@ -211,10 +212,10 @@ namespace Starforge.Editor {
             int vtxOffset = 0;
             int idxOffset = 0;
 
-            for (int i = 0; i < ptr.CmdListsCount; i++) {
+            for(int i = 0; i < ptr.CmdListsCount; i++) {
                 ImDrawListPtr cmdList = ptr.CmdListsRange[i];
-                fixed (void* vtxDstPtr = &VertexData[vtxOffset * DrawVertDeclaration.Size]) {
-                    fixed (void* idxDstPtr = &IndexData[idxOffset * sizeof(ushort)]) {
+                fixed(void* vtxDstPtr = &VertexData[vtxOffset * DrawVertDeclaration.Size]) {
+                    fixed(void* idxDstPtr = &IndexData[idxOffset * sizeof(ushort)]) {
                         Buffer.MemoryCopy((void*)cmdList.VtxBuffer.Data, vtxDstPtr, VertexData.Length, cmdList.VtxBuffer.Size * DrawVertDeclaration.Size);
                         Buffer.MemoryCopy((void*)cmdList.IdxBuffer.Data, idxDstPtr, IndexData.Length, cmdList.IdxBuffer.Size * sizeof(ushort));
                     }
@@ -236,12 +237,12 @@ namespace Starforge.Editor {
             int vtxOffset = 0;
             int idxOffset = 0;
 
-            for (int i = 0; i < ptr.CmdListsCount; i++) {
+            for(int i = 0; i < ptr.CmdListsCount; i++) {
                 ImDrawListPtr cmdList = ptr.CmdListsRange[i];
 
-                for (int cmdi = 0; cmdi < cmdList.CmdBuffer.Size; cmdi++) {
+                for(int cmdi = 0; cmdi < cmdList.CmdBuffer.Size; cmdi++) {
                     ImDrawCmdPtr cmd = cmdList.CmdBuffer[cmdi];
-                    if (!Textures.ContainsKey(cmd.TextureId)) {
+                    if(!Textures.ContainsKey(cmd.TextureId)) {
                         throw new InvalidOperationException($"Could not find ImGUI texture with ID {cmd.TextureId}");
                     }
 
@@ -253,7 +254,7 @@ namespace Starforge.Editor {
                     );
 
                     Effect e = UpdateEffect(Textures[cmd.TextureId]);
-                    for (int passIndex = 0; passIndex < e.CurrentTechnique.Passes.Count; passIndex++) {
+                    for(int passIndex = 0; passIndex < e.CurrentTechnique.Passes.Count; passIndex++) {
                         EffectPass pass = e.CurrentTechnique.Passes[passIndex];
                         pass.Apply();
                         GraphicsDevice.DrawIndexedPrimitives(

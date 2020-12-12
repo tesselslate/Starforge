@@ -140,13 +140,15 @@ namespace Starforge.MapStructure {
         }
 
         public static new Parallax FromBinary(BinaryMapElement element) {
-            return new Parallax {
+            return new Parallax
+            {
                 Attributes = element.Attributes
             };
         }
 
         public override BinaryMapElement ToBinary() {
-            BinaryMapElement bin = new BinaryMapElement() {
+            BinaryMapElement bin = new BinaryMapElement()
+            {
                 Name = "parallax"
             };
 
@@ -167,7 +169,8 @@ namespace Starforge.MapStructure {
         }
 
         public override BinaryMapElement ToBinary() {
-            BinaryMapElement bin = new BinaryMapElement() {
+            BinaryMapElement bin = new BinaryMapElement()
+            {
                 Name = Name
             };
 

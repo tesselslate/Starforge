@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Starforge.Util;
 
 namespace Starforge.Core {
     public partial class Engine {

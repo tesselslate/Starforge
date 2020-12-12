@@ -62,7 +62,7 @@ namespace Starforge.Editor {
 
         public void LoadMap(Map map) {
             LoadedMap = map;
-            if (LoadedMap.Levels.Count > 0) {
+            if(LoadedMap.Levels.Count > 0) {
                 SelectedLevel = LoadedMap.Levels[0];
                 SelectedLevel.Selected = true;
             }
@@ -75,15 +75,15 @@ namespace Starforge.Editor {
             Camera.Update();
 
             List<string> roomNames = new List<string>();
-            foreach (Level level in map.Levels) {
+            foreach(Level level in map.Levels) {
                 roomNames.Add(level.Name);
             }
             RoomListWindow.RoomNames = roomNames.ToArray();
 
             // Tools
             List<string> toolList = new List<string>();
-
-            foreach (ToolType type in Enum.GetValues(typeof(ToolType))) {
+            
+            foreach(ToolType type in Enum.GetValues(typeof(ToolType))) {
                 toolList.Add(type.ToString());
             }
             ToolWindow.Tools = toolList.ToArray();
@@ -97,9 +97,9 @@ namespace Starforge.Editor {
             List<Tileset> fgtilesets = FGAutotiler.GetTilesetList();
 
             tilesetNames.Add("Air");
-            foreach (Tileset t in bgtilesets) {
+            foreach(Tileset t in bgtilesets) {
                 // The game has a built in tileset template.
-                if (t.Path.ToLower() == "template") continue;
+                if(t.Path.ToLower() == "template") continue;
 
                 BGTilesets.Add(t);
                 tilesetNames.Add(MiscHelper.CleanCamelCase(t.Path.Substring(2)));
@@ -108,9 +108,9 @@ namespace Starforge.Editor {
 
             tilesetNames = new List<string>();
             tilesetNames.Add("Air");
-            foreach (Tileset t in fgtilesets) {
+            foreach(Tileset t in fgtilesets) {
                 // The game has a built in tileset template.
-                if (t.Path.ToLower() == "template") continue;
+                if(t.Path.ToLower() == "template") continue;
 
                 FGTilesets.Add(t);
                 tilesetNames.Add(MiscHelper.CleanCamelCase(t.Path));
@@ -126,44 +126,40 @@ namespace Starforge.Editor {
 
             // Only process input for editor if ImGUI doesn't currently want user input
             // (e.g. user is not hovering over/focused on GUI elements)
-            if (!io.WantCaptureKeyboard && !io.WantCaptureMouse) {
+            if(!io.WantCaptureKeyboard && !io.WantCaptureMouse) {
                 bool SelectedUpdate = false;
 
-                if (Engine.Instance.IsActive) {
-                    if (m.ScrollWheelValue > PreviousMouseState.ScrollWheelValue) {
+                if(Engine.Instance.IsActive) {
+                    if(m.ScrollWheelValue > PreviousMouseState.ScrollWheelValue) {
                         // Scrolled up
                         Camera.ZoomIn(new Vector2(m.X, m.Y));
-                    }
-                    else if (m.ScrollWheelValue < PreviousMouseState.ScrollWheelValue) {
+                    } else if(m.ScrollWheelValue < PreviousMouseState.ScrollWheelValue) {
                         // Scrolled down
                         Camera.ZoomOut(new Vector2(m.X, m.Y));
                     }
 
-                    if (m.RightButton == ButtonState.Pressed) {
-                        if (m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
+                    if(m.RightButton == ButtonState.Pressed) {
+                        if(m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
                             // User is dragging mouse
                             Camera.Move(new Vector2(PreviousMouseState.X - m.X, PreviousMouseState.Y - m.Y) / Camera.Zoom);
-                        }
-                        else {
+                        } else {
                             // User clicked mouse
 
                         }
-                    }
-                    else if (m.LeftButton == ButtonState.Pressed) {
+                    } else if(m.LeftButton == ButtonState.Pressed) {
                         Vector2 realPos = Camera.ScreenToReal(new Vector2(m.X, m.Y));
                         Point point = new Point((int)realPos.X, (int)realPos.Y);
 
-                        if (m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
+                        if(m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
                             // User is dragging mouse
 
-                        }
-                        else if (PreviousMouseState.LeftButton != ButtonState.Pressed) {
+                        } else if(PreviousMouseState.LeftButton != ButtonState.Pressed) {
                             // User clicked mouse
-                            if (LoadedMap.Levels.Count > 0) {
-                                for (int i = 0; i < LoadedMap.Levels.Count; i++) {
+                            if(LoadedMap.Levels.Count > 0) {
+                                for(int i = 0; i < LoadedMap.Levels.Count; i++) {
                                     Level level = LoadedMap.Levels[i];
-                                    if (level.Bounds.Contains(point)) {
-                                        if (level == SelectedLevel) break;
+                                    if(level.Bounds.Contains(point)) {
+                                        if(level == SelectedLevel) break;
                                         SelectedLevel.Selected = false;
                                         SelectedLevel.Render();
 
@@ -183,7 +179,7 @@ namespace Starforge.Editor {
                         }
                     }
 
-                    if (!SelectedUpdate) {
+                    if(!SelectedUpdate) {
                         // User did not change selected level
                         // Send inputs to level for further processing
                         SelectedLevel.Update(kbd, m, gt);
@@ -191,7 +187,7 @@ namespace Starforge.Editor {
                 }
             }
 
-            if (LoadedMap.Levels[RoomListWindow.CurrentRoom] != SelectedLevel && RoomListWindow.LastRoom != RoomListWindow.CurrentRoom) {
+            if(LoadedMap.Levels[RoomListWindow.CurrentRoom] != SelectedLevel && RoomListWindow.LastRoom != RoomListWindow.CurrentRoom) {
                 SelectedLevel.Selected = false;
                 SelectedLevel.Render();
 
@@ -216,10 +212,10 @@ namespace Starforge.Editor {
         }
 
         public void UpdateVisibleLevels() {
-            if (LoadedMap != null) {
+            if(LoadedMap != null) {
                 List<Level> visible = new List<Level>();
-                foreach (Level level in LoadedMap.Levels) {
-                    if (Camera.VisibleArea.Intersects(level.Bounds)) {
+                foreach(Level level in LoadedMap.Levels) {
+                    if(Camera.VisibleArea.Intersects(level.Bounds)) {
                         visible.Add(level);
                     }
                 }
@@ -230,8 +226,8 @@ namespace Starforge.Editor {
 
         public void Render(GameTime gt) {
             // Rerender "dirty" levels (those which need to be rerendered)
-            foreach (Level level in VisibleLevels) {
-                if (level.Dirty) level.Render();
+            foreach(Level level in VisibleLevels) {
+                if(level.Dirty) level.Render();
             }
 
             Engine.Instance.GraphicsDevice.SetRenderTarget(null);
@@ -239,13 +235,13 @@ namespace Starforge.Editor {
 
             Engine.Batch.Begin(SpriteSortMode.Deferred,
                 BlendState.AlphaBlend,
-                SamplerState.PointWrap, null,
+                SamplerState.PointWrap, null, 
                 RasterizerState.CullNone, null,
                 Camera.Transform);
 
             LoadedMap.Render();
 
-            foreach (Level level in VisibleLevels) {
+            foreach(Level level in VisibleLevels) {
                 Engine.Batch.Draw(level.Target, level.Position, Color.White);
             }
 

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using Starforge.Core;
 using Starforge.MapStructure.Encoding;
 using Starforge.Mod;
+using Starforge.Mod.Assets;
 using System.Collections.Generic;
 
 namespace Starforge.MapStructure {
@@ -38,12 +40,12 @@ namespace Starforge.MapStructure {
             Name = data.Name;
             Nodes = new List<Vector2>();
 
-            if (data.Nodes.Count > 0) {
-                foreach (Vector2 node in data.Nodes) Nodes.Add(node);
+            if(data.Nodes.Count > 0) {
+                foreach(Vector2 node in data.Nodes) Nodes.Add(node);
             }
 
             Level = level;
-            foreach (KeyValuePair<string, object> pair in data.Attributes) Attributes.Add(pair.Key, pair.Value);
+            foreach(KeyValuePair<string, object> pair in data.Attributes) Attributes.Add(pair.Key, pair.Value);
         }
 
         public Entity(string name) {
@@ -51,15 +53,17 @@ namespace Starforge.MapStructure {
         }
 
         public override BinaryMapElement ToBinary() {
-            BinaryMapElement bin = new BinaryMapElement() {
+            BinaryMapElement bin = new BinaryMapElement()
+            {
                 Name = Name
             };
 
-            foreach (KeyValuePair<string, object> pair in Attributes) bin.Attributes.Add(pair.Key, pair.Value);
+            foreach(KeyValuePair<string, object> pair in Attributes) bin.Attributes.Add(pair.Key, pair.Value);
 
-            if (Nodes.Count > 0) {
-                foreach (Vector2 node in Nodes) {
-                    BinaryMapElement binNode = new BinaryMapElement() {
+            if(Nodes.Count > 0) {
+                foreach(Vector2 node in Nodes) {
+                    BinaryMapElement binNode = new BinaryMapElement()
+                    {
                         Name = "node"
                     };
 

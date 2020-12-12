@@ -39,34 +39,31 @@ namespace Starforge.MapStructure {
 
             // Generate map RNG seed
             int seed = 0;
-            foreach (char c in package) seed += c;
+            foreach(char c in package) seed += c;
 
             RNGSeed = seed;
             ResetRNG();
         }
 
         public static Style ParseStyle(BinaryMapElement style, BinaryMapElement parent) {
-            if (parent != null && parent.Name == "apply") {
-                if (style.Name == "parallax") {
+            if(parent != null && parent.Name == "apply") {
+                if(style.Name == "parallax") {
                     // Apply parallax styleground
                     Parallax p = Parallax.FromBinary(style);
                     p.MergeAttributes(parent);
 
                     return p;
-                }
-                else {
+                } else {
                     // Apply effect
                     Effect e = new Effect(style);
                     e.MergeAttributes(parent);
 
                     return e;
                 }
-            }
-            else if (style.Name == "parallax") {
+            } else if(style.Name == "parallax") {
                 // Parallax styleground
                 return Parallax.FromBinary(style);
-            }
-            else {
+            } else {
                 // Effect
                 return new Effect(style);
             }
@@ -75,8 +72,8 @@ namespace Starforge.MapStructure {
         public static List<Style> ParseStyles(BinaryMapElement bin) {
             List<Style> styles = new List<Style>();
 
-            foreach (BinaryMapElement style in bin.Children) {
-                if (style.Name == "apply") {
+            foreach(BinaryMapElement style in bin.Children) {
+                if(style.Name == "apply") {
                     // Apply stylegrounds are weird, and only present in vanilla maps
                     // (to my knowledge.)
                     //
@@ -86,11 +83,10 @@ namespace Starforge.MapStructure {
                     //
                     // These are essentially a way to apply attributes to stylegrounds in bulk..
                     // Although, it seems relatively useless. Still exists and needs to be accounted for, though.
-                    foreach (BinaryMapElement apply in style.Children) {
+                    foreach(BinaryMapElement apply in style.Children) {
                         styles.Add(ParseStyle(apply, style));
                     }
-                }
-                else {
+                } else {
                     styles.Add(ParseStyle(style, null));
                 }
             }
@@ -101,17 +97,15 @@ namespace Starforge.MapStructure {
         public static Map FromBinary(BinaryMapElement bin) {
             Map map = new Map(bin.Package);
 
-            foreach (BinaryMapElement child in bin.Children) {
-                if (child.Name == "meta") {
+            foreach(BinaryMapElement child in bin.Children) {
+                if(child.Name == "meta") {
                     map.Meta = new MapMeta(child);
-                }
-                else if (child.Name == "levels") {
-                    foreach (BinaryMapElement level in child.Children) {
+                } else if(child.Name == "levels") {
+                    foreach(BinaryMapElement level in child.Children) {
                         map.Levels.Add(Level.FromBinary(level, map));
                     }
-                }
-                else if (child.Name == "Filler") {
-                    foreach (BinaryMapElement filler in child.Children) {
+                } else if(child.Name == "Filler") {
+                    foreach(BinaryMapElement filler in child.Children) {
                         map.Fillers.Add(new Rectangle(
                             filler.GetInt("x") * 8,
                             filler.GetInt("y") * 8,
@@ -119,13 +113,11 @@ namespace Starforge.MapStructure {
                             filler.GetInt("h") * 8
                         ));
                     }
-                }
-                else if (child.Name == "Style") {
-                    foreach (BinaryMapElement styleRoot in child.Children) {
-                        if (styleRoot.Name == "Backgrounds") {
+                } else if(child.Name == "Style") {
+                    foreach(BinaryMapElement styleRoot in child.Children) {
+                        if(styleRoot.Name == "Backgrounds") {
                             map.BackgroundStyles = ParseStyles(styleRoot);
-                        }
-                        else if (styleRoot.Name == "Foregrounds") {
+                        } else if(styleRoot.Name == "Foregrounds") {
                             map.ForegroundStyles = ParseStyles(styleRoot);
                         }
                     }
@@ -136,7 +128,8 @@ namespace Starforge.MapStructure {
         }
 
         public override BinaryMapElement ToBinary() {
-            BinaryMapElement bin = new BinaryMapElement() {
+            BinaryMapElement bin = new BinaryMapElement()
+            {
                 Name = "Map",
                 Package = Package
             };
@@ -145,24 +138,27 @@ namespace Starforge.MapStructure {
             bin.Children.Add(Meta.MetaElement);
 
             // Add levels
-            BinaryMapElement levelsElement = new BinaryMapElement() {
+            BinaryMapElement levelsElement = new BinaryMapElement()
+            {
                 Name = "levels"
             };
 
-            foreach (Level level in Levels) {
+            foreach(Level level in Levels) {
                 levelsElement.Children.Add(level.ToBinary());
             }
 
             bin.Children.Add(levelsElement);
 
             // Add fillers
-            if (Fillers.Count > 0) {
-                BinaryMapElement fillersElement = new BinaryMapElement() {
+            if(Fillers.Count > 0) {
+                BinaryMapElement fillersElement = new BinaryMapElement()
+                {
                     Name = "Filler"
                 };
 
-                foreach (Rectangle filler in Fillers) {
-                    BinaryMapElement rect = new BinaryMapElement() {
+                foreach(Rectangle filler in Fillers) {
+                    BinaryMapElement rect = new BinaryMapElement()
+                    {
                         Name = "rect"
                     };
                     rect.SetAttribute("x", filler.X / 8);
@@ -181,11 +177,11 @@ namespace Starforge.MapStructure {
             BinaryMapElement bgElement = new BinaryMapElement() { Name = "Backgrounds" };
             BinaryMapElement fgElement = new BinaryMapElement() { Name = "Foregrounds" };
 
-            foreach (Style style in BackgroundStyles) {
+            foreach(Style style in BackgroundStyles) {
                 bgElement.Children.Add(style.ToBinary());
             }
 
-            foreach (Style style in ForegroundStyles) {
+            foreach(Style style in ForegroundStyles) {
                 fgElement.Children.Add(style.ToBinary());
             }
 
@@ -198,7 +194,7 @@ namespace Starforge.MapStructure {
         }
 
         public void Render() {
-            for (int i = 0; i < Fillers.Count; i++) {
+            for(int i = 0; i < Fillers.Count; i++) {
                 GFX.Pixel.Draw(Fillers[i], Color.Gray);
             }
         }
@@ -411,13 +407,13 @@ namespace Starforge.MapStructure {
             bool hasAudio = false;
             bool hasCassette = false;
 
-            foreach (BinaryMapElement child in meta.Children) {
-                if (child.Name == "cassettemodifier")
+            foreach(BinaryMapElement child in meta.Children) {
+                if(child.Name == "cassettemodifier")
                     hasCassette = true;
 
-                if (child.Name == "mode") {
+                if(child.Name == "mode") {
                     hasMode = true;
-                    if (child.Children.Find(el => el.Name == "audiostate") != null) {
+                    if(child.Children.Find(el => el.Name == "audiostate") != null) {
                         hasAudio = true;
                     }
                 }
@@ -427,30 +423,30 @@ namespace Starforge.MapStructure {
             BinaryMapElement audioElement;
             BinaryMapElement cassetteElement;
 
-            if (!hasCassette) {
-                meta.Children.Add(cassetteElement = new BinaryMapElement() {
+            if(!hasCassette) {
+                meta.Children.Add(cassetteElement = new BinaryMapElement()
+                {
                     Name = "cassettemodifier"
                 });
-            }
-            else {
+            } else {
                 cassetteElement = meta.Children.Find(el => el.Name == "cassettemodifier");
             }
 
-            if (!hasMode) {
-                meta.Children.Add(modeElement = new BinaryMapElement() {
+            if(!hasMode) {
+                meta.Children.Add(modeElement = new BinaryMapElement()
+                {
                     Name = "mode"
                 });
-            }
-            else {
+            } else {
                 modeElement = meta.Children.Find(el => el.Name == "mode");
             }
 
-            if (!hasAudio) {
-                modeElement.Children.Add(audioElement = new BinaryMapElement() {
+            if(!hasAudio) {
+                modeElement.Children.Add(audioElement = new BinaryMapElement()
+                {
                     Name = "audiostate"
                 });
-            }
-            else {
+            } else {
                 audioElement = modeElement.Children.Find(el => el.Name == "audiostate");
             }
 
