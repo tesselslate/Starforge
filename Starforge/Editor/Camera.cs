@@ -60,7 +60,9 @@ namespace Starforge.Editor {
         }
 
         public void GotoCentered(Vector2 position) {
-            Position = new Vector2(position.X - Bounds.Width / 2, position.Y - Bounds.Height / 2);
+            Position = new Vector2(position.X - (Viewport.Width / 2), position.Y - (Viewport.Height / 2));
+
+            Update();
         }
 
         public void Update() {

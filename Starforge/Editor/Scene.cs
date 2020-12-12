@@ -80,6 +80,9 @@ namespace Starforge.Editor {
             MouseState m = Mouse.GetState();
 
             ImGuiIOPtr io = ImGui.GetIO();
+
+            // Only process input for editor if ImGUI doesn't currently want user input
+            // (e.g. user is not hovering over/focused on GUI elements)
             if(!io.WantCaptureKeyboard && !io.WantCaptureMouse) {
                 bool SelectedUpdate = false;
 
@@ -138,7 +141,7 @@ namespace Starforge.Editor {
                 }
             }
 
-            if(LoadedMap.Levels[RoomListWindow.CurrentRoom] != SelectedLevel) {
+            if(LoadedMap.Levels[RoomListWindow.CurrentRoom] != SelectedLevel && RoomListWindow.LastRoom != RoomListWindow.CurrentRoom) {
                 SelectedLevel.Selected = false;
                 SelectedLevel.Render();
 
@@ -147,8 +150,14 @@ namespace Starforge.Editor {
                 SelectedLevel.WasSelected = false;
                 SelectedLevel.Render();
 
-                Camera.GotoCentered(new Vector2(SelectedLevel.Bounds.X, SelectedLevel.Bounds.Y));
+                // Don't ask me how the camera works. It makes no sense to me honestly.
+                // It breaks on anything other than default zoom, so it's just set back to that when
+                // going to a room from the list.
+                Camera.Zoom = 1f;
+                Camera.GotoCentered(new Vector2(-SelectedLevel.Bounds.Center.X, -SelectedLevel.Bounds.Center.Y));
                 Camera.Update();
+
+                RoomListWindow.LastRoom = RoomListWindow.CurrentRoom;
             }
 
             // Set previous keyboard/mouse state
@@ -194,7 +203,7 @@ namespace Starforge.Editor {
 
             // Render ImGUI content
             Engine.GUI.BeforeLayout(gt);
-            if(Engine.Config.Debug) DebugWindow.Render();
+
             RoomListWindow.Render();
 
             Engine.GUI.AfterLayout();
