@@ -59,8 +59,8 @@ namespace Starforge.MapStructure {
         public LevelMeta Meta;
         public Map Parent;
 
-        private StaticTexture[] FgGrid;
-        private StaticTexture[] BgGrid;
+        public StaticTexture[] FgGrid;
+        public StaticTexture[] BgGrid;
         private bool TilesDirty = true;
 
         public RenderTarget2D Target { get; private set; }
@@ -261,13 +261,7 @@ namespace Starforge.MapStructure {
                     );
 
                     TilePointer = new Point((int)Math.Floor(roomPos.X / 8f), (int)Math.Floor(roomPos.Y / 8f));
-
-                    RerenderType res = ToolManager.Manage(m, this);
-                    if(res == RerenderType.Background) {
-                        Engine.Scene.BGAutotiler.Update(BackgroundTiles, BgGrid, TilePointer);
-                    } else if(res == RerenderType.Foreground) {
-                        Engine.Scene.FGAutotiler.Update(ForegroundTiles, FgGrid, TilePointer);
-                    }
+                    ToolManager.Manage(m, this);
 
                     Dirty = true;
                 }

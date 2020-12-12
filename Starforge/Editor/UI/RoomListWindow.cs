@@ -13,7 +13,7 @@ namespace Starforge.Editor.UI {
 
         public static void Render() {
             ImGui.SetNextWindowPos(new System.Numerics.Vector2(0f, 0f));
-            ImGui.SetNextWindowSize(new System.Numerics.Vector2(200f, Engine.Instance.GraphicsDevice.Viewport.Height));
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(250f, Engine.Instance.GraphicsDevice.Viewport.Height));
             ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0f);
             ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 0f);
 
@@ -27,7 +27,7 @@ namespace Starforge.Editor.UI {
             ImGui.PopStyleVar();
             ImGui.PopStyleVar();
 
-            ImGui.SetNextItemWidth(185f);
+            ImGui.SetNextItemWidth(235f);
             ImGui.ListBox("", ref CurrentRoom, RoomNames, RoomNames.Length, 30);
             ImGui.Text($"Rooms: {RoomNames.Length}");
 
