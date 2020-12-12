@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ImGuiNET;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
@@ -66,66 +67,88 @@ namespace Starforge.Editor {
             Camera.Zoom = 1f;
             Camera.GotoCentered(new Vector2(SelectedLevel.Bounds.Center.X, SelectedLevel.Bounds.Center.Y));
             Camera.Update();
+
+            List<string> roomNames = new List<string>();
+            foreach(Level level in map.Levels) {
+                roomNames.Add(level.Name);
+            }
+            RoomListWindow.RoomNames = roomNames.ToArray();
         }
 
         public void Update(GameTime gt) {
             KeyboardState kbd = Keyboard.GetState();
             MouseState m = Mouse.GetState();
 
-            bool SelectedUpdate = false;
+            ImGuiIOPtr io = ImGui.GetIO();
+            if(!io.WantCaptureKeyboard && !io.WantCaptureMouse) {
+                bool SelectedUpdate = false;
 
-            if(Engine.Instance.IsActive) {
-                if(m.ScrollWheelValue > PreviousMouseState.ScrollWheelValue) {
-                    // Scrolled up
-                    Camera.ZoomIn(new Vector2(m.X, m.Y));
-                } else if(m.ScrollWheelValue < PreviousMouseState.ScrollWheelValue) {
-                    // Scrolled down
-                    Camera.ZoomOut(new Vector2(m.X, m.Y));
-                }
-
-                if(m.RightButton == ButtonState.Pressed) {
-                    if(m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
-                        // User is dragging mouse
-                        Camera.Move(new Vector2(PreviousMouseState.X - m.X, PreviousMouseState.Y - m.Y) / Camera.Zoom);
-                    } else {
-                        // User clicked mouse
-
+                if(Engine.Instance.IsActive) {
+                    if(m.ScrollWheelValue > PreviousMouseState.ScrollWheelValue) {
+                        // Scrolled up
+                        Camera.ZoomIn(new Vector2(m.X, m.Y));
+                    } else if(m.ScrollWheelValue < PreviousMouseState.ScrollWheelValue) {
+                        // Scrolled down
+                        Camera.ZoomOut(new Vector2(m.X, m.Y));
                     }
-                } else if(m.LeftButton == ButtonState.Pressed) {
-                    Vector2 realPos = Camera.ScreenToReal(new Vector2(m.X, m.Y));
-                    Point point = new Point((int)realPos.X, (int)realPos.Y);
 
-                    if(m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
-                        // User is dragging mouse
-                        
-                    } else if(PreviousMouseState.LeftButton != ButtonState.Pressed) {
-                        // User clicked mouse
-                        if(LoadedMap.Levels.Count > 0) {
-                            foreach(Level level in VisibleLevels) {
-                                if(level.Bounds.Contains(point)) {
-                                    if(level == SelectedLevel) break;
-                                    SelectedLevel.Selected = false;
-                                    SelectedLevel.Render();
+                    if(m.RightButton == ButtonState.Pressed) {
+                        if(m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
+                            // User is dragging mouse
+                            Camera.Move(new Vector2(PreviousMouseState.X - m.X, PreviousMouseState.Y - m.Y) / Camera.Zoom);
+                        } else {
+                            // User clicked mouse
 
-                                    SelectedLevel = level;
-                                    SelectedLevel.Selected = true;
-                                    SelectedLevel.WasSelected = false;
-                                    SelectedLevel.Render();
+                        }
+                    } else if(m.LeftButton == ButtonState.Pressed) {
+                        Vector2 realPos = Camera.ScreenToReal(new Vector2(m.X, m.Y));
+                        Point point = new Point((int)realPos.X, (int)realPos.Y);
 
-                                    SelectedUpdate = true;
+                        if(m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
+                            // User is dragging mouse
 
-                                    break;
+                        } else if(PreviousMouseState.LeftButton != ButtonState.Pressed) {
+                            // User clicked mouse
+                            if(LoadedMap.Levels.Count > 0) {
+                                foreach(Level level in VisibleLevels) {
+                                    if(level.Bounds.Contains(point)) {
+                                        if(level == SelectedLevel) break;
+                                        SelectedLevel.Selected = false;
+                                        SelectedLevel.Render();
+
+                                        SelectedLevel = level;
+                                        SelectedLevel.Selected = true;
+                                        SelectedLevel.WasSelected = false;
+                                        SelectedLevel.Render();
+
+                                        SelectedUpdate = true;
+
+                                        break;
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                if(!SelectedUpdate) {
-                    // User did not change selected level
-                    // Send inputs to level for further processing
-                    SelectedLevel.Update(kbd, m, gt);
+                    if(!SelectedUpdate) {
+                        // User did not change selected level
+                        // Send inputs to level for further processing
+                        SelectedLevel.Update(kbd, m, gt);
+                    }
                 }
+            }
+
+            if(LoadedMap.Levels[RoomListWindow.CurrentRoom] != SelectedLevel) {
+                SelectedLevel.Selected = false;
+                SelectedLevel.Render();
+
+                SelectedLevel = LoadedMap.Levels[RoomListWindow.CurrentRoom];
+                SelectedLevel.Selected = true;
+                SelectedLevel.WasSelected = false;
+                SelectedLevel.Render();
+
+                Camera.GotoCentered(new Vector2(SelectedLevel.Bounds.X, SelectedLevel.Bounds.Y));
+                Camera.Update();
             }
 
             // Set previous keyboard/mouse state
@@ -172,6 +195,8 @@ namespace Starforge.Editor {
             // Render ImGUI content
             Engine.GUI.BeforeLayout(gt);
             if(Engine.Config.Debug) DebugWindow.Render();
+            RoomListWindow.Render();
+
             Engine.GUI.AfterLayout();
         }
     }
