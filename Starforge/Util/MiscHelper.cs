@@ -14,6 +14,24 @@ namespace Starforge.Util {
             return toChoose[(x ^ 2 + y * x) % toChoose.Count];
         }
 
+        public static string CleanCamelCase(string str) {
+            List<string> words = new List<string>();
+            string word = "";
+
+            foreach(char c in str) {
+                if(char.IsUpper(c)) {
+                    if(!string.IsNullOrEmpty(word)) words.Add(char.ToUpper(word[0]) + word.Substring(1));
+                    word = $"{c}";
+                } else {
+                    word += c;
+                }
+            }
+
+            words.Add(char.ToUpper(word[0]) + word.Substring(1));
+
+            return string.Join(" ", words.ToArray());
+        }
+
         public static byte HexCharToByte(char c) {
             return (byte)"0123456789ABCDEF".IndexOf(char.ToUpper(c));
         }

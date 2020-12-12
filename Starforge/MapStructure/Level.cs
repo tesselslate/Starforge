@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
+using Starforge.Editor.UI;
 using Starforge.MapStructure.Encoding;
 using Starforge.Mod;
 using Starforge.Mod.Assets;
@@ -67,8 +68,7 @@ namespace Starforge.MapStructure {
         public bool Selected = false;
         public bool WasSelected = false;
         private double InputProcessWait;
-
-        private Point PreviousTile = new Point(0, 0);
+        private Point TilePointer;
 
         public Level() {
             // Create empty lists for usual level elements (entities, etc)
@@ -255,17 +255,23 @@ namespace Starforge.MapStructure {
                         (int)rm.X - X,
                         (int)rm.Y - Y
                     );
-                    Point tile = new Point((int)Math.Floor(roomPos.X / 8f), (int)Math.Floor(roomPos.Y / 8f));
+                    TilePointer = new Point((int)Math.Floor(roomPos.X / 8f), (int)Math.Floor(roomPos.Y / 8f));
 
                     if(m.LeftButton == ButtonState.Pressed) {
-                        if(PreviousTile != tile) {
-                            ForegroundTiles.SetTile(tile.X, tile.Y, '6');
-                            Engine.Scene.FGAutotiler.Update(ForegroundTiles, FgGrid, tile);
+                        if(ToolWindow.CurrentTilesetList == 0) {
+                            if(ToolWindow.CurrentFGTileset == 0) ForegroundTiles.SetTile(TilePointer.X, TilePointer.Y, 48);
+                            else ForegroundTiles.SetTile(TilePointer.X, TilePointer.Y, Engine.Scene.FGTilesets[ToolWindow.CurrentFGTileset - 1].ID);
 
-                            Dirty = true;
-                            PreviousTile = tile;
+                            Engine.Scene.FGAutotiler.Update(ForegroundTiles, FgGrid, TilePointer);
+                        } else if(ToolWindow.CurrentTilesetList == 1) {
+                            if(ToolWindow.CurrentBGTileset == 0) BackgroundTiles.SetTile(TilePointer.X, TilePointer.Y, 48);
+                            else BackgroundTiles.SetTile(TilePointer.X, TilePointer.Y, Engine.Scene.BGTilesets[ToolWindow.CurrentBGTileset - 1].ID);
+
+                            Engine.Scene.BGAutotiler.Update(BackgroundTiles, BgGrid, TilePointer);
                         }
                     }
+
+                    Dirty = true;
                 }
             } else {
                 WasSelected = true;
@@ -327,6 +333,8 @@ namespace Starforge.MapStructure {
             for(int pos = 0; pos < ForegroundDecals.Count; pos++) {
                 ForegroundDecals[pos].Texture.DrawCentered();
             }
+
+            if(Selected) GFX.Draw.HollowRectangle(new Rectangle(TilePointer.X * 8, TilePointer.Y * 8, 8, 8), Color.Goldenrod);
 
             Engine.Batch.End();
             Dirty = false;

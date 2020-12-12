@@ -26,6 +26,7 @@ namespace Starforge.MapStructure.Tiling {
                 char c = el.AttrChar("id");
                 Tileset t = new Tileset(GFX.Gameplay["tilesets/" + el.Attr("path")], 8, 8);
                 t.ID = c;
+                t.Path = el.Attr("path");
 
                 t.Ignores = new HashSet<char>();
                 if(el.HasAttribute("ignores")) {
@@ -185,6 +186,15 @@ namespace Starforge.MapStructure.Tiling {
                     texArray[(y + r.Y) * grid.Width + x + r.X] = GenerateTileTexture(grid, x + r.X, y + r.Y);
                 }
             }
+        }
+
+        public List<Tileset> GetTilesetList() {
+            List<Tileset> l = new List<Tileset>();
+            foreach(Tileset t in Tilesets.Values) {
+                l.Add(t);
+            }
+
+            return l;
         }
     }
 }

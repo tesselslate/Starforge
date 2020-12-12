@@ -42,10 +42,10 @@ namespace Starforge.Editor {
             }
         }
 
-        public Camera(Viewport viewport) {
+        public Camera() {
             Zoom = 1f;
             Position = Vector2.Zero;
-            Viewport = viewport;
+            Viewport = Engine.Instance.GraphicsDevice.Viewport;
             Bounds = Viewport.Bounds;
         }
 
@@ -92,6 +92,10 @@ namespace Starforge.Editor {
 
             // Invoke position change event
             PositionChange?.Invoke();
+        }
+
+        public void UpdateViewport() {
+            Viewport = Engine.Instance.GraphicsDevice.Viewport;
         }
 
         // Convert a position on the map to a position on the screen.

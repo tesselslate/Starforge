@@ -27,6 +27,8 @@ namespace Starforge.MapStructure.Tiling {
             private set;
         }
 
+        public string Path;
+
         // Tileset masking/info
         public char ID;
 

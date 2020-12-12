@@ -6,6 +6,7 @@ using Starforge.Core;
 using Starforge.Editor.UI;
 using Starforge.MapStructure;
 using Starforge.MapStructure.Tiling;
+using Starforge.Util;
 using System.Collections.Generic;
 
 namespace Starforge.Editor {
@@ -20,6 +21,10 @@ namespace Starforge.Editor {
         public Autotiler BGAutotiler;
 
         public Autotiler FGAutotiler;
+
+        public List<Tileset> BGTilesets;
+
+        public List<Tileset> FGTilesets;
 
         public KeyboardState PreviousKeyboardState {
             get;
@@ -44,7 +49,7 @@ namespace Starforge.Editor {
         public Scene() {
             VisibleLevels = new List<Level>();
 
-            Camera = new Camera(Engine.Instance.GraphicsDevice.Viewport);
+            Camera = new Camera();
 
             // Update visible level list when the camera is moved
             Camera.PositionChange += UpdateVisibleLevels;
@@ -73,6 +78,35 @@ namespace Starforge.Editor {
                 roomNames.Add(level.Name);
             }
             RoomListWindow.RoomNames = roomNames.ToArray();
+
+            // Tilesets
+            BGTilesets = new List<Tileset>();
+            FGTilesets = new List<Tileset>();
+
+            List<string> tilesetNames = new List<string>();
+            List<Tileset> bgtilesets = BGAutotiler.GetTilesetList();
+            List<Tileset> fgtilesets = FGAutotiler.GetTilesetList();
+
+            tilesetNames.Add("Air");
+            foreach(Tileset t in bgtilesets) {
+                // The game has a built in tileset template.
+                if(t.Path.ToLower() == "template") continue;
+
+                BGTilesets.Add(t);
+                tilesetNames.Add(MiscHelper.CleanCamelCase(t.Path.Substring(2)));
+            }
+            ToolWindow.BGTilesets = tilesetNames.ToArray();
+
+            tilesetNames = new List<string>();
+            tilesetNames.Add("Air");
+            foreach(Tileset t in fgtilesets) {
+                // The game has a built in tileset template.
+                if(t.Path.ToLower() == "template") continue;
+
+                FGTilesets.Add(t);
+                tilesetNames.Add(MiscHelper.CleanCamelCase(t.Path));
+            }
+            ToolWindow.FGTilesets = tilesetNames.ToArray();
         }
 
         public void Update(GameTime gt) {
@@ -113,7 +147,8 @@ namespace Starforge.Editor {
                         } else if(PreviousMouseState.LeftButton != ButtonState.Pressed) {
                             // User clicked mouse
                             if(LoadedMap.Levels.Count > 0) {
-                                foreach(Level level in VisibleLevels) {
+                                for(int i = 0; i < LoadedMap.Levels.Count; i++) {
+                                    Level level = LoadedMap.Levels[i];
                                     if(level.Bounds.Contains(point)) {
                                         if(level == SelectedLevel) break;
                                         SelectedLevel.Selected = false;
@@ -123,6 +158,8 @@ namespace Starforge.Editor {
                                         SelectedLevel.Selected = true;
                                         SelectedLevel.WasSelected = false;
                                         SelectedLevel.Render();
+
+                                        RoomListWindow.CurrentRoom = i;
 
                                         SelectedUpdate = true;
 
@@ -205,6 +242,7 @@ namespace Starforge.Editor {
             Engine.GUI.BeforeLayout(gt);
 
             RoomListWindow.Render();
+            ToolWindow.Render();
 
             Engine.GUI.AfterLayout();
         }

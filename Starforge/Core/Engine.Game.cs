@@ -44,6 +44,9 @@ namespace Starforge.Core {
             GDM.SynchronizeWithVerticalRetrace = true;
 
             IsMouseVisible = true;
+
+            Window.AllowUserResizing = true;
+            Window.ClientSizeChanged += ResizeHandler;
         }
 
         protected override void Initialize() {
@@ -93,6 +96,10 @@ namespace Starforge.Core {
             Exit(0, false);
 
             base.OnExiting(sender, args);
+        }
+
+        private void ResizeHandler(object sender, EventArgs e) {
+            Scene.Camera.UpdateViewport();
         }
     }
 }
