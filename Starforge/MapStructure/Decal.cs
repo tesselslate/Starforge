@@ -10,7 +10,7 @@ namespace Starforge.MapStructure {
         public float ScaleX;
         public float ScaleY;
         public string Name;
-        
+
         public StaticTexture Texture {
             get;
             private set;
@@ -27,8 +27,7 @@ namespace Starforge.MapStructure {
         }
 
         public BinaryMapElement ToBinary() {
-            BinaryMapElement bin = new BinaryMapElement()
-            {
+            BinaryMapElement bin = new BinaryMapElement() {
                 Name = "decal"
             };
 

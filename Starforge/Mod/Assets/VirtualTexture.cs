@@ -11,7 +11,7 @@ namespace Starforge.Mod.Assets {
         public string Name { get; private set; }
 
         public int Width { get; private set; }
-        
+
         public int Height { get; private set; }
 
         public bool IsDisposed {
@@ -53,7 +53,7 @@ namespace Starforge.Mod.Assets {
         }
 
         public void Dispose() {
-            if(Texture != null && !Texture.IsDisposed) {
+            if (Texture != null && !Texture.IsDisposed) {
                 Texture.Dispose();
             }
             Texture = null;
@@ -61,18 +61,19 @@ namespace Starforge.Mod.Assets {
 
         internal unsafe void Reload() {
             Dispose();
-            if(string.IsNullOrEmpty(Path)) {
+            if (string.IsNullOrEmpty(Path)) {
                 Texture = new Texture2D(Engine.Instance.GraphicsDevice, Width, Height);
                 Color[] array = new Color[Width * Height];
-                
-                for(int i = 0; i < array.Length; i++) {
+
+                for (int i = 0; i < array.Length; i++) {
                     array[i] = Color.Transparent;
                 }
 
                 Texture.SetData(array);
-            } else if(System.IO.Path.GetExtension(Path) == ".data") {
-                using(FileStream stream = File.OpenRead(Path)) {
-                    using(BinaryReader reader = new BinaryReader(stream)) {
+            }
+            else if (System.IO.Path.GetExtension(Path) == ".data") {
+                using (FileStream stream = File.OpenRead(Path)) {
+                    using (BinaryReader reader = new BinaryReader(stream)) {
                         int width = reader.ReadInt32();
                         int height = reader.ReadInt32();
                         bool alpha = reader.ReadBoolean();
@@ -89,31 +90,34 @@ namespace Starforge.Mod.Assets {
                         Color[] c = new Color[width * height];
                         int pos = 0;
 
-                        for(int y = 0; y < height; y++) {
-                            for(int x = 0; x < width; x++) {
-                                if(loop == 0) {
+                        for (int y = 0; y < height; y++) {
+                            for (int x = 0; x < width; x++) {
+                                if (loop == 0) {
                                     loop = reader.ReadByte() - 1;
 
-                                    if(alpha) {
+                                    if (alpha) {
                                         a = reader.ReadByte();
 
-                                        if(a > 0) {
+                                        if (a > 0) {
                                             b = reader.ReadByte();
                                             g = reader.ReadByte();
                                             r = reader.ReadByte();
 
                                             c[pos] = new Color(r, g, b, a);
-                                        } else {
+                                        }
+                                        else {
                                             a = r = g = b = 0;
                                         }
-                                    } else {
+                                    }
+                                    else {
                                         b = reader.ReadByte();
                                         g = reader.ReadByte();
                                         r = reader.ReadByte();
 
                                         c[pos] = new Color(r, g, b, byte.MaxValue);
                                     }
-                                } else {
+                                }
+                                else {
                                     c[pos] = new Color(r, g, b, a);
                                     loop--;
                                 }
@@ -124,8 +128,9 @@ namespace Starforge.Mod.Assets {
                         Texture.SetData(c);
                     }
                 }
-            } else if(System.IO.Path.GetExtension(Path) == ".png") {
-                using(FileStream stream = File.OpenRead(Path)) {
+            }
+            else if (System.IO.Path.GetExtension(Path) == ".png") {
+                using (FileStream stream = File.OpenRead(Path)) {
                     Texture = Texture2D.FromStream(Engine.Instance.GraphicsDevice, stream);
                 }
             }
