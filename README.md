@@ -12,7 +12,7 @@ To compile from source, you can clone this repository and then build using Visua
 
 ---
 # Contributing
-Contributions are currently not accepted. You are, however, welcome to create a fork of your own. While it's preferred that in doing so you change the name and logo of your version of the project, I can't force you to do so.
+Public contributions are currently not accepted. You are, however, welcome to create a fork of your own. While it's preferred that in doing so you change the name and logo of your version of the project, I can't force you to do so.
 
 ---
 # License
