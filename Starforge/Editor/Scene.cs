@@ -7,6 +7,7 @@ using Starforge.Editor.UI;
 using Starforge.MapStructure;
 using Starforge.MapStructure.Tiling;
 using Starforge.Util;
+using System;
 using System.Collections.Generic;
 
 namespace Starforge.Editor {
@@ -78,6 +79,14 @@ namespace Starforge.Editor {
                 roomNames.Add(level.Name);
             }
             RoomListWindow.RoomNames = roomNames.ToArray();
+
+            // Tools
+            List<string> toolList = new List<string>();
+            
+            foreach(ToolType type in Enum.GetValues(typeof(ToolType))) {
+                toolList.Add(type.ToString());
+            }
+            ToolWindow.Tools = toolList.ToArray();
 
             // Tilesets
             BGTilesets = new List<Tileset>();
@@ -243,6 +252,12 @@ namespace Starforge.Editor {
 
             RoomListWindow.Render();
             ToolWindow.Render();
+
+            ImGui.Begin("Starforge");
+            ImGui.Text("Starforge is an experimental map editor.");
+            ImGui.TextColored(new System.Numerics.Vector4(0, 255, 0, 255), "It is made by WoofWoofDoggo!");
+            ImGui.Text("It can be found at https://github.com/WoofWoofDoggo/Starforge");
+            ImGui.End();
 
             Engine.GUI.AfterLayout();
         }

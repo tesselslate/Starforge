@@ -5,14 +5,17 @@ using Starforge.MapStructure.Tiling;
 namespace Starforge.Editor.UI {
     public static class ToolWindow {
         public static int CurrentBGTileset;
-
         public static int CurrentFGTileset;
 
         public static string[] BGTilesets;
-
         public static string[] FGTilesets;
+        public static string[] Tools;
 
         public static int CurrentTilesetList = 0;
+        public static ToolType CurrentTool = ToolType.Point;
+
+        private static int CurrentToolInt = 0;
+        private static string[] Layers = new string[] { "Foreground", "Background" };
 
         public static void Render() {
             ImGui.SetNextWindowPos(new System.Numerics.Vector2(Engine.Instance.GraphicsDevice.Viewport.Width - 150f, 0f));
@@ -37,7 +40,10 @@ namespace Starforge.Editor.UI {
                 ImGui.ListBox("", ref CurrentBGTileset, BGTilesets, BGTilesets.Length, 30);
             }
 
-            ImGui.ListBox("Tools", ref CurrentTilesetList, new string[] { "Foreground", "Background" }, 2);
+            ImGui.ListBox("Layer", ref CurrentTilesetList, Layers, 2);
+            ImGui.ListBox("Tool", ref CurrentToolInt, Tools, Tools.Length);
+
+            CurrentTool = (ToolType)CurrentToolInt;
             
             ImGui.End();
         }
