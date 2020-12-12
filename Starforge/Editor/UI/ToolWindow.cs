@@ -1,6 +1,5 @@
 ﻿using ImGuiNET;
 using Starforge.Core;
-using Starforge.MapStructure.Tiling;
 
 namespace Starforge.Editor.UI {
     public static class ToolWindow {
@@ -34,9 +33,10 @@ namespace Starforge.Editor.UI {
             ImGui.PopStyleVar();
 
             ImGui.SetNextItemWidth(135f);
-            if(CurrentTilesetList == 0) {
+            if (CurrentTilesetList == 0) {
                 ImGui.ListBox("", ref CurrentFGTileset, FGTilesets, FGTilesets.Length, 30);
-            } else {
+            }
+            else {
                 ImGui.ListBox("", ref CurrentBGTileset, BGTilesets, BGTilesets.Length, 30);
             }
 
@@ -44,7 +44,7 @@ namespace Starforge.Editor.UI {
             ImGui.ListBox("Tool", ref CurrentToolInt, Tools, Tools.Length);
 
             CurrentTool = (ToolType)CurrentToolInt;
-            
+
             ImGui.End();
         }
     }

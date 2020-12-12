@@ -13,9 +13,10 @@ namespace Starforge.Mod {
         public static Entity Create(Level level, string name) {
             EntityData data = new EntityData(name);
 
-            if(Creators.ContainsKey(name)) {
+            if (Creators.ContainsKey(name)) {
                 return Creators[name](level, data);
-            } else {
+            }
+            else {
                 return new Entity(level, data);
             }
         }
@@ -23,9 +24,10 @@ namespace Starforge.Mod {
         public static Entity Create(Level level, BinaryMapElement el) {
             EntityData data = new EntityData(el);
 
-            if(Creators.ContainsKey(data.Name)) {
+            if (Creators.ContainsKey(data.Name)) {
                 return Creators[data.Name](level, data);
-            } else {
+            }
+            else {
                 return new Entity(level, data);
             }
         }
@@ -33,18 +35,19 @@ namespace Starforge.Mod {
         public static Trigger CreateTrigger(Level level, BinaryMapElement el) {
             EntityData data = new EntityData(el);
 
-            if(Creators.ContainsKey(data.Name)) {
+            if (Creators.ContainsKey(data.Name)) {
                 return (Trigger)Creators[data.Name](level, data);
-            } else {
+            }
+            else {
                 return new Trigger(level, data);
             }
         }
 
         public static void Register(Type type) {
             try {
-                if(type.IsSubclassOf(typeof(Entity))) {
+                if (type.IsSubclassOf(typeof(Entity))) {
                     EntityDefinitionAttribute attr = type.GetCustomAttribute<EntityDefinitionAttribute>();
-                    if(attr != null) {
+                    if (attr != null) {
                         string id = attr.ID;
                         ConstructorInfo ctor = type.GetConstructor(new Type[]
                         {
@@ -52,17 +55,20 @@ namespace Starforge.Mod {
                             typeof(EntityData)
                         });
 
-                        if(ctor != null) {
+                        if (ctor != null) {
                             Creators.Add(id, (Level l, EntityData e) => (Entity)ctor.Invoke(new object[] { l, e }));
                             Logger.Log($"Registered entity of ID {id}");
-                        } else {
+                        }
+                        else {
                             Logger.Log(LogLevel.Error, $"Attempted to register entity of type ${type}, but could not find a suitable constructor");
                         }
-                    } else {
+                    }
+                    else {
                         Logger.Log(LogLevel.Error, $"Attempted to register entity of type ${type}, but could not find a definition attribute");
                     }
                 }
-            } catch(Exception e) {
+            }
+            catch (Exception e) {
                 Logger.Log(LogLevel.Error, $"Failed to register entity of type {type}");
                 Logger.LogException(e);
             }

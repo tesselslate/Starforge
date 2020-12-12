@@ -18,11 +18,12 @@ namespace Starforge.Util {
             List<string> words = new List<string>();
             string word = "";
 
-            foreach(char c in str) {
-                if(char.IsUpper(c)) {
-                    if(!string.IsNullOrEmpty(word)) words.Add(char.ToUpper(word[0]) + word.Substring(1));
+            foreach (char c in str) {
+                if (char.IsUpper(c)) {
+                    if (!string.IsNullOrEmpty(word)) words.Add(char.ToUpper(word[0]) + word.Substring(1));
                     word = $"{c}";
-                } else {
+                }
+                else {
                     word += c;
                 }
             }
@@ -38,19 +39,21 @@ namespace Starforge.Util {
 
         public static Color HexToColor(string hex) {
             int index = 0;
-            if(hex.Length >= 1 && hex[0] == '#') index = 1;
+            if (hex.Length >= 1 && hex[0] == '#') index = 1;
 
-            if(hex.Length - index >= 6) {
+            if (hex.Length - index >= 6) {
                 return new Color(
-                    HexCharToByte(hex[index])     * 16 + HexCharToByte(hex[index + 1]),
+                    HexCharToByte(hex[index]) * 16 + HexCharToByte(hex[index + 1]),
                     HexCharToByte(hex[index + 2]) * 16 + HexCharToByte(hex[index + 3]),
                     HexCharToByte(hex[index + 4]) * 16 + HexCharToByte(hex[index + 5])
                 );
-            } else {
+            }
+            else {
                 int hexNum;
-                if(int.TryParse(hex.Substring(index), out hexNum)) {
+                if (int.TryParse(hex.Substring(index), out hexNum)) {
                     return HexToColor(hexNum);
-                } else {
+                }
+                else {
                     return Color.White;
                 }
             }
@@ -68,8 +71,8 @@ namespace Starforge.Util {
         public static int[,] ReadCSV(string csv, int width, int height) {
             int[,] array = new int[width, height];
 
-            for(int i = 0; i < width; i++) {
-                for(int j = 0; j < height; j++) {
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) {
                     array[i, j] = -1;
                 }
             }
@@ -79,14 +82,14 @@ namespace Starforge.Util {
             });
 
             int index = 0;
-            while(index < height && index < array2.Length) {
+            while (index < height && index < array2.Length) {
                 string[] array3 = array2[index].Split(new char[]
                 {
                     ','
                 }, StringSplitOptions.RemoveEmptyEntries);
 
                 int widthIndex = 0;
-                while(widthIndex < width && widthIndex < array3.Length) {
+                while (widthIndex < width && widthIndex < array3.Length) {
                     array[widthIndex, index] = Convert.ToInt32(array3[widthIndex]);
                     widthIndex++;
                 }

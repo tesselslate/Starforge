@@ -33,7 +33,7 @@ namespace Starforge.Editor.UI {
 
             MouseState m = Mouse.GetState();
 
-            if(Engine.Config.Debug) {
+            if (Engine.Config.Debug) {
                 ImGui.SetCursorPosY(Engine.Instance.GraphicsDevice.Viewport.Height - ImGui.GetTextLineHeightWithSpacing() * 6);
                 ImGui.Text(string.Format("{0:F3} ms/frame ({1:F1} FPS)", 1000f / ImGui.GetIO().Framerate, ImGui.GetIO().Framerate));
                 ImGui.Text($"Current room: {Engine.Scene.SelectedLevel.Name}");

@@ -11,14 +11,15 @@ namespace Starforge.Mod {
 
         public static void LoadAssembly(Assembly asm) {
             try {
-                foreach(Type type in asm.GetTypes()) {
-                    if(type.IsSubclassOf(typeof(Entity)) && type.GetCustomAttribute<EntityDefinitionAttribute>() != null) {
+                foreach (Type type in asm.GetTypes()) {
+                    if (type.IsSubclassOf(typeof(Entity)) && type.GetCustomAttribute<EntityDefinitionAttribute>() != null) {
                         EntityRegistry.Register(type);
                     }
                 }
 
                 LoadedAssemblies.Add(asm);
-            } catch(Exception e) {
+            }
+            catch (Exception e) {
                 Logger.Log(LogLevel.Error, $"Failed to load assembly: {asm.GetName()}");
                 Logger.LogException(e);
             }
@@ -28,7 +29,8 @@ namespace Starforge.Mod {
             try {
                 Assembly asm = Assembly.LoadFile(path);
                 LoadAssembly(asm);
-            } catch(Exception e) {
+            }
+            catch (Exception e) {
                 Logger.Log(LogLevel.Error, $"Failed to load assembly: ${path}");
                 Logger.LogException(e);
             }

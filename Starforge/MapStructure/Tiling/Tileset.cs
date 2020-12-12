@@ -1,7 +1,5 @@
 ﻿using Starforge.Mod.Assets;
-using Starforge.Util;
 using System.Collections.Generic;
-using System.Xml;
 
 namespace Starforge.MapStructure.Tiling {
     public class Tileset {
@@ -46,8 +44,8 @@ namespace Starforge.MapStructure.Tiling {
             TileHeight = height;
 
             Tiles = new DrawableTexture[texture.Width / width, texture.Height / height];
-            for(int i = 0; i < texture.Width / width; i++) {
-                for(int j = 0; j < texture.Height / height; j++) {
+            for (int i = 0; i < texture.Width / width; i++) {
+                for (int j = 0; j < texture.Height / height; j++) {
                     Tiles[i, j] = new DrawableTexture(Texture, i * TileWidth, j * TileHeight, TileWidth, TileHeight);
                 }
             }
@@ -56,7 +54,7 @@ namespace Starforge.MapStructure.Tiling {
         public List<DrawableTexture> ParseTextureString(string str) {
             List<DrawableTexture> list = new List<DrawableTexture>();
             string[] tiles = str.Split(';');
-            foreach(string loc in tiles) {
+            foreach (string loc in tiles) {
                 string[] split = loc.Split(',');
                 list.Add(this[int.Parse(split[0]), int.Parse(split[1])]);
             }
