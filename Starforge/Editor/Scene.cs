@@ -161,11 +161,7 @@ namespace Starforge.Editor {
         }
 
         private void UpdateClick(MouseState m) {
-            if (m.LeftButton != ButtonState.Pressed || PreviousMouseState.LeftButton == ButtonState.Pressed) {
-                return;
-            }
-            if (m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
-                // User is dragging mouse
+            if (m.LeftButton != ButtonState.Pressed) {
                 return;
             }
 
@@ -176,6 +172,16 @@ namespace Starforge.Editor {
             // Search for room that was clicked on
             // Most common option, check for currently selected level first
             if (SelectedLevel.Bounds.Contains(point)) {
+                SelectedLevel.Dirty = true;
+                return;
+            }
+
+            if (PreviousMouseState.LeftButton == ButtonState.Pressed) {
+                // no new click -> exit
+                return;
+            }
+            if (m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
+                // User is dragging mouse
                 return;
             }
 

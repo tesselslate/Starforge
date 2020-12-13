@@ -63,7 +63,7 @@ namespace Starforge.MapStructure {
         private bool TilesDirty = true;
 
         public RenderTarget2D Target { get; private set; }
-        public bool Dirty = true;
+        public bool Dirty { get; set; } = true;
 
         // whether this level is currently selected
         public bool Selected = false;
@@ -236,8 +236,6 @@ namespace Starforge.MapStructure {
 
                     TilePointer = new Point((int)Math.Floor(roomPos.X / 8f), (int)Math.Floor(roomPos.Y / 8f));
                     ToolManager.Manage(m, this);
-
-                    Dirty = true;
                 }
             }
             else {

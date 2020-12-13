@@ -40,7 +40,8 @@ namespace Starforge.Core {
             GDM.PreferredBackBufferWidth = 1280;
             GDM.PreferredBackBufferHeight = 720;
             GDM.PreferMultiSampling = true;
-            GDM.SynchronizeWithVerticalRetrace = true;
+            GDM.SynchronizeWithVerticalRetrace = false;
+            IsFixedTimeStep = false;
 
             IsMouseVisible = true;
 
