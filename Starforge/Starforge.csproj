@@ -49,6 +49,8 @@
     <Compile Include="Core\Engine.Settings.cs" />
     <Compile Include="Core\Engine.Game.cs" />
     <Compile Include="Core\GFX.cs" />
+    <Compile Include="Editor\Actions\DrawTilePlacement.cs" />
+    <Compile Include="Editor\Actions\RectangleTilePlacement.cs" />
     <Compile Include="Editor\Camera.cs" />
     <Compile Include="Editor\Actions\Action.cs" />
     <Compile Include="Editor\ImGUIHandler.cs" />

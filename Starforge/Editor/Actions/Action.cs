@@ -1,27 +1,19 @@
-﻿using Microsoft.Xna.Framework;
-using Starforge.MapStructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Starforge.MapStructure;
 
 namespace Starforge.Editor.Actions {
 
     // representing a user action, like placing/removing an entity or a tile
-    abstract class Action {
+    abstract public class Action {
 
-        // the type of action
-        private ToolType toolType;
+        protected Level Level;
 
-        // the place of the action
-        private Rectangle position;
-
-        public Action() {
-
+        public Action(Level l) {
+            Level = l;
         }
 
-        public abstract void Apply(Level l);
+        public abstract bool Apply();
+
+        public abstract bool Undo();
     }
 
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
+using Starforge.Editor.Actions;
 using Starforge.Editor.UI;
 using Starforge.MapStructure;
 using Starforge.MapStructure.Tiling;
@@ -16,44 +17,50 @@ namespace Starforge.Editor {
         private static Rectangle Hold = default;
         private static Point HoldStart;
 
+        private static DrawTilePlacement CurrentDrawAction = null;
+
         public static void Manage(MouseState m, Level l) {
             ToolHint = new Rectangle(l.TilePointer.X * TILE_SIZE, l.TilePointer.Y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 
-            bool changed = false;
             switch (ToolWindow.CurrentTool) {
-            case ToolType.Point:
-                changed = HandlePointTool(m, l);
+            case ToolType.Draw:
+                HandlePointTool(m, l);
                 break;
             case ToolType.Rectangle:
-                changed = HandleRectangleTool(m, l);
+                HandleRectangleTool(m, l);
                 break;
             }
 
-            if (changed) {
-                l.Dirty = true;
-            }
         }
 
-        private static bool HandlePointTool(MouseState m, Level l) {
+        private static void HandlePointTool(MouseState m, Level l) {
             if (m.LeftButton != ButtonState.Pressed) {
-                return false;
-            }
-            bool changed = false;
-            switch (ToolWindow.CurrentTileType) {
-            case TileType.Foreground:
-                changed = setPoint(Engine.Scene.FGAutotiler, l.ForegroundTiles, l.FgGrid, ToolWindow.CurrentFGTileset, l.TilePointer);
-                break;
-            case TileType.Background:
-                changed = setPoint(Engine.Scene.BGAutotiler, l.BackgroundTiles, l.BgGrid, ToolWindow.CurrentBGTileset, l.TilePointer);
-                break;
+                if (Engine.Scene.PreviousMouseState.LeftButton == ButtonState.Pressed) {
+                    // if the user just let go of press, add action to recent Actions of the level
+                    //l.PastActions.Add(CurrentDrawAction);
+                }
+                return;
             }
 
-            return changed;
+            // when newly pressing button down
+            if (Engine.Scene.PreviousMouseState.LeftButton == ButtonState.Released) {
+                switch (ToolWindow.CurrentTileType) {
+                case TileType.Foreground:
+                    CurrentDrawAction = new DrawTilePlacement(l, ToolWindow.CurrentTileType, ToolWindow.CurrentFGTileset, l.TilePointer);
+                    break;
+                case TileType.Background:
+                    CurrentDrawAction = new DrawTilePlacement(l, ToolWindow.CurrentTileType, ToolWindow.CurrentBGTileset, l.TilePointer);
+                    break;
+                }
+                l.ApplyNewAction(CurrentDrawAction);
+                return;
+            }
+
+            // when holding and continuously drawing, add to existing action
+            CurrentDrawAction.AddPoint(l.TilePointer);
         }
 
-        private static bool HandleRectangleTool(MouseState m, Level l) {
-            bool changed = false;
-
+        private static void HandleRectangleTool(MouseState m, Level l) {
             if (m.LeftButton == ButtonState.Pressed) {
                 if (Engine.Scene.PreviousMouseState.LeftButton == ButtonState.Released) {
                     // Just started holding LMB
@@ -80,52 +87,23 @@ namespace Starforge.Editor {
                 ToolHint = new Rectangle(Hold.X * TILE_SIZE, Hold.Y * TILE_SIZE, Hold.Width * TILE_SIZE, Hold.Height * TILE_SIZE);
             }
             else if (Engine.Scene.PreviousMouseState.LeftButton == ButtonState.Pressed) {
-                // Create rectangle
+                // Create rectangle action
                 switch (ToolWindow.CurrentTileType) {
                 case TileType.Foreground:
-                    changed = setRectangle(Engine.Scene.FGAutotiler, l.ForegroundTiles, l.FgGrid, ToolWindow.CurrentFGTileset, Hold);
+                    l.ApplyNewAction(new RectangleTilePlacement(l, ToolWindow.CurrentTileType, ToolWindow.CurrentFGTileset, Hold));
                     break;
                 case TileType.Background:
-                    changed = setRectangle(Engine.Scene.BGAutotiler, l.BackgroundTiles, l.BgGrid, ToolWindow.CurrentBGTileset, Hold);
+                    l.ApplyNewAction(new RectangleTilePlacement(l, ToolWindow.CurrentTileType, ToolWindow.CurrentBGTileset, Hold));
                     break;
                 }
                 Hold = default;
             }
-
-            return changed;
         }
 
-        // Sets a single tile to a given tileset, returns true if anything changed
-        private static bool setPoint(Autotiler tiler, TileGrid tileGrid, StaticTexture[] textures, int tileset, Point position) {
-            if (tileset == 0) {
-                tileGrid.SetTile(position.X, position.Y, '0');
-            }
-            else {
-                tileGrid.SetTile(position.X, position.Y, tiler.GetTilesetList()[tileset - 1].ID);
-            }
-
-            return tiler.Update(tileGrid, textures, position);
-        }
-
-        // Sets a rectangle to a given tileset, returns true if anything changed
-        private static bool setRectangle(Autotiler tiler, TileGrid tileGrid, StaticTexture[] textures, int tileset, Rectangle area) {
-            for (int x = area.X; x < area.X + area.Width; x++) {
-                for (int y = area.Y; y < area.Y + area.Height; y++) {
-                    if (tileset == 0) {
-                        tileGrid.SetTile(x, y, '0');
-                    }
-                    else {
-                        tileGrid.SetTile(x, y, tiler.GetTilesetList()[tileset - 1].ID);
-                    }
-                }
-            }
-
-            return tiler.Update(tileGrid, textures, area);
-        }
     }
 
     public enum ToolType {
-        Point,
+        Draw,
         Rectangle
     }
 
