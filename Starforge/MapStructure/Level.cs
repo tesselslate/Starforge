@@ -327,7 +327,10 @@ namespace Starforge.MapStructure {
                 ForegroundDecals[pos].Texture.DrawCentered();
             }
 
-            if (Selected) GFX.Draw.HollowRectangle(ToolManager.ToolHint, Color.Goldenrod);
+            if (Selected) {
+                GFX.Pixel.Draw(ToolManager.ToolHint, Engine.Config.ToolAccentColor, 0.25f);
+                GFX.Draw.HollowRectangle(ToolManager.ToolHint, Color.Goldenrod);
+            }
 
             Engine.Batch.End();
             Dirty = false;

@@ -1,17 +1,25 @@
 ﻿using Starforge.Mod;
+using Starforge.Platform;
 using System;
 using System.IO;
 
 namespace Starforge.Core {
     public partial class Engine {
-        public static readonly string StarforgeDirectory;
-
         public static bool Loaded {
             get;
             private set;
         }
 
+        public static string CelesteDirectory {
+            get;
+            private set;
+        }
+        
+        public static readonly string StarforgeDirectory;
+
         public static Engine Instance;
+
+        public static PlatformBase Platform;
 
         static Engine() {
             StarforgeDirectory = Environment.CurrentDirectory;
@@ -29,6 +37,22 @@ namespace Starforge.Core {
             ));
 
             Logger.SetOutputStream(new StreamWriter(logStream));
+
+            // Set up platform-specific helper
+            switch(SDL2.SDL.SDL_GetPlatform()) {
+            case "Windows":
+                Platform = new PlatformWindows();
+                break;
+            case "Mac OS X":
+                throw new PlatformNotSupportedException("Mac OS is currently unsupported.");
+            case "Linux":
+                throw new PlatformNotSupportedException("Linux is currently unsupported.");
+            default: 
+                throw new PlatformNotSupportedException($"Invalid platform: {SDL2.SDL.SDL_GetPlatform()}");
+            }
+
+            CelesteDirectory = Platform.GetCelesteDirectory();
+            Config.ContentDirectory = Path.Combine(CelesteDirectory, "Content");
 
             // Load plugins (first stage mod loading)
             Loader.LoadPluginAssemblies();

@@ -61,11 +61,11 @@ namespace Starforge.Editor {
                 SelectedLevel.Selected = true;
             }
 
-            BGAutotiler = new Autotiler("./Content/Graphics/BackgroundTiles.xml");
-            FGAutotiler = new Autotiler("./Content/Graphics/ForegroundTiles.xml");
+            BGAutotiler = new Autotiler($"{Engine.Config.ContentDirectory}/Graphics/BackgroundTiles.xml");
+            FGAutotiler = new Autotiler($"{Engine.Config.ContentDirectory}/Graphics/ForegroundTiles.xml");
 
             Camera.Zoom = 1f;
-            Camera.GotoCentered(new Vector2(SelectedLevel.Bounds.Center.X, SelectedLevel.Bounds.Center.Y));
+            Camera.GotoCentered(new Vector2(-SelectedLevel.Bounds.Center.X, -SelectedLevel.Bounds.Center.Y));
             Camera.Update();
 
             List<string> roomNames = new List<string>();
@@ -227,12 +227,6 @@ namespace Starforge.Editor {
 
             RoomListWindow.Render();
             ToolWindow.Render();
-
-            ImGui.Begin("Starforge");
-            ImGui.Text("Starforge is an experimental map editor.");
-            ImGui.TextColored(new System.Numerics.Vector4(0, 255, 0, 255), "It is made by WoofWoofDoggo!");
-            ImGui.Text("It can be found at https://github.com/WoofWoofDoggo/Starforge");
-            ImGui.End();
 
             Engine.GUI.AfterLayout();
         }
