@@ -45,5 +45,10 @@ namespace Starforge.Editor.UI {
 
             ImGui.End();
         }
+
+        public static void SetCurrentRoom(int newRoom) {
+            LastRoom = CurrentRoom;
+            CurrentRoom = newRoom;
+        }
     }
 }

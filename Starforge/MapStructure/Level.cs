@@ -63,9 +63,14 @@ namespace Starforge.MapStructure {
         private bool TilesDirty = true;
 
         public RenderTarget2D Target { get; private set; }
-        public bool Dirty = true;
+        public RenderTarget2D Overlay { get; private set; }
+        public Point OverlayPosition { get; private set; }
+        public bool Dirty { get; set; } = true;
 
-        public bool Selected = false;
+        // whether this level is currently selected
+        private bool Selected { get; set; } = false;
+
+        // whether this level was just newly selected
         public bool WasSelected = false;
         private double InputProcessWait;
 
@@ -83,93 +88,92 @@ namespace Starforge.MapStructure {
             ForegroundDecals = new List<Decal>();
         }
 
+        // create a new level from reading the binary
+        public Level(BinaryMapElement element, Map parent) : this() {
+            Attributes = element.Attributes;
+            CreateTileGrids();
+
+            Meta = new LevelMeta(this);
+            Parent = parent;
+
+            // Normalize room size
+            if (Width % 8 != 0) {
+                Width += 8 - (Width % 8);
+            }
+            if (Height % 8 != 0) {
+                Height += 8 - (Height % 8);
+            }
+
+            foreach (BinaryMapElement child in element.Children) {
+                switch (child.Name) {
+                case "entities":
+                    foreach (BinaryMapElement entity in child.Children) {
+                        Entities.Add(EntityRegistry.Create(this, entity));
+                    }
+                    break;
+                case "triggers":
+                    foreach (BinaryMapElement trigger in child.Children) {
+                        Triggers.Add(EntityRegistry.CreateTrigger(this, trigger));
+                    }
+                    break;
+                case "bgdecals":
+                    foreach (BinaryMapElement decal in child.Children) {
+                        BackgroundDecals.Add(new Decal(
+                            decal.GetFloat("x"),
+                            decal.GetFloat("y"),
+                            decal.GetFloat("scaleX", 1),
+                            decal.GetFloat("scaleY", 1),
+                            decal.GetString("texture")
+                        ));
+                    }
+                    break;
+                case "fgdecals":
+                    foreach (BinaryMapElement decal in child.Children) {
+                        ForegroundDecals.Add(new Decal(
+                            decal.GetFloat("x"),
+                            decal.GetFloat("y"),
+                            decal.GetFloat("scaleX", 1),
+                            decal.GetFloat("scaleY", 1),
+                            decal.GetString("texture")
+                        ));
+                    }
+                    break;
+                case "objtiles":
+                    ObjectTiles = new TileGrid(
+                        MiscHelper.ReadCSV(
+                            child.GetString("innerText"),
+                            Width / 8,
+                            Height / 8
+                        ),
+                        Width / 8,
+                        Height / 8
+                    );
+                    break;
+                case "solids":
+                    ForegroundTiles = new TileGrid(
+                        child.GetString("innerText"),
+                        Width / 8,
+                        Height / 8
+                    );
+                    break;
+                case "bg":
+                    BackgroundTiles = new TileGrid(
+                        child.GetString("innerText"),
+                        Width / 8,
+                        Height / 8
+                     );
+                    break;
+                }
+            }
+
+            UpdateBounds();
+        }
+
         private void CreateTileGrids() {
             // This is just used to ensure the TileGrids aren't null when resaving (some rooms don't have these.)
             BackgroundTiles = new TileGrid(Width / 8, Height / 8);
             ForegroundTiles = new TileGrid(Width / 8, Height / 8);
             ObjectTiles = new TileGrid(Width / 8, Height / 8);
-        }
-
-        public static Level FromBinary(BinaryMapElement element, Map parent) {
-            Level level = new Level();
-            level.Attributes = element.Attributes;
-            level.CreateTileGrids();
-
-            level.Meta = new LevelMeta(level);
-            level.Parent = parent;
-
-            // Normalize room size
-            if (level.Width % 8 != 0) {
-                level.Width += 8 - (level.Width % 8);
-            }
-
-            if (level.Height % 8 != 0) {
-                level.Height += 8 - (level.Height % 8);
-            }
-
-            foreach (BinaryMapElement child in element.Children) {
-                if (child.Name == "entities") {
-                    foreach (BinaryMapElement entity in child.Children) {
-                        level.Entities.Add(EntityRegistry.Create(level, entity));
-                    }
-                }
-                else if (child.Name == "triggers") {
-                    foreach (BinaryMapElement trigger in child.Children) {
-                        level.Triggers.Add(EntityRegistry.CreateTrigger(level, trigger));
-                    }
-                }
-                else if (child.Name == "bgdecals") {
-                    foreach (BinaryMapElement decal in child.Children) {
-                        level.BackgroundDecals.Add(new Decal(
-                            decal.GetFloat("x"),
-                            decal.GetFloat("y"),
-                            decal.GetFloat("scaleX", 1),
-                            decal.GetFloat("scaleY", 1),
-                            decal.GetString("texture")
-                        ));
-                    }
-                }
-                else if (child.Name == "fgdecals") {
-                    foreach (BinaryMapElement decal in child.Children) {
-                        level.ForegroundDecals.Add(new Decal(
-                            decal.GetFloat("x"),
-                            decal.GetFloat("y"),
-                            decal.GetFloat("scaleX", 1),
-                            decal.GetFloat("scaleY", 1),
-                            decal.GetString("texture")
-                        ));
-                    }
-                }
-                else if (child.Name == "objtiles") {
-                    level.ObjectTiles = new TileGrid(
-                        MiscHelper.ReadCSV(
-                            child.GetString("innerText"),
-                            level.Width / 8,
-                            level.Height / 8
-                        ),
-                        level.Width / 8,
-                        level.Height / 8
-                    );
-                }
-                else if (child.Name == "solids") {
-                    level.ForegroundTiles = new TileGrid(
-                        child.GetString("innerText"),
-                        level.Width / 8,
-                        level.Height / 8
-                    );
-                }
-                else if (child.Name == "bg") {
-                    level.BackgroundTiles = new TileGrid(
-                        child.GetString("innerText"),
-                        level.Width / 8,
-                        level.Height / 8
-                     );
-                }
-            }
-
-            level.UpdateBounds();
-
-            return level;
         }
 
         public override BinaryMapElement ToBinary() {
@@ -178,49 +182,10 @@ namespace Starforge.MapStructure {
                 Attributes = Attributes
             };
 
-            // Add entities
-            if (Entities.Count > 0) {
-                BinaryMapElement entities = new BinaryMapElement() {
-                    Name = "entities"
-                };
-                foreach (Entity entity in Entities) {
-                    entities.Children.Add(entity.ToBinary());
-                }
-                bin.Children.Add(entities);
-            }
-
-            // Add triggers
-            if (Triggers.Count > 0) {
-                BinaryMapElement triggers = new BinaryMapElement() {
-                    Name = "triggers"
-                };
-                foreach (Trigger trigger in Triggers) {
-                    triggers.Children.Add(trigger.ToBinary());
-                }
-                bin.Children.Add(triggers);
-            }
-
-            // Add background decals
-            if (BackgroundDecals.Count > 0) {
-                BinaryMapElement bgDecals = new BinaryMapElement() {
-                    Name = "bgdecals"
-                };
-                foreach (Decal decal in BackgroundDecals) {
-                    bgDecals.Children.Add(decal.ToBinary());
-                }
-                bin.Children.Add(bgDecals);
-            }
-
-            // Add foreground decals
-            if (ForegroundDecals.Count > 0) {
-                BinaryMapElement fgDecals = new BinaryMapElement() {
-                    Name = "fgdecals"
-                };
-                foreach (Decal decal in ForegroundDecals) {
-                    fgDecals.Children.Add(decal.ToBinary());
-                }
-                bin.Children.Add(fgDecals);
-            }
+            addListToBinary(ref bin, Entities, "entities");
+            addListToBinary(ref bin, Triggers, "triggers");
+            addListToBinary(ref bin, BackgroundDecals, "bgdecals");
+            addListToBinary(ref bin, ForegroundDecals, "fgdecals");
 
             // Add background tiles
             BinaryMapElement bgTiles = new BinaryMapElement() {
@@ -246,30 +211,39 @@ namespace Starforge.MapStructure {
             return bin;
         }
 
-        public void Update(KeyboardState kbd, MouseState m, GameTime gt) {
-            MouseState prevMouse = Engine.Scene.PreviousMouseState;
+        private static void addListToBinary<T>(ref BinaryMapElement bin, List<T> objects, string name) where T : MapElement {
+            if (objects.Count <= 0) return;
 
-            if (WasSelected) {
-                if (InputProcessWait > 0) {
-                    InputProcessWait -= gt.ElapsedGameTime.TotalSeconds;
-                }
-                else {
-                    Vector2 rm = Engine.Scene.Camera.ScreenToReal(new Vector2(m.X, m.Y));
-                    Point roomPos = new Point(
-                        (int)rm.X - X,
-                        (int)rm.Y - Y
-                    );
-
-                    TilePointer = new Point((int)Math.Floor(roomPos.X / 8f), (int)Math.Floor(roomPos.Y / 8f));
-                    ToolManager.Manage(m, this);
-
-                    Dirty = true;
-                }
+            BinaryMapElement binaryMapElement = new BinaryMapElement() {
+                Name = name
+            };
+            foreach (T obj in objects) {
+                binaryMapElement.Children.Add(obj.ToBinary());
             }
-            else {
+            bin.Children.Add(binaryMapElement);
+        }
+
+        public void Update(KeyboardState kbd, MouseState m, GameTime gt) {
+            // Start input cooldown if this level just got selected
+            if (!WasSelected) {
                 WasSelected = true;
                 InputProcessWait = 0.2;
+                return;
             }
+            // if cooldown is still running
+            if (InputProcessWait > 0) {
+                InputProcessWait -= gt.ElapsedGameTime.TotalSeconds;
+                return;
+            }
+
+            Vector2 rm = Engine.Scene.Camera.ScreenToReal(new Vector2(m.X, m.Y));
+            Point roomPos = new Point(
+                (int)rm.X - X,
+                (int)rm.Y - Y
+            );
+
+            TilePointer = new Point((int)Math.Floor(roomPos.X / 8f), (int)Math.Floor(roomPos.Y / 8f));
+            ToolManager.Manage(m, this);
         }
 
         public void UpdateBounds() {
@@ -281,6 +255,7 @@ namespace Starforge.MapStructure {
                 Width, Height, false,
                 SurfaceFormat.Color, DepthFormat.None,
                 0, RenderTargetUsage.PreserveContents);
+
         }
 
         private void RegenerateTileGrids() {
@@ -292,15 +267,39 @@ namespace Starforge.MapStructure {
         }
 
         public void Render() {
+            if (Selected) {
+                // if selected -> update overlay
+                Engine.Instance.GraphicsDevice.SetRenderTarget(Overlay);
+                Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
+                
+                Engine.Batch.Begin(SpriteSortMode.Deferred,
+                                   BlendState.AlphaBlend,
+                                   SamplerState.PointClamp, null, RasterizerState.CullNone, null);
+
+                GFX.Pixel.Draw(ToolManager.ToolHint, Engine.Config.ToolAccentColor, 0.25f);
+                GFX.Draw.HollowRectangle(ToolManager.ToolHint, Color.Goldenrod);
+                Engine.Batch.End();
+            }
+
+            if (!Dirty) {
+                return;
+            }
+
             Engine.Instance.GraphicsDevice.SetRenderTarget(Target);
-            if (Selected) Engine.Instance.GraphicsDevice.Clear(Engine.Config.SelectedRoomColor);
-            else Engine.Instance.GraphicsDevice.Clear(Engine.Config.RoomColor);
+            if (Selected) {
+                Engine.Instance.GraphicsDevice.Clear(Engine.Config.SelectedRoomColor);
+            }
+            else {
+                Engine.Instance.GraphicsDevice.Clear(Engine.Config.RoomColor);
+            }
 
             Engine.Batch.Begin(SpriteSortMode.Deferred,
                                BlendState.AlphaBlend,
                                SamplerState.PointClamp, null, RasterizerState.CullNone, null);
 
-            if (TilesDirty) RegenerateTileGrids();
+            if (TilesDirty) {
+                RegenerateTileGrids();
+            }
 
             // Background tiles
             for (int pos = 0; pos < BgGrid.Length; pos++) {
@@ -327,14 +326,32 @@ namespace Starforge.MapStructure {
                 ForegroundDecals[pos].Texture.DrawCentered();
             }
 
-            if (Selected) {
-                GFX.Pixel.Draw(ToolManager.ToolHint, Engine.Config.ToolAccentColor, 0.25f);
-                GFX.Draw.HollowRectangle(ToolManager.ToolHint, Color.Goldenrod);
-            }
-
             Engine.Batch.End();
             Dirty = false;
         }
+
+        // Sets the selected state of this Level
+        public void SetSelected(bool selected) {
+            if (Selected == selected) {
+                return;
+            }
+            Selected = selected;
+            Dirty = true;
+
+            if (Selected) {
+                // generate overlay for this when this becomes Selected
+                Overlay = new RenderTarget2D(
+                    Engine.Instance.GraphicsDevice,
+                    Width, Height, false,
+                    SurfaceFormat.Color, DepthFormat.None,
+                    0, RenderTargetUsage.PreserveContents);
+            }
+            else {
+                // delete overlay when this becomes deselected
+                Overlay.Dispose();
+            }
+        }
+
     }
 
     public class LevelMeta {

@@ -58,7 +58,7 @@ namespace Starforge.Editor {
             LoadedMap = map;
             if (LoadedMap.Levels.Count > 0) {
                 SelectedLevel = LoadedMap.Levels[0];
-                SelectedLevel.Selected = true;
+                SelectedLevel.SetSelected(true);
             }
 
             BGAutotiler = new Autotiler($"{Engine.Config.ContentDirectory}/Graphics/BackgroundTiles.xml");
@@ -91,94 +91,17 @@ namespace Starforge.Editor {
         public void Update(GameTime gt) {
             KeyboardState kbd = Keyboard.GetState();
             MouseState m = Mouse.GetState();
-
             ImGuiIOPtr io = ImGui.GetIO();
 
             // Only process input for editor if ImGUI doesn't currently want user input
             // (e.g. user is not hovering over/focused on GUI elements)
-            if (!io.WantCaptureKeyboard && !io.WantCaptureMouse) {
-                bool SelectedUpdate = false;
-
-                if (Engine.Instance.IsActive) {
-                    if (m.ScrollWheelValue > PreviousMouseState.ScrollWheelValue) {
-                        // Scrolled up
-                        Camera.ZoomIn(new Vector2(m.X, m.Y));
-                    }
-                    else if (m.ScrollWheelValue < PreviousMouseState.ScrollWheelValue) {
-                        // Scrolled down
-                        Camera.ZoomOut(new Vector2(m.X, m.Y));
-                    }
-
-                    if (m.RightButton == ButtonState.Pressed) {
-                        if (m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
-                            // User is dragging mouse
-                            Camera.Move(new Vector2(PreviousMouseState.X - m.X, PreviousMouseState.Y - m.Y) / Camera.Zoom);
-                        }
-                        else {
-                            // User clicked mouse
-
-                        }
-                    }
-                    else if (m.LeftButton == ButtonState.Pressed) {
-                        Vector2 realPos = Camera.ScreenToReal(new Vector2(m.X, m.Y));
-                        Point point = new Point((int)realPos.X, (int)realPos.Y);
-
-                        if (m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
-                            // User is dragging mouse
-
-                        }
-                        else if (PreviousMouseState.LeftButton != ButtonState.Pressed) {
-                            // User clicked mouse
-                            if (LoadedMap.Levels.Count > 0) {
-                                for (int i = 0; i < LoadedMap.Levels.Count; i++) {
-                                    Level level = LoadedMap.Levels[i];
-
-                                    if (!level.Bounds.Contains(point)) continue;
-                                    if (level == SelectedLevel) break;
-
-                                    SelectedLevel.Selected = false;
-                                    SelectedLevel.Render();
-
-                                    SelectedLevel = level;
-                                    SelectedLevel.Selected = true;
-                                    SelectedLevel.WasSelected = false;
-                                    SelectedLevel.Render();
-
-                                    RoomListWindow.CurrentRoom = i;
-
-                                    SelectedUpdate = true;
-
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    if (!SelectedUpdate) {
-                        // User did not change selected level
-                        // Send inputs to level for further processing
-                        SelectedLevel.Update(kbd, m, gt);
-                    }
-                }
+            if (!io.WantCaptureKeyboard && !io.WantCaptureMouse && Engine.Instance.IsActive) {
+                HandleUserInput(m, kbd, gt);
             }
 
+            // Detect if user changed selected room
             if (LoadedMap.Levels[RoomListWindow.CurrentRoom] != SelectedLevel && RoomListWindow.LastRoom != RoomListWindow.CurrentRoom) {
-                SelectedLevel.Selected = false;
-                SelectedLevel.Render();
-
-                SelectedLevel = LoadedMap.Levels[RoomListWindow.CurrentRoom];
-                SelectedLevel.Selected = true;
-                SelectedLevel.WasSelected = false;
-                SelectedLevel.Render();
-
-                // Don't ask me how the camera works. It makes no sense to me honestly.
-                // It breaks on anything other than default zoom, so it's just set back to that when
-                // going to a room from the list.
-                Camera.Zoom = 1f;
-                Camera.GotoCentered(new Vector2(-SelectedLevel.Bounds.Center.X, -SelectedLevel.Bounds.Center.Y));
-                Camera.Update();
-
-                RoomListWindow.LastRoom = RoomListWindow.CurrentRoom;
+                ChangeSelectedRoom(RoomListWindow.CurrentRoom, true);
             }
 
             // Set previous keyboard/mouse state
@@ -186,23 +109,107 @@ namespace Starforge.Editor {
             PreviousMouseState = m;
         }
 
-        public void UpdateVisibleLevels() {
-            if (LoadedMap != null) {
-                List<Level> visible = new List<Level>();
-                foreach (Level level in LoadedMap.Levels) {
-                    if (Camera.VisibleArea.Intersects(level.Bounds)) {
-                        visible.Add(level);
-                    }
-                }
+        private void ChangeSelectedRoom(int newRoom, bool moveCamera) {
+            SelectedLevel.SetSelected(false);
+            SelectedLevel.Render();
 
-                VisibleLevels = visible;
+            SelectedLevel = LoadedMap.Levels[newRoom];
+            SelectedLevel.SetSelected(true);
+            SelectedLevel.WasSelected = false;
+            SelectedLevel.Render();
+
+            if (moveCamera) {
+                // Don't ask me how the camera works. It makes no sense to me honestly.
+                // It breaks on anything other than default zoom, so it's just set back to that when
+                // going to a room from the list.
+                Camera.Zoom = 1f;
+                Camera.GotoCentered(new Vector2(-SelectedLevel.Bounds.Center.X, -SelectedLevel.Bounds.Center.Y));
+                Camera.Update();
             }
+
+            RoomListWindow.SetCurrentRoom(newRoom);
+        }
+
+        private void HandleUserInput(MouseState m, KeyboardState kbd, GameTime gt) {
+            UpdateZoom(m);
+            UpdateDrag(m);
+            UpdateClick(m);
+
+            // Send inputs to level for further processing
+            SelectedLevel.Update(kbd, m, gt);
+        }
+
+        private void UpdateZoom(MouseState m) {
+            if (m.ScrollWheelValue > PreviousMouseState.ScrollWheelValue) {
+                // Scrolled up
+                Camera.ZoomIn(new Vector2(m.X, m.Y));
+            }
+            else if (m.ScrollWheelValue < PreviousMouseState.ScrollWheelValue) {
+                // Scrolled down
+                Camera.ZoomOut(new Vector2(m.X, m.Y));
+            }
+        }
+
+        private void UpdateDrag(MouseState m) {
+            if (m.RightButton != ButtonState.Pressed) {
+                return;
+            }
+            if (m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
+                // User is dragging mouse
+                Camera.Move(new Vector2(PreviousMouseState.X - m.X, PreviousMouseState.Y - m.Y) / Camera.Zoom);
+            }
+        }
+
+        private void UpdateClick(MouseState m) {
+            if (m.LeftButton != ButtonState.Pressed) {
+                return;
+            }
+
+            // User clicked mouse
+            Vector2 realPos = Camera.ScreenToReal(new Vector2(m.X, m.Y));
+            Point point = new Point((int)realPos.X, (int)realPos.Y);
+
+            // Search for room that was clicked on
+            // Most common option, check for currently selected level first
+            if (SelectedLevel.Bounds.Contains(point)) {
+                return;
+            }
+
+            if (PreviousMouseState.LeftButton == ButtonState.Pressed) {
+                // no new click -> exit
+                return;
+            }
+            if (m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
+                // User is dragging mouse
+                return;
+            }
+
+            for (int i = 0; i < LoadedMap.Levels.Count; i++) {
+                if (LoadedMap.Levels[i].Bounds.Contains(point)) {
+                    ChangeSelectedRoom(i, false);
+                    break;
+                }
+            }
+        }
+
+        public void UpdateVisibleLevels() {
+            if (LoadedMap == null) {
+                return;
+            }
+            List<Level> visible = new List<Level>();
+            foreach (Level level in LoadedMap.Levels) {
+                if (Camera.VisibleArea.Intersects(level.Bounds)) {
+                    visible.Add(level);
+                }
+            }
+
+            VisibleLevels = visible;
         }
 
         public void Render(GameTime gt) {
             // Rerender "dirty" levels (those which need to be rerendered)
             foreach (Level level in VisibleLevels) {
-                if (level.Dirty) level.Render();
+                level.Render();
             }
 
             Engine.Instance.GraphicsDevice.SetRenderTarget(null);
@@ -216,10 +223,13 @@ namespace Starforge.Editor {
 
             LoadedMap.Render();
 
+            // draw each level
             foreach (Level level in VisibleLevels) {
                 Engine.Batch.Draw(level.Target, level.Position, Color.White);
             }
-
+            // draw the selected level's overlay
+            Engine.Batch.Draw(SelectedLevel.Overlay, SelectedLevel.Position, Color.White);
+            
             Engine.Batch.End();
 
             // Render ImGUI content

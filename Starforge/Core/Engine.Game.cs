@@ -40,7 +40,8 @@ namespace Starforge.Core {
             GDM.PreferredBackBufferWidth = 1280;
             GDM.PreferredBackBufferHeight = 720;
             GDM.PreferMultiSampling = true;
-            GDM.SynchronizeWithVerticalRetrace = true;
+            GDM.SynchronizeWithVerticalRetrace = false;
+            IsFixedTimeStep = false;
 
             IsMouseVisible = true;
 
@@ -56,7 +57,7 @@ namespace Starforge.Core {
 
             // Load map
             Scene = new Scene();
-            using (FileStream stream = File.OpenRead($"{Engine.Config.ContentDirectory}/Maps/7-Summit.bin")) {
+            using (FileStream stream = File.OpenRead($"{Engine.Config.ContentDirectory}/Maps/LostLevels.bin")) {
                 using (BinaryReader reader = new BinaryReader(stream)) {
                     Scene.LoadMap(Map.FromBinary(MapPacker.ReadMapBinary(reader)));
                 }

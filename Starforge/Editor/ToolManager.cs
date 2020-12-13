@@ -3,6 +3,8 @@ using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
 using Starforge.Editor.UI;
 using Starforge.MapStructure;
+using Starforge.MapStructure.Tiling;
+using Starforge.Mod.Assets;
 using System;
 
 namespace Starforge.Editor {
@@ -17,31 +19,41 @@ namespace Starforge.Editor {
         public static void Manage(MouseState m, Level l) {
             ToolHint = new Rectangle(l.TilePointer.X * TILE_SIZE, l.TilePointer.Y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 
+            bool changed = false;
             switch (ToolWindow.CurrentTool) {
             case ToolType.Point:
-                HandlePointTool(m, l);
+                changed = HandlePointTool(m, l);
                 break;
             case ToolType.Rectangle:
-                HandleRectangleTool(m, l);
+                changed = HandleRectangleTool(m, l);
                 break;
+            }
+
+            if (changed) {
+                l.Dirty = true;
             }
         }
 
-        private static void HandlePointTool(MouseState m, Level l) {
+        private static bool HandlePointTool(MouseState m, Level l) {
             if (m.LeftButton != ButtonState.Pressed) {
-                return;
+                return false;
             }
+            bool changed = false;
             switch (ToolWindow.CurrentTileType) {
             case TileType.Foreground:
-                setPoint(Engine.Scene.FGAutotiler, l.ForegroundTiles, l.FgGrid, ToolWindow.CurrentFGTileset, l.TilePointer);
+                changed = setPoint(Engine.Scene.FGAutotiler, l.ForegroundTiles, l.FgGrid, ToolWindow.CurrentFGTileset, l.TilePointer);
                 break;
             case TileType.Background:
-                setPoint(Engine.Scene.BGAutotiler, l.BackgroundTiles, l.BgGrid, ToolWindow.CurrentBGTileset, l.TilePointer);
+                changed = setPoint(Engine.Scene.BGAutotiler, l.BackgroundTiles, l.BgGrid, ToolWindow.CurrentBGTileset, l.TilePointer);
                 break;
             }
+
+            return changed;
         }
 
-        private static void HandleRectangleTool(MouseState m, Level l) {
+        private static bool HandleRectangleTool(MouseState m, Level l) {
+            bool changed = false;
+
             if (m.LeftButton == ButtonState.Pressed) {
                 if (Engine.Scene.PreviousMouseState.LeftButton == ButtonState.Released) {
                     // Just started holding LMB
@@ -71,30 +83,44 @@ namespace Starforge.Editor {
                 // Create rectangle
                 switch (ToolWindow.CurrentTileType) {
                 case TileType.Foreground:
-                    setRectangle(Engine.Scene.FGAutotiler, l.ForegroundTiles, l.FgGrid, ToolWindow.CurrentFGTileset, Hold);
+                    changed = setRectangle(Engine.Scene.FGAutotiler, l.ForegroundTiles, l.FgGrid, ToolWindow.CurrentFGTileset, Hold);
                     break;
                 case TileType.Background:
-                    setRectangle(Engine.Scene.BGAutotiler, l.BackgroundTiles, l.BgGrid, ToolWindow.CurrentBGTileset, Hold);
+                    changed = setRectangle(Engine.Scene.BGAutotiler, l.BackgroundTiles, l.BgGrid, ToolWindow.CurrentBGTileset, Hold);
                     break;
                 }
                 Hold = default;
             }
+
+            return changed;
         }
 
-        private static void setPoint(MapStructure.Tiling.Autotiler tiler, TileGrid tileGrid, Mod.Assets.StaticTexture[] textures, int tileset, Point position) {
-            Rectangle area = new Rectangle(position.X, position.Y, 1, 1);
-            setRectangle(tiler, tileGrid, textures, tileset, area);
+        // Sets a single tile to a given tileset, returns true if anything changed
+        private static bool setPoint(Autotiler tiler, TileGrid tileGrid, StaticTexture[] textures, int tileset, Point position) {
+            if (tileset == 0) {
+                tileGrid.SetTile(position.X, position.Y, '0');
+            }
+            else {
+                tileGrid.SetTile(position.X, position.Y, tiler.GetTilesetList()[tileset - 1].ID);
+            }
+
+            return tiler.Update(tileGrid, textures, position);
         }
 
-        private static void setRectangle(MapStructure.Tiling.Autotiler tiler, TileGrid tileGrid, Mod.Assets.StaticTexture[] textures, int tileset, Rectangle area) {
+        // Sets a rectangle to a given tileset, returns true if anything changed
+        private static bool setRectangle(Autotiler tiler, TileGrid tileGrid, StaticTexture[] textures, int tileset, Rectangle area) {
             for (int x = area.X; x < area.X + area.Width; x++) {
                 for (int y = area.Y; y < area.Y + area.Height; y++) {
-                    if (tileset == 0) tileGrid.SetTile(x, y, '0');
-                    else tileGrid.SetTile(x, y, tiler.GetTilesetList()[tileset - 1].ID);
+                    if (tileset == 0) {
+                        tileGrid.SetTile(x, y, '0');
+                    }
+                    else {
+                        tileGrid.SetTile(x, y, tiler.GetTilesetList()[tileset - 1].ID);
+                    }
                 }
             }
 
-            tiler.Update(tileGrid, textures, area);
+            return tiler.Update(tileGrid, textures, area);
         }
     }
 
