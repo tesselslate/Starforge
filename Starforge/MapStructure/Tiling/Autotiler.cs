@@ -10,8 +10,12 @@ namespace Starforge.MapStructure.Tiling {
     public class Autotiler {
         private Dictionary<char, Tileset> Tilesets;
 
+        //stores all tilesets except the template as a list
+        private List<Tileset> TilesetList;
+
         public Autotiler(string xmlPath) {
             Tilesets = new Dictionary<char, Tileset>();
+            TilesetList = new List<Tileset>();
             Dictionary<char, XmlElement> tileXmls = new Dictionary<char, XmlElement>();
 
             XmlDocument doc = new XmlDocument();
@@ -60,6 +64,10 @@ namespace Starforge.MapStructure.Tiling {
 
                 tileXmls.Add(c, el);
                 Tilesets.Add(c, t);
+
+                // The game has a built in tileset template.
+                if (t.Path.ToLower() == "template") continue;
+                TilesetList.Add(t);
             }
         }
 
@@ -67,27 +75,30 @@ namespace Starforge.MapStructure.Tiling {
             foreach (object obj in root.GetElementsByTagName("set")) {
                 XmlElement el = (XmlElement)obj;
 
-                if (el.Attr("mask") == "center") {
+                switch (el.Attr("mask")) {
+                case "center":
                     t.Center = t.ParseTextureString(el.Attr("tiles"));
-                }
-                else if (el.Attr("mask") == "padding") {
+                    break;
+                case "padding":
                     t.Padding = t.ParseTextureString(el.Attr("tiles"));
-                }
-                else {
+                    break;
+                default:
                     string orig = el.Attr("mask");
                     byte[] mask = new byte[9];
 
                     int num = 0;
                     for (int i = 0; i < orig.Length; i++) {
-                        char c = orig[i];
-                        if (c == '0') {
+                        switch (orig[i]) {
+                        case '0':
                             mask[num++] = 0;
-                        }
-                        else if (c == '1') {
+                            break;
+                        case '1':
                             mask[num++] = 1;
-                        }
-                        else if (c == 'x' || c == 'X') {
+                            break;
+                        case 'x':
+                        case 'X':
                             mask[num++] = 2;
+                            break;
                         }
                     }
 
@@ -95,6 +106,7 @@ namespace Starforge.MapStructure.Tiling {
                         Mask = mask,
                         Textures = t.ParseTextureString(el.Attr("tiles"))
                     });
+                    break;
                 }
             }
         }
@@ -103,7 +115,7 @@ namespace Starforge.MapStructure.Tiling {
             // If position is out of bounds in a given TileGrid, assume there is a tile there
             if (x < 0 || x > grid.Width - 1 || y < 0 || y > grid.Height - 1) return true;
 
-            return grid[x, y] != 48 && !(t.ID != grid[x, y] && (t.Ignores.Contains((char)grid[x, y]) || t.Ignores.Contains('*')));
+            return grid[x, y] != '0' && !(t.ID != grid[x, y] && (t.Ignores.Contains((char)grid[x, y]) || t.Ignores.Contains('*')));
         }
 
 
@@ -113,7 +125,7 @@ namespace Starforge.MapStructure.Tiling {
             for (int i = 0; i < grid.Tiles.GetLength(0); i++) {
                 for (int j = 0; j < grid.Tiles.GetLength(1); j++) {
                     StaticTexture tex = new StaticTexture(GFX.Empty);
-                    if (grid[i, j] != 48) {
+                    if (grid[i, j] != '0') {
                         textures[j * grid.Width + i] = GenerateTileTexture(grid, i, j);
                     }
                 }
@@ -124,7 +136,7 @@ namespace Starforge.MapStructure.Tiling {
 
         public StaticTexture GenerateTileTexture(TileGrid grid, int i, int j) {
             StaticTexture tex = new StaticTexture(GFX.Empty);
-            if (grid[i, j] != 48) {
+            if (grid[i, j] != '0') {
                 int num = 0;
                 byte[] adjacent = new byte[9];
                 bool center = true;
@@ -182,10 +194,15 @@ namespace Starforge.MapStructure.Tiling {
         }
 
         public void Update(TileGrid grid, StaticTexture[] texArray, Point point) {
-            Update(grid, texArray, new Rectangle(point.X - 1, point.Y - 1, 3, 3));
+            Update(grid, texArray, new Rectangle(point.X, point.Y, 1, 1));
         }
 
         public void Update(TileGrid grid, StaticTexture[] texArray, Rectangle r) {
+            // need to check one tile out in each direction
+            r.X -= 1;
+            r.Y -= 1;
+            r.Width += 2;
+            r.Height += 2;
             for (int x = 0; x < r.Width; x++) {
                 for (int y = 0; y < r.Height; y++) {
                     if (x + r.X < 0 || x + r.X > grid.Width - 1 || y + r.Y < 0 || y + r.Y > grid.Height - 1) continue;
@@ -195,12 +212,7 @@ namespace Starforge.MapStructure.Tiling {
         }
 
         public List<Tileset> GetTilesetList() {
-            List<Tileset> l = new List<Tileset>();
-            foreach (Tileset t in Tilesets.Values) {
-                l.Add(t);
-            }
-
-            return l;
+            return TilesetList;
         }
     }
 }

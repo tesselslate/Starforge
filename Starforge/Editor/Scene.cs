@@ -19,12 +19,7 @@ namespace Starforge.Editor {
         public Map LoadedMap;
 
         public Autotiler BGAutotiler;
-
         public Autotiler FGAutotiler;
-
-        public List<Tileset> BGTilesets;
-
-        public List<Tileset> FGTilesets;
 
         public KeyboardState PreviousKeyboardState {
             get;
@@ -57,9 +52,6 @@ namespace Starforge.Editor {
 
             PreviousKeyboardState = new KeyboardState();
             PreviousMouseState = new MouseState();
-
-            BGTilesets = new List<Tileset>();
-            FGTilesets = new List<Tileset>();
         }
 
         public void LoadMap(Map map) {
@@ -83,24 +75,15 @@ namespace Starforge.Editor {
             RoomListWindow.RoomNames = roomNames.ToArray();
 
             // Tilesets
-            BGTilesets.Clear();
-            FGTilesets.Clear();
-
+            ToolWindow.BGTilesets.Clear();
+            ToolWindow.FGTilesets.Clear();
             ToolWindow.BGTilesets.Add("Air");
-            foreach (Tileset t in BGAutotiler.GetTilesetList()) {
-                // The game has a built in tileset template.
-                if (t.Path.ToLower() == "template") continue;
+            ToolWindow.FGTilesets.Add("Air");
 
-                BGTilesets.Add(t);
+            foreach (Tileset t in BGAutotiler.GetTilesetList()) {
                 ToolWindow.BGTilesets.Add(MiscHelper.CleanCamelCase(t.Path.Substring(2)));
             }
-
-            ToolWindow.FGTilesets.Add("Air");
             foreach (Tileset t in FGAutotiler.GetTilesetList()) {
-                // The game has a built in tileset template.
-                if (t.Path.ToLower() == "template") continue;
-
-                FGTilesets.Add(t);
                 ToolWindow.FGTilesets.Add(MiscHelper.CleanCamelCase(t.Path));
             }
         }
@@ -149,22 +132,23 @@ namespace Starforge.Editor {
                             if (LoadedMap.Levels.Count > 0) {
                                 for (int i = 0; i < LoadedMap.Levels.Count; i++) {
                                     Level level = LoadedMap.Levels[i];
-                                    if (level.Bounds.Contains(point)) {
-                                        if (level == SelectedLevel) break;
-                                        SelectedLevel.Selected = false;
-                                        SelectedLevel.Render();
 
-                                        SelectedLevel = level;
-                                        SelectedLevel.Selected = true;
-                                        SelectedLevel.WasSelected = false;
-                                        SelectedLevel.Render();
+                                    if (!level.Bounds.Contains(point)) continue;
+                                    if (level == SelectedLevel) break;
 
-                                        RoomListWindow.CurrentRoom = i;
+                                    SelectedLevel.Selected = false;
+                                    SelectedLevel.Render();
 
-                                        SelectedUpdate = true;
+                                    SelectedLevel = level;
+                                    SelectedLevel.Selected = true;
+                                    SelectedLevel.WasSelected = false;
+                                    SelectedLevel.Render();
 
-                                        break;
-                                    }
+                                    RoomListWindow.CurrentRoom = i;
+
+                                    SelectedUpdate = true;
+
+                                    break;
                                 }
                             }
                         }

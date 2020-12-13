@@ -68,6 +68,8 @@ namespace Starforge.MapStructure {
         public bool Selected = false;
         public bool WasSelected = false;
         private double InputProcessWait;
+
+        // Current position of the mouse in the room, in tiles
         public Point TilePointer {
             get;
             private set;
