@@ -57,7 +57,7 @@ namespace Starforge.Core {
 
             // Load map
             Scene = new Scene();
-            using (FileStream stream = File.OpenRead($"{Engine.Config.ContentDirectory}/Maps/10-Farewell.bin")) {
+            using (FileStream stream = File.OpenRead($"{Engine.Config.ContentDirectory}/Maps/LostLevels.bin")) {
                 using (BinaryReader reader = new BinaryReader(stream)) {
                     Scene.LoadMap(Map.FromBinary(MapPacker.ReadMapBinary(reader)));
                 }
