@@ -53,7 +53,9 @@
     <Compile Include="Editor\ImGUIHandler.cs" />
     <Compile Include="Editor\Scene.cs" />
     <Compile Include="Editor\ToolManager.cs" />
+    <Compile Include="Editor\UI\MenuBar.cs" />
     <Compile Include="Editor\UI\RoomListWindow.cs" />
+    <Compile Include="Editor\UI\SettingsWindow.cs" />
     <Compile Include="Editor\UI\ToolWindow.cs" />
     <Compile Include="MapStructure\Tiling\Autotiler.cs" />
     <Compile Include="MapStructure\Tiling\Tileset.cs" />

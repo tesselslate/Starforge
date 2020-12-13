@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
+using System;
 
 namespace Starforge.Editor.UI {
     public static class RoomListWindow {
@@ -12,10 +13,11 @@ namespace Starforge.Editor.UI {
         public static string[] RoomNames;
 
         public static void Render() {
-            ImGui.SetNextWindowPos(new System.Numerics.Vector2(0f, 0f));
-            ImGui.SetNextWindowSize(new System.Numerics.Vector2(250f, Engine.Instance.GraphicsDevice.Viewport.Height));
+            ImGui.SetNextWindowPos(new System.Numerics.Vector2(0f, MenuBar.MenuBarSize));
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(250f, Engine.Instance.GraphicsDevice.Viewport.Height - MenuBar.MenuBarSize));
             ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0f);
             ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 0f);
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0f);
 
             ImGui.Begin("Rooms",
                 ImGuiWindowFlags.NoDecoration |
@@ -24,8 +26,7 @@ namespace Starforge.Editor.UI {
                 ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoMove);
 
-            ImGui.PopStyleVar();
-            ImGui.PopStyleVar();
+            ImGui.PopStyleVar(3);
 
             ImGui.SetNextItemWidth(235f);
             ImGui.ListBox("", ref CurrentRoom, RoomNames, RoomNames.Length, 30);
@@ -34,8 +35,8 @@ namespace Starforge.Editor.UI {
             MouseState m = Mouse.GetState();
 
             if (Engine.Config.Debug) {
-                ImGui.SetCursorPosY(Engine.Instance.GraphicsDevice.Viewport.Height - ImGui.GetTextLineHeightWithSpacing() * 6 - 10);
-                ImGui.Text(string.Format("{0:F3} ms/frame ({1:F1} FPS)", 1000f / ImGui.GetIO().Framerate, ImGui.GetIO().Framerate));
+                ImGui.SetCursorPosY(Engine.Instance.GraphicsDevice.Viewport.Height - ImGui.GetTextLineHeightWithSpacing() * 6 - MenuBar.MenuBarSize - 10);
+                ImGui.Text($"{Math.Round(1000f / ImGui.GetIO().Framerate, 2)} ms/frame ({Math.Round(ImGui.GetIO().Framerate)} FPS)");
                 ImGui.Text($"Current room: {Engine.Scene.SelectedLevel.Name}");
                 ImGui.Text($"Visible rooms: {Engine.Scene.VisibleLevels.Count}");
                 ImGui.Text("");

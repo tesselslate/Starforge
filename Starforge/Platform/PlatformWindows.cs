@@ -33,6 +33,15 @@ namespace Starforge.Platform {
             return install;
         }
 
+        private string SearchSteamLibrary(string library) {
+            foreach (string dir in Directory.EnumerateDirectories(library)) {
+                if (new DirectoryInfo(dir).Name == "Celeste") return dir;
+            }
+
+            return null;
+        }
+
+
         private List<string> GetSteamLibraries() {
             List<string> libraries = new List<string>();
             string steamInstall = GetSteamInstallPath();
@@ -88,14 +97,6 @@ namespace Starforge.Platform {
             }
 
             return libraries;
-        }
-
-        private string SearchSteamLibrary(string library) {
-            foreach (string dir in Directory.EnumerateDirectories(library)) {
-                if (new DirectoryInfo(dir).Name == "Celeste") return dir;
-            }
-
-            return null;
         }
 
         private const string STEAMREG_32 = "HKEY_LOCAL_MACHINE\\SOFTWARE\\VALVE\\Steam\\";
