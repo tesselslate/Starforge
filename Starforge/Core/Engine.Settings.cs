@@ -10,6 +10,8 @@ namespace Starforge.Core {
 
             public static Color SelectedRoomColor = new Color(60, 60, 60);
 
+            public static Color ToolAccentColor = new Color(237, 210, 31);
+
             // Temporary for testing. Proper content directory detection later.
             public static string ContentDirectory = "./Content/";
 
