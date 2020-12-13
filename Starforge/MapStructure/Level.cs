@@ -98,7 +98,6 @@ namespace Starforge.MapStructure {
             if (Width % 8 != 0) {
                 Width += 8 - (Width % 8);
             }
-
             if (Height % 8 != 0) {
                 Height += 8 - (Height % 8);
             }
@@ -223,25 +222,26 @@ namespace Starforge.MapStructure {
         }
 
         public void Update(KeyboardState kbd, MouseState m, GameTime gt) {
-            if (WasSelected) {
-                if (InputProcessWait > 0) {
-                    InputProcessWait -= gt.ElapsedGameTime.TotalSeconds;
-                }
-                else {
-                    Vector2 rm = Engine.Scene.Camera.ScreenToReal(new Vector2(m.X, m.Y));
-                    Point roomPos = new Point(
-                        (int)rm.X - X,
-                        (int)rm.Y - Y
-                    );
-
-                    TilePointer = new Point((int)Math.Floor(roomPos.X / 8f), (int)Math.Floor(roomPos.Y / 8f));
-                    ToolManager.Manage(m, this);
-                }
-            }
-            else {
+            // Start input cooldown if this level just got selected
+            if (!WasSelected) {
                 WasSelected = true;
                 InputProcessWait = 0.2;
+                return;
             }
+            // if cooldown is still running
+            if (InputProcessWait > 0) {
+                InputProcessWait -= gt.ElapsedGameTime.TotalSeconds;
+                return;
+            }
+
+            Vector2 rm = Engine.Scene.Camera.ScreenToReal(new Vector2(m.X, m.Y));
+            Point roomPos = new Point(
+                (int)rm.X - X,
+                (int)rm.Y - Y
+            );
+
+            TilePointer = new Point((int)Math.Floor(roomPos.X / 8f), (int)Math.Floor(roomPos.Y / 8f));
+            ToolManager.Manage(m, this);
         }
 
         public void UpdateBounds() {
