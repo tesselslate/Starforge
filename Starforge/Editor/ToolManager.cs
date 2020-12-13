@@ -3,6 +3,8 @@ using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
 using Starforge.Editor.UI;
 using Starforge.MapStructure;
+using Starforge.MapStructure.Tiling;
+using Starforge.Mod.Assets;
 using System;
 
 namespace Starforge.Editor {
@@ -81,16 +83,25 @@ namespace Starforge.Editor {
             }
         }
 
-        private static void setPoint(MapStructure.Tiling.Autotiler tiler, TileGrid tileGrid, Mod.Assets.StaticTexture[] textures, int tileset, Point position) {
-            Rectangle area = new Rectangle(position.X, position.Y, 1, 1);
-            setRectangle(tiler, tileGrid, textures, tileset, area);
+        private static void setPoint(Autotiler tiler, TileGrid tileGrid, StaticTexture[] textures, int tileset, Point position) {
+            if (tileset == 0) {
+                tileGrid.SetTile(position.X, position.Y, '0');
+            }
+            else {
+                tileGrid.SetTile(position.X, position.Y, tiler.GetTilesetList()[tileset - 1].ID);
+            }
+            tiler.Update(tileGrid, textures, position);
         }
 
-        private static void setRectangle(MapStructure.Tiling.Autotiler tiler, TileGrid tileGrid, Mod.Assets.StaticTexture[] textures, int tileset, Rectangle area) {
+        private static void setRectangle(Autotiler tiler, TileGrid tileGrid, StaticTexture[] textures, int tileset, Rectangle area) {
             for (int x = area.X; x < area.X + area.Width; x++) {
                 for (int y = area.Y; y < area.Y + area.Height; y++) {
-                    if (tileset == 0) tileGrid.SetTile(x, y, '0');
-                    else tileGrid.SetTile(x, y, tiler.GetTilesetList()[tileset - 1].ID);
+                    if (tileset == 0) {
+                        tileGrid.SetTile(x, y, '0');
+                    }
+                    else {
+                        tileGrid.SetTile(x, y, tiler.GetTilesetList()[tileset - 1].ID);
+                    }
                 }
             }
 

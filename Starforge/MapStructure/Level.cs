@@ -65,7 +65,10 @@ namespace Starforge.MapStructure {
         public RenderTarget2D Target { get; private set; }
         public bool Dirty = true;
 
+        // whether this level is currently selected
         public bool Selected = false;
+
+        // whether this level was just newly selected
         public bool WasSelected = false;
         private double InputProcessWait;
 
@@ -220,8 +223,6 @@ namespace Starforge.MapStructure {
         }
 
         public void Update(KeyboardState kbd, MouseState m, GameTime gt) {
-            MouseState prevMouse = Engine.Scene.PreviousMouseState;
-
             if (WasSelected) {
                 if (InputProcessWait > 0) {
                     InputProcessWait -= gt.ElapsedGameTime.TotalSeconds;

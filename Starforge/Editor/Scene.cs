@@ -188,16 +188,17 @@ namespace Starforge.Editor {
         }
 
         public void UpdateVisibleLevels() {
-            if (LoadedMap != null) {
-                List<Level> visible = new List<Level>();
-                foreach (Level level in LoadedMap.Levels) {
-                    if (Camera.VisibleArea.Intersects(level.Bounds)) {
-                        visible.Add(level);
-                    }
-                }
-
-                VisibleLevels = visible;
+            if (LoadedMap == null) {
+                return;
             }
+            List<Level> visible = new List<Level>();
+            foreach (Level level in LoadedMap.Levels) {
+                if (Camera.VisibleArea.Intersects(level.Bounds)) {
+                    visible.Add(level);
+                }
+            }
+
+            VisibleLevels = visible;
         }
 
         public void Render(GameTime gt) {
