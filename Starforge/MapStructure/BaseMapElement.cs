@@ -6,8 +6,8 @@ namespace Starforge.MapStructure {
         public Dictionary<string, object> Attributes = new Dictionary<string, object>();
 
         public BaseMapElement MergeAttributes(BaseMapElement element) {
-            foreach(KeyValuePair<string, object> pair in element.Attributes) {
-                if(!Attributes.ContainsKey(pair.Key))
+            foreach (KeyValuePair<string, object> pair in element.Attributes) {
+                if (!Attributes.ContainsKey(pair.Key))
                     Attributes.Add(pair.Key, pair.Value);
             }
 
@@ -21,7 +21,7 @@ namespace Starforge.MapStructure {
         protected object GetAttribute(string name, object defaultValue = null) {
             object obj;
 
-            if(!Attributes.TryGetValue(name, out obj)) {
+            if (!Attributes.TryGetValue(name, out obj)) {
                 return defaultValue;
             }
 
@@ -45,7 +45,7 @@ namespace Starforge.MapStructure {
         }
 
         public void SetAttribute(string name, object value) {
-            if(value == null) {
+            if (value == null) {
                 Attributes.Remove(name);
                 return;
             }

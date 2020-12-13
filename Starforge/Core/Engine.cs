@@ -27,8 +27,8 @@ namespace Starforge.Core {
         }
 
         public static void Main(string[] args) {
-            if(File.Exists("./log_old.txt")) File.Delete("./log_old.txt");
-            if(File.Exists("./log.txt")) File.Move("./log.txt", "./log_old.txt");
+            if (File.Exists("./log_old.txt")) File.Delete("./log_old.txt");
+            if (File.Exists("./log.txt")) File.Move("./log.txt", "./log_old.txt");
 
             // Set log stream
             FileStream logStream = File.OpenWrite(Path.Combine(
@@ -57,7 +57,7 @@ namespace Starforge.Core {
             // Load plugins (first stage mod loading)
             Loader.LoadPluginAssemblies();
 
-            using(Engine sf = new Engine()) {
+            using (Engine sf = new Engine()) {
                 Logger.Log("Beginning game loop");
                 Instance = sf;
                 sf.Run();
@@ -68,7 +68,7 @@ namespace Starforge.Core {
             Logger.Log("Closing Starforge.");
             Logger.Close();
 
-            if(exit) {
+            if (exit) {
                 Environment.Exit(code);
             }
         }

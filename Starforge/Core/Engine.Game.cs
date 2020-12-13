@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Starforge.Editor;
-using Starforge.Editor.UI;
 using Starforge.MapStructure;
 using Starforge.MapStructure.Encoding;
 using Starforge.Mod.Assets;
@@ -13,9 +12,9 @@ namespace Starforge.Core {
     public partial class Engine : Game {
         public static ImGUIHandler GUI;
 
-        public static SpriteBatch Batch { 
-            get; 
-            private set; 
+        public static SpriteBatch Batch {
+            get;
+            private set;
         }
 
         public static Scene Scene {
@@ -57,8 +56,8 @@ namespace Starforge.Core {
 
             // Load map
             Scene = new Scene();
-            using(FileStream stream = File.OpenRead($"{Engine.Config.ContentDirectory}/Maps/7-Summit.bin")) {
-                using(BinaryReader reader = new BinaryReader(stream)) {
+            using (FileStream stream = File.OpenRead($"{Engine.Config.ContentDirectory}/Maps/7-Summit.bin")) {
+                using (BinaryReader reader = new BinaryReader(stream)) {
                     Scene.LoadMap(Map.FromBinary(MapPacker.ReadMapBinary(reader)));
                 }
             }
@@ -74,7 +73,7 @@ namespace Starforge.Core {
         }
 
         protected override void UnloadContent() {
-            foreach(VirtualTexture t in VirtualContent) {
+            foreach (VirtualTexture t in VirtualContent) {
                 t.Dispose();
             }
 

@@ -14,7 +14,7 @@ namespace Starforge.Mod.Assets {
         public VirtualTexture Texture { get; private set; }
 
         public int Width { get; private set; }
-        
+
         public int Height { get; private set; }
 
         // Used so that ClipRect isn't converted to a nullable rectangle on each draw call.
