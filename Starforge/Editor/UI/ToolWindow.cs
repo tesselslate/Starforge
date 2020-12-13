@@ -16,7 +16,7 @@ namespace Starforge.Editor.UI {
         public static List<string> Layers;
 
         public static TileType CurrentTileType = TileType.Foreground;
-        public static ToolType CurrentTool = ToolType.Draw;
+        public static ToolType CurrentTool = ToolType.TileDraw;
 
         static ToolWindow() {
             BGTilesets = new List<string>();

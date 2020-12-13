@@ -17,7 +17,7 @@ namespace Starforge.Mod {
                 return Creators[name](level, data);
             }
             else {
-                return new Entity(level, data);
+                return new UnknownEntity(level, data);
             }
         }
 
@@ -28,7 +28,7 @@ namespace Starforge.Mod {
                 return Creators[data.Name](level, data);
             }
             else {
-                return new Entity(level, data);
+                return new UnknownEntity(level, data);
             }
         }
 

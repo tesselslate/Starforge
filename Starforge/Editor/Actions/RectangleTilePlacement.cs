@@ -53,7 +53,7 @@ namespace Starforge.Editor.Actions {
         }
 
         public override ToolType GetToolType() {
-            return ToolType.Rectangle;
+            return ToolType.TileRectangle;
         }
 
     }

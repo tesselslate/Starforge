@@ -23,10 +23,10 @@ namespace Starforge.Editor {
             ToolHint = new Rectangle(l.TilePointer.X * TILE_SIZE, l.TilePointer.Y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 
             switch (ToolWindow.CurrentTool) {
-            case ToolType.Draw:
+            case ToolType.TileDraw:
                 HandlePointTool(m, l);
                 break;
-            case ToolType.Rectangle:
+            case ToolType.TileRectangle:
                 HandleRectangleTool(m, l);
                 break;
             }
@@ -103,8 +103,8 @@ namespace Starforge.Editor {
     }
 
     public enum ToolType {
-        Draw,
-        Rectangle
+        TileDraw,
+        TileRectangle
     }
 
     public enum TileType {

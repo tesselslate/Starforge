@@ -41,7 +41,7 @@ namespace Starforge.Editor.Actions {
         }
 
         public override ToolType GetToolType() {
-            return ToolType.Draw;
+            return ToolType.TileDraw;
         }
 
     }

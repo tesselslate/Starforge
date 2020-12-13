@@ -4,7 +4,7 @@ using Starforge.Mod;
 using System.Collections.Generic;
 
 namespace Starforge.MapStructure {
-    public class Entity : MapElement {
+    public abstract class Entity : MapElement {
         public float X {
             get => GetFloat("x");
             set => SetAttribute("x", value);
@@ -57,26 +57,36 @@ namespace Starforge.MapStructure {
 
             foreach (KeyValuePair<string, object> pair in Attributes) bin.Attributes.Add(pair.Key, pair.Value);
 
-            if (Nodes.Count > 0) {
-                foreach (Vector2 node in Nodes) {
-                    BinaryMapElement binNode = new BinaryMapElement() {
-                        Name = "node"
-                    };
+            if (Nodes.Count == 0) {
+                return bin;
+            }
 
-                    binNode.SetAttribute("x", node.X);
-                    binNode.SetAttribute("y", node.Y);
+            foreach (Vector2 node in Nodes) {
+                BinaryMapElement binNode = new BinaryMapElement() {
+                    Name = "node"
+                };
 
-                    bin.Children.Add(binNode);
-                }
+                binNode.SetAttribute("x", node.X);
+                binNode.SetAttribute("y", node.Y);
+
+                bin.Children.Add(binNode);
             }
 
             return bin;
         }
 
-        public virtual void Render() { }
+        public abstract void Render();
     }
 
     public class Trigger : Entity {
         public Trigger(Level level, EntityData data) : base(level, data) { }
+
+        public override void Render() { }
+    }
+
+    public class UnknownEntity : Entity {
+        public UnknownEntity(Level level, EntityData data) : base(level, data) { }
+
+        public override void Render() { }
     }
 }
