@@ -107,7 +107,7 @@ namespace Starforge.MapStructure {
                 }
                 else if (child.Name == "levels") {
                     foreach (BinaryMapElement level in child.Children) {
-                        map.Levels.Add(Level.FromBinary(level, map));
+                        map.Levels.Add(new Level(level, map));
                     }
                 }
                 else if (child.Name == "Filler") {

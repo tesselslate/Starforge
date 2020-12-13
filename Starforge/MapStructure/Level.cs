@@ -83,93 +83,93 @@ namespace Starforge.MapStructure {
             ForegroundDecals = new List<Decal>();
         }
 
+        // create a new level from reading the binary
+        public Level(BinaryMapElement element, Map parent) : this() {
+            Attributes = element.Attributes;
+            CreateTileGrids();
+
+            Meta = new LevelMeta(this);
+            Parent = parent;
+
+            // Normalize room size
+            if (Width % 8 != 0) {
+                Width += 8 - (Width % 8);
+            }
+
+            if (Height % 8 != 0) {
+                Height += 8 - (Height % 8);
+            }
+
+            foreach (BinaryMapElement child in element.Children) {
+                switch (child.Name) {
+                case "entities":
+                    foreach (BinaryMapElement entity in child.Children) {
+                        Entities.Add(EntityRegistry.Create(this, entity));
+                    }
+                    break;
+                case "triggers":
+                    foreach (BinaryMapElement trigger in child.Children) {
+                        Triggers.Add(EntityRegistry.CreateTrigger(this, trigger));
+                    }
+                    break;
+                case "bgdecals":
+                    foreach (BinaryMapElement decal in child.Children) {
+                        BackgroundDecals.Add(new Decal(
+                            decal.GetFloat("x"),
+                            decal.GetFloat("y"),
+                            decal.GetFloat("scaleX", 1),
+                            decal.GetFloat("scaleY", 1),
+                            decal.GetString("texture")
+                        ));
+                    }
+                    break;
+                case "fgdecals":
+                    foreach (BinaryMapElement decal in child.Children) {
+                        ForegroundDecals.Add(new Decal(
+                            decal.GetFloat("x"),
+                            decal.GetFloat("y"),
+                            decal.GetFloat("scaleX", 1),
+                            decal.GetFloat("scaleY", 1),
+                            decal.GetString("texture")
+                        ));
+                    }
+                    break;
+                case "objtiles":
+                    ObjectTiles = new TileGrid(
+                        MiscHelper.ReadCSV(
+                            child.GetString("innerText"),
+                            Width / 8,
+                            Height / 8
+                        ),
+                        Width / 8,
+                        Height / 8
+                    );
+                    break;
+                case "solids":
+                    ForegroundTiles = new TileGrid(
+                        child.GetString("innerText"),
+                        Width / 8,
+                        Height / 8
+                    );
+                    break;
+                case "bg":
+                    BackgroundTiles = new TileGrid(
+                        child.GetString("innerText"),
+                        Width / 8,
+                        Height / 8
+                     );
+                    break;
+                }
+            }
+
+            UpdateBounds();
+        }
+
         private void CreateTileGrids() {
             // This is just used to ensure the TileGrids aren't null when resaving (some rooms don't have these.)
             BackgroundTiles = new TileGrid(Width / 8, Height / 8);
             ForegroundTiles = new TileGrid(Width / 8, Height / 8);
             ObjectTiles = new TileGrid(Width / 8, Height / 8);
-        }
-
-        public static Level FromBinary(BinaryMapElement element, Map parent) {
-            Level level = new Level();
-            level.Attributes = element.Attributes;
-            level.CreateTileGrids();
-
-            level.Meta = new LevelMeta(level);
-            level.Parent = parent;
-
-            // Normalize room size
-            if (level.Width % 8 != 0) {
-                level.Width += 8 - (level.Width % 8);
-            }
-
-            if (level.Height % 8 != 0) {
-                level.Height += 8 - (level.Height % 8);
-            }
-
-            foreach (BinaryMapElement child in element.Children) {
-                if (child.Name == "entities") {
-                    foreach (BinaryMapElement entity in child.Children) {
-                        level.Entities.Add(EntityRegistry.Create(level, entity));
-                    }
-                }
-                else if (child.Name == "triggers") {
-                    foreach (BinaryMapElement trigger in child.Children) {
-                        level.Triggers.Add(EntityRegistry.CreateTrigger(level, trigger));
-                    }
-                }
-                else if (child.Name == "bgdecals") {
-                    foreach (BinaryMapElement decal in child.Children) {
-                        level.BackgroundDecals.Add(new Decal(
-                            decal.GetFloat("x"),
-                            decal.GetFloat("y"),
-                            decal.GetFloat("scaleX", 1),
-                            decal.GetFloat("scaleY", 1),
-                            decal.GetString("texture")
-                        ));
-                    }
-                }
-                else if (child.Name == "fgdecals") {
-                    foreach (BinaryMapElement decal in child.Children) {
-                        level.ForegroundDecals.Add(new Decal(
-                            decal.GetFloat("x"),
-                            decal.GetFloat("y"),
-                            decal.GetFloat("scaleX", 1),
-                            decal.GetFloat("scaleY", 1),
-                            decal.GetString("texture")
-                        ));
-                    }
-                }
-                else if (child.Name == "objtiles") {
-                    level.ObjectTiles = new TileGrid(
-                        MiscHelper.ReadCSV(
-                            child.GetString("innerText"),
-                            level.Width / 8,
-                            level.Height / 8
-                        ),
-                        level.Width / 8,
-                        level.Height / 8
-                    );
-                }
-                else if (child.Name == "solids") {
-                    level.ForegroundTiles = new TileGrid(
-                        child.GetString("innerText"),
-                        level.Width / 8,
-                        level.Height / 8
-                    );
-                }
-                else if (child.Name == "bg") {
-                    level.BackgroundTiles = new TileGrid(
-                        child.GetString("innerText"),
-                        level.Width / 8,
-                        level.Height / 8
-                     );
-                }
-            }
-
-            level.UpdateBounds();
-
-            return level;
         }
 
         public override BinaryMapElement ToBinary() {
@@ -178,49 +178,10 @@ namespace Starforge.MapStructure {
                 Attributes = Attributes
             };
 
-            // Add entities
-            if (Entities.Count > 0) {
-                BinaryMapElement entities = new BinaryMapElement() {
-                    Name = "entities"
-                };
-                foreach (Entity entity in Entities) {
-                    entities.Children.Add(entity.ToBinary());
-                }
-                bin.Children.Add(entities);
-            }
-
-            // Add triggers
-            if (Triggers.Count > 0) {
-                BinaryMapElement triggers = new BinaryMapElement() {
-                    Name = "triggers"
-                };
-                foreach (Trigger trigger in Triggers) {
-                    triggers.Children.Add(trigger.ToBinary());
-                }
-                bin.Children.Add(triggers);
-            }
-
-            // Add background decals
-            if (BackgroundDecals.Count > 0) {
-                BinaryMapElement bgDecals = new BinaryMapElement() {
-                    Name = "bgdecals"
-                };
-                foreach (Decal decal in BackgroundDecals) {
-                    bgDecals.Children.Add(decal.ToBinary());
-                }
-                bin.Children.Add(bgDecals);
-            }
-
-            // Add foreground decals
-            if (ForegroundDecals.Count > 0) {
-                BinaryMapElement fgDecals = new BinaryMapElement() {
-                    Name = "fgdecals"
-                };
-                foreach (Decal decal in ForegroundDecals) {
-                    fgDecals.Children.Add(decal.ToBinary());
-                }
-                bin.Children.Add(fgDecals);
-            }
+            addListToBinary(ref bin, Entities, "entities");
+            addListToBinary(ref bin, Triggers, "triggers");
+            addListToBinary(ref bin, BackgroundDecals, "bgdecals");
+            addListToBinary(ref bin, ForegroundDecals, "fgdecals");
 
             // Add background tiles
             BinaryMapElement bgTiles = new BinaryMapElement() {
@@ -244,6 +205,18 @@ namespace Starforge.MapStructure {
             bin.Children.Add(objTiles);
 
             return bin;
+        }
+
+        private static void addListToBinary<T>(ref BinaryMapElement bin, List<T> objects, string name) where T : MapElement {
+            if (objects.Count <= 0) return;
+
+            BinaryMapElement binaryMapElement = new BinaryMapElement() {
+                Name = name
+            };
+            foreach (T obj in objects) {
+                binaryMapElement.Children.Add(obj.ToBinary());
+            }
+            bin.Children.Add(binaryMapElement);
         }
 
         public void Update(KeyboardState kbd, MouseState m, GameTime gt) {

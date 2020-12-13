@@ -4,7 +4,7 @@ using Starforge.MapStructure.Encoding;
 using Starforge.Mod.Assets;
 
 namespace Starforge.MapStructure {
-    public class Decal {
+    public class Decal : MapElement {
         public float X;
         public float Y;
         public float ScaleX;
@@ -26,7 +26,7 @@ namespace Starforge.MapStructure {
             Update();
         }
 
-        public BinaryMapElement ToBinary() {
+        public override BinaryMapElement ToBinary() {
             BinaryMapElement bin = new BinaryMapElement() {
                 Name = "decal"
             };
