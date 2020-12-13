@@ -63,10 +63,12 @@ namespace Starforge.MapStructure {
         private bool TilesDirty = true;
 
         public RenderTarget2D Target { get; private set; }
+        public RenderTarget2D Overlay { get; private set; }
+        public Point OverlayPosition { get; private set; }
         public bool Dirty { get; set; } = true;
 
         // whether this level is currently selected
-        public bool Selected = false;
+        private bool Selected { get; set; } = false;
 
         // whether this level was just newly selected
         public bool WasSelected = false;
@@ -253,6 +255,7 @@ namespace Starforge.MapStructure {
                 Width, Height, false,
                 SurfaceFormat.Color, DepthFormat.None,
                 0, RenderTargetUsage.PreserveContents);
+
         }
 
         private void RegenerateTileGrids() {
@@ -264,15 +267,39 @@ namespace Starforge.MapStructure {
         }
 
         public void Render() {
+            if (Selected) {
+                // if selected -> update overlay
+                Engine.Instance.GraphicsDevice.SetRenderTarget(Overlay);
+                Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
+                
+                Engine.Batch.Begin(SpriteSortMode.Deferred,
+                                   BlendState.AlphaBlend,
+                                   SamplerState.PointClamp, null, RasterizerState.CullNone, null);
+
+                GFX.Pixel.Draw(ToolManager.ToolHint, Engine.Config.ToolAccentColor, 0.25f);
+                GFX.Draw.HollowRectangle(ToolManager.ToolHint, Color.Goldenrod);
+                Engine.Batch.End();
+            }
+
+            if (!Dirty) {
+                return;
+            }
+
             Engine.Instance.GraphicsDevice.SetRenderTarget(Target);
-            if (Selected) Engine.Instance.GraphicsDevice.Clear(Engine.Config.SelectedRoomColor);
-            else Engine.Instance.GraphicsDevice.Clear(Engine.Config.RoomColor);
+            if (Selected) {
+                Engine.Instance.GraphicsDevice.Clear(Engine.Config.SelectedRoomColor);
+            }
+            else {
+                Engine.Instance.GraphicsDevice.Clear(Engine.Config.RoomColor);
+            }
 
             Engine.Batch.Begin(SpriteSortMode.Deferred,
                                BlendState.AlphaBlend,
                                SamplerState.PointClamp, null, RasterizerState.CullNone, null);
 
-            if (TilesDirty) RegenerateTileGrids();
+            if (TilesDirty) {
+                RegenerateTileGrids();
+            }
 
             // Background tiles
             for (int pos = 0; pos < BgGrid.Length; pos++) {
@@ -299,14 +326,32 @@ namespace Starforge.MapStructure {
                 ForegroundDecals[pos].Texture.DrawCentered();
             }
 
-            if (Selected) {
-                GFX.Pixel.Draw(ToolManager.ToolHint, Engine.Config.ToolAccentColor, 0.25f);
-                GFX.Draw.HollowRectangle(ToolManager.ToolHint, Color.Goldenrod);
-            }
-
             Engine.Batch.End();
             Dirty = false;
         }
+
+        // Sets the selected state of this Level
+        public void SetSelected(bool selected) {
+            if (Selected == selected) {
+                return;
+            }
+            Selected = selected;
+            Dirty = true;
+
+            if (Selected) {
+                // generate overlay for this when this becomes Selected
+                Overlay = new RenderTarget2D(
+                    Engine.Instance.GraphicsDevice,
+                    Width, Height, false,
+                    SurfaceFormat.Color, DepthFormat.None,
+                    0, RenderTargetUsage.PreserveContents);
+            }
+            else {
+                // delete overlay when this becomes deselected
+                Overlay.Dispose();
+            }
+        }
+
     }
 
     public class LevelMeta {

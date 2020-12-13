@@ -135,80 +135,98 @@ namespace Starforge.MapStructure.Tiling {
         }
 
         public StaticTexture GenerateTileTexture(TileGrid grid, int i, int j) {
+            if (grid[i, j] == '0') {
+                return new StaticTexture(GFX.Empty);
+            }
+
             StaticTexture tex = new StaticTexture(GFX.Empty);
-            if (grid[i, j] != '0') {
-                int num = 0;
-                byte[] adjacent = new byte[9];
-                bool center = true;
 
-                Tileset t = Tilesets[(char)grid[i, j]];
+            int num = 0;
+            byte[] adjacent = new byte[9];
+            bool center = true;
 
-                for (int y = -1; y < 2; y++) {
-                    for (int x = -1; x < 2; x++) {
-                        bool res = CheckTile(grid, t, i + x, j + y);
-                        if (res) {
-                            adjacent[num++] = 1;
-                        }
-                        else {
-                            adjacent[num++] = 0;
-                            center = false;
-                        }
-                    }
-                }
+            Tileset t = Tilesets[(char)grid[i, j]];
 
-                if (center) {
-                    if (!CheckTile(grid, t, i - 2, j)
-                        || !CheckTile(grid, t, i + 2, j)
-                        || !CheckTile(grid, t, i, j - 2)
-                        || !CheckTile(grid, t, i, j + 2)) {
-                        tex.Texture = MiscHelper.Choose(i, j, t.Padding);
+            for (int y = -1; y < 2; y++) {
+                for (int x = -1; x < 2; x++) {
+                    bool res = CheckTile(grid, t, i + x, j + y);
+                    if (res) {
+                        adjacent[num++] = 1;
                     }
                     else {
-                        tex.Texture = MiscHelper.Choose(i, j, t.Center);
+                        adjacent[num++] = 0;
+                        center = false;
                     }
+                }
+            }
+
+            if (center) {
+                if (!CheckTile(grid, t, i - 2, j)
+                    || !CheckTile(grid, t, i + 2, j)
+                    || !CheckTile(grid, t, i, j - 2)
+                    || !CheckTile(grid, t, i, j + 2)) {
+                    tex.Texture = MiscHelper.Choose(i, j, t.Padding);
                 }
                 else {
-                    tex.Texture = GFX.Empty; // Set to arbitrary texture incase there isn't a valid mask.
-                    tex.Visible = false;
-                    foreach (TileMask m in t.Masks) {
-                        bool found = true;
-                        int index = 0;
-                        while (index < 9 && found) {
-                            if (m.Mask[index] != 2 && m.Mask[index] != adjacent[index]) found = false;
+                    tex.Texture = MiscHelper.Choose(i, j, t.Center);
+                }
+            }
+            else {
+                tex.Texture = GFX.Empty; // Set to arbitrary texture incase there isn't a valid mask.
+                tex.Visible = false;
+                foreach (TileMask m in t.Masks) {
+                    bool found = true;
+                    int index = 0;
+                    while (index < 9 && found) {
+                        if (m.Mask[index] != 2 && m.Mask[index] != adjacent[index]) found = false;
 
-                            index++;
-                        }
+                        index++;
+                    }
 
-                        if (found) {
-                            tex.Texture = MiscHelper.Choose(i, j, m.Textures);
-                            tex.Visible = true;
-                            break;
-                        }
+                    if (found) {
+                        tex.Texture = MiscHelper.Choose(i, j, m.Textures);
+                        tex.Visible = true;
+                        break;
                     }
                 }
-
-                tex.Position = new Vector2(i * 8, j * 8);
             }
+
+            tex.Position = new Vector2(i * 8, j * 8);
 
             return tex;
         }
 
-        public void Update(TileGrid grid, StaticTexture[] texArray, Point point) {
-            Update(grid, texArray, new Rectangle(point.X, point.Y, 1, 1));
+        // updates the tile textures around a given point, returns true if anything changed
+        public bool Update(TileGrid grid, StaticTexture[] texArray, Point point) {
+            return Update(grid, texArray, new Rectangle(point.X, point.Y, 1, 1));
         }
 
-        public void Update(TileGrid grid, StaticTexture[] texArray, Rectangle r) {
+        // updates the tile textures in a given rectangle, returns true if anything changed
+        public bool Update(TileGrid grid, StaticTexture[] texArray, Rectangle r) {
             // need to check one tile out in each direction
             r.X -= 1;
             r.Y -= 1;
             r.Width += 2;
             r.Height += 2;
+
+            bool changed = false;
             for (int x = 0; x < r.Width; x++) {
                 for (int y = 0; y < r.Height; y++) {
-                    if (x + r.X < 0 || x + r.X > grid.Width - 1 || y + r.Y < 0 || y + r.Y > grid.Height - 1) continue;
-                    texArray[(y + r.Y) * grid.Width + x + r.X] = GenerateTileTexture(grid, x + r.X, y + r.Y);
+                    if (x + r.X < 0 || x + r.X > grid.Width - 1 || y + r.Y < 0 || y + r.Y > grid.Height - 1) {
+                        // Don't update anything outside the window
+                        continue;
+                    }
+                    int index = (y + r.Y) * grid.Width + x + r.X;
+                    StaticTexture newTexture = GenerateTileTexture(grid, x + r.X, y + r.Y);
+                    if (!newTexture.Equals(texArray[index])) {
+                        // If a texture was actually updated
+                        texArray[index] = newTexture;
+                        changed = true;
+                    }
                 }
             }
+
+            return changed;
         }
 
         public List<Tileset> GetTilesetList() {

@@ -58,7 +58,7 @@ namespace Starforge.Editor {
             LoadedMap = map;
             if (LoadedMap.Levels.Count > 0) {
                 SelectedLevel = LoadedMap.Levels[0];
-                SelectedLevel.Selected = true;
+                SelectedLevel.SetSelected(true);
             }
 
             BGAutotiler = new Autotiler($"{Engine.Config.ContentDirectory}/Graphics/BackgroundTiles.xml");
@@ -110,11 +110,11 @@ namespace Starforge.Editor {
         }
 
         private void ChangeSelectedRoom(int newRoom, bool moveCamera) {
-            SelectedLevel.Selected = false;
+            SelectedLevel.SetSelected(false);
             SelectedLevel.Render();
 
             SelectedLevel = LoadedMap.Levels[newRoom];
-            SelectedLevel.Selected = true;
+            SelectedLevel.SetSelected(true);
             SelectedLevel.WasSelected = false;
             SelectedLevel.Render();
 
@@ -172,7 +172,6 @@ namespace Starforge.Editor {
             // Search for room that was clicked on
             // Most common option, check for currently selected level first
             if (SelectedLevel.Bounds.Contains(point)) {
-                SelectedLevel.Dirty = true;
                 return;
             }
 
@@ -210,7 +209,7 @@ namespace Starforge.Editor {
         public void Render(GameTime gt) {
             // Rerender "dirty" levels (those which need to be rerendered)
             foreach (Level level in VisibleLevels) {
-                if (level.Dirty) level.Render();
+                level.Render();
             }
 
             Engine.Instance.GraphicsDevice.SetRenderTarget(null);
@@ -224,10 +223,13 @@ namespace Starforge.Editor {
 
             LoadedMap.Render();
 
+            // draw each level
             foreach (Level level in VisibleLevels) {
                 Engine.Batch.Draw(level.Target, level.Position, Color.White);
             }
-
+            // draw the selected level's overlay
+            Engine.Batch.Draw(SelectedLevel.Overlay, SelectedLevel.Position, Color.White);
+            
             Engine.Batch.End();
 
             // Render ImGUI content
