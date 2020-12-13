@@ -37,44 +37,54 @@ namespace Starforge.Platform {
             List<string> libraries = new List<string>();
             string steamInstall = GetSteamInstallPath();
 
-            if (!string.IsNullOrEmpty(steamInstall)) {
-                // Add default Steam library if it exists.
-                string defaultLibrary = Path.Combine(steamInstall, "steamapps", "common");
-                if (Directory.Exists(defaultLibrary)) libraries.Add(defaultLibrary);
+            if (string.IsNullOrEmpty(steamInstall)) {
+                return libraries;
+            }
 
-                // Check steamapps/libraryfolders.vdf for external Steam libraries.
-                string libraryFolders = Path.Combine(steamInstall, "steamapps", "libraryfolders.vdf");
-                if (File.Exists(libraryFolders)) {
-                    try {
-                        string[] content = File.ReadAllLines(libraryFolders);
-                        foreach (string rawLine in content) {
-                            string[] splitLine = rawLine.Split('"');
+            // Add default Steam library if it exists.
+            string defaultLibrary = Path.Combine(steamInstall, "steamapps", "common");
+            if (Directory.Exists(defaultLibrary)) libraries.Add(defaultLibrary);
 
-                            // Libraries are stored in libraryfolders.vdf like so:
-                            //     "1"        "E:\\Steam"
-                            // Splitting them by double quotes yields something like:
-                            // ["    ", "1", "     ", "E:\\Steam"]
-                            // (indices 0 and 2 can be disregarded.)
+            // Check steamapps/libraryfolders.vdf for external Steam libraries.
+            string libraryFolders = Path.Combine(steamInstall, "steamapps", "libraryfolders.vdf");
+            if (!File.Exists(libraryFolders)) {
+                return libraries;
+            }
 
-                            // Only include this library folder if it is in the proper format
-                            // (libraryfolders.vdf contains a few lines other than library locations)
-                            // (key is number, value is path)
+            try {
+                string[] content = File.ReadAllLines(libraryFolders);
+                foreach (string rawLine in content) {
+                    string[] splitLine = rawLine.Trim().Split('"');
 
-                            if (int.TryParse(splitLine[1], out int unused)) {
-                                string path = Path.Combine(
-                                    splitLine[3],
-                                    "steamapps",
-                                    "common"
-                                );
+                    if(splitLine.Length < 4) {
+                        continue;
+                    }
 
-                                if (Directory.Exists(path)) libraries.Add(path);
-                            }
+                    // Libraries are stored in libraryfolders.vdf like so:
+                    //     "1"        "E:\\Steam"
+                    // Splitting them by double quotes yields something like:
+                    // ["", "1", "     ", "E:\\Steam"]
+                    // (indices 0 and 2 can be disregarded.)
+
+                    // Only include this library folder if it is in the proper format
+                    // (libraryfolders.vdf contains a few lines other than library locations)
+                    // (key is number, value is path)
+
+                    if (int.TryParse(splitLine[1], out int unused)) {
+                        string path = Path.Combine(
+                            splitLine[3],
+                            "steamapps",
+                            "common"
+                        );
+
+                        if (Directory.Exists(path)) {
+                            libraries.Add(path);
                         }
-                    } catch (Exception e) {
-                        Logger.Log(LogLevel.Error, "Unable to open steamapps/libraryfolders.vdf");
-                        Logger.LogException(e);
                     }
                 }
+            } catch (Exception e) {
+                Logger.Log(LogLevel.Error, "Unable to open steamapps/libraryfolders.vdf");
+                Logger.LogException(e);
             }
 
             return libraries;
