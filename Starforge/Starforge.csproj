@@ -50,6 +50,7 @@
     <Compile Include="Core\Engine.Game.cs" />
     <Compile Include="Core\GFX.cs" />
     <Compile Include="Editor\Camera.cs" />
+    <Compile Include="Editor\Action.cs" />
     <Compile Include="Editor\ImGUIHandler.cs" />
     <Compile Include="Editor\Scene.cs" />
     <Compile Include="Editor\ToolManager.cs" />
