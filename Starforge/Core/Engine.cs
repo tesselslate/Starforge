@@ -51,7 +51,8 @@ namespace Starforge.Core {
                 throw new PlatformNotSupportedException($"Invalid platform: {SDL2.SDL.SDL_GetPlatform()}");
             }
 
-            CelesteDirectory = Platform.GetCelesteDirectory();
+            // TODO: More robust Celeste install detection
+            CelesteDirectory = new PlatformWindows().GetCelesteDirectories()[0];
             Config.ContentDirectory = Path.Combine(CelesteDirectory, "Content");
 
             // Load plugins (first stage mod loading)

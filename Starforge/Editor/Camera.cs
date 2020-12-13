@@ -96,6 +96,7 @@ namespace Starforge.Editor {
 
         public void UpdateViewport() {
             Viewport = Engine.Instance.GraphicsDevice.Viewport;
+            Update();
         }
 
         // Convert a position on the map to a position on the screen.
