@@ -13,8 +13,8 @@ namespace Starforge.Core {
             // General
             public static bool Debug = true;
 
-            public static bool CelesteAutodetect = false;
-            public static bool ContentAutodetect = false;
+            public static bool CelesteAutodetect = true;
+            public static bool ContentAutodetect = true;
 
             // Graphics
             public static bool VerticalSync = true;
@@ -47,18 +47,18 @@ namespace Starforge.Core {
                     case "CelesteDirectory":
                         if (props[1] == "$AUTODETECT") {
                             CelesteDirectory = "";
-                            CelesteAutodetect = true;
                         } else {
                             CelesteDirectory = props[1];
+                            CelesteAutodetect = false;
                         }
 
                         break;
                     case "ContentDirectory":
                         if (props[1] == "$AUTODETECT") {
                             ContentDirectory = "";
-                            ContentAutodetect = true;
                         } else {
                             ContentDirectory = props[1];
+                            ContentAutodetect = false;
                         }
 
                         break;
@@ -89,15 +89,15 @@ namespace Starforge.Core {
             }
 
             public static void WriteConfig(StreamWriter writer) {
-                writer.WriteLine($"ImGUITheme:{ImGUITheme.ToString()}");
-                writer.WriteLine($"BackgroundColor:{MiscHelper.ColorToHex(BackgroundColor)}");
-                writer.WriteLine($"RoomColor:{MiscHelper.ColorToHex(RoomColor)}");
-                writer.WriteLine($"SelectedRoomColor:{MiscHelper.ColorToHex(SelectedRoomColor)}");
-                writer.WriteLine($"ToolAccentColor:{MiscHelper.ColorToHex(ToolAccentColor)}");
-                writer.WriteLine($"CelesteDirectory:{(CelesteAutodetect ? "$AUTODETECT" : CelesteDirectory)}");
-                writer.WriteLine($"ContentDirectory:{(ContentAutodetect ? "$AUTODETECT" : ContentDirectory)}");
-                writer.WriteLine($"Debug:{Debug}");
-                writer.WriteLine($"VerticalSync:{VerticalSync}");
+                writer.WriteLine($"ImGUITheme|{ImGUITheme.ToString()}");
+                writer.WriteLine($"BackgroundColor|{MiscHelper.ColorToHex(BackgroundColor)}");
+                writer.WriteLine($"RoomColor|{MiscHelper.ColorToHex(RoomColor)}");
+                writer.WriteLine($"SelectedRoomColor|{MiscHelper.ColorToHex(SelectedRoomColor)}");
+                writer.WriteLine($"ToolAccentColor|{MiscHelper.ColorToHex(ToolAccentColor)}");
+                writer.WriteLine($"CelesteDirectory|{(CelesteAutodetect ? "$AUTODETECT" : CelesteDirectory)}");
+                writer.WriteLine($"ContentDirectory|{(ContentAutodetect ? "$AUTODETECT" : ContentDirectory)}");
+                writer.WriteLine($"Debug|{Debug}");
+                writer.WriteLine($"VerticalSync|{VerticalSync}");
             }
         }
     }
