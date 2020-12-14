@@ -43,7 +43,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\CrystalSpinner.cs" />
+    <Compile Include="Entities\Feather.cs" />
+    <Compile Include="Entities\Jumpthru.cs" />
+    <Compile Include="Entities\Lightning.cs" />
     <Compile Include="Entities\Player.cs" />
+    <Compile Include="Entities\Refill.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
