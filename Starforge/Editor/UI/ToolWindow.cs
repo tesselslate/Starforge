@@ -40,10 +40,11 @@ namespace Starforge.Editor.UI {
         }
 
         public static void Render() {
-            ImGui.SetNextWindowPos(new System.Numerics.Vector2(Engine.Instance.GraphicsDevice.Viewport.Width - 150f, 0f));
-            ImGui.SetNextWindowSize(new System.Numerics.Vector2(150f, Engine.Instance.GraphicsDevice.Viewport.Height));
+            ImGui.SetNextWindowPos(new System.Numerics.Vector2(Engine.Instance.GraphicsDevice.Viewport.Width - 150f, MenuBar.MenuBarSize));
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(150f, Engine.Instance.GraphicsDevice.Viewport.Height - MenuBar.MenuBarSize));
             ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0f);
             ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 0f);
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0f);
 
             ImGui.Begin("Tools",
                 ImGuiWindowFlags.NoDecoration |
@@ -52,8 +53,7 @@ namespace Starforge.Editor.UI {
                 ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoMove);
 
-            ImGui.PopStyleVar();
-            ImGui.PopStyleVar();
+            ImGui.PopStyleVar(3);
 
             ImGui.SetNextItemWidth(135f);
 

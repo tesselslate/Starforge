@@ -33,6 +33,10 @@ namespace Starforge.Util {
             return string.Join(" ", words.ToArray());
         }
 
+        public static string ColorToHex(Color c) {
+            return c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
+        }
+
         public static byte HexCharToByte(char c) {
             return (byte)"0123456789ABCDEF".IndexOf(char.ToUpper(c));
         }
@@ -97,6 +101,14 @@ namespace Starforge.Util {
             }
 
             return array;
+        }
+
+        public static System.Numerics.Vector3 ColorToVect3(Color c) {
+            return new System.Numerics.Vector3((float)c.R / 255, (float)c.G / 255, (float)c.B / 255);
+        }
+
+        public static Color Vect3ToColor(System.Numerics.Vector3 v) {
+            return new Color(v.X, v.Y, v.Z);
         }
     }
 }

@@ -48,6 +48,19 @@ namespace Starforge.Editor {
                 SlopeScaleDepthBias = 0
             };
 
+            // Initialize color theme based on config
+            switch(Engine.Config.ImGUITheme) {
+            case GUITheme.Dark:
+                ImGui.StyleColorsDark();
+                break;
+            case GUITheme.Light:
+                ImGui.StyleColorsLight();
+                break;
+            case GUITheme.Classic:
+                ImGui.StyleColorsClassic();
+                break;
+            }
+
             SetupInput();
         }
 
