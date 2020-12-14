@@ -38,7 +38,16 @@ namespace Starforge.Core.Interop {
             Marshal.FreeHGlobal(defaultPathPtr);
 
             path = res != NfdResult.NFD_OKAY ? null : NFDParser.FromNfdString(outPath);
-            Marshal.FreeHGlobal(outPath);
+
+            // Here, we *should* free the outPath pointer.
+            // However, doing so causes a crash!
+            // Does not doing so cause a memory leak? Probably. :)
+
+            if (res == NfdResult.NFD_ERROR) {
+                Logger.Log(LogLevel.Error, "nativefiledialog error:");
+                Logger.Log(LogLevel.Error, GetError());
+            }
+
             return res;
         }
 
@@ -51,7 +60,14 @@ namespace Starforge.Core.Interop {
             Marshal.FreeHGlobal(defaultPathPtr);
 
             path = res != NfdResult.NFD_OKAY ? null : NFDParser.FromNfdString(outPath);
-            Marshal.FreeHGlobal(outPath);
+
+            // The outPath pointer should also probably be freed here.
+
+            if (res == NfdResult.NFD_ERROR) {
+                Logger.Log(LogLevel.Error, "nativefiledialog error:");
+                Logger.Log(LogLevel.Error, GetError());
+            }
+
             return res;
         }
 
