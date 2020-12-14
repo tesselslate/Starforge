@@ -26,6 +26,7 @@ namespace Starforge.Editor.Tools {
                     new Vector2(l.TilePointer.X * 8f, l.TilePointer.Y * 8f));
             }
 
+            heldEntity.Level = l;
             heldEntity.Position = new Vector2(l.TilePointer.X * 8f, l.TilePointer.Y * 8f);
 
             if (m.LeftButton != ButtonState.Pressed) {
