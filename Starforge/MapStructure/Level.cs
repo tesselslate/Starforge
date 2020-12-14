@@ -287,16 +287,7 @@ namespace Starforge.MapStructure {
         public void Render() {
             if (Selected) {
                 // if selected -> update overlay
-                Engine.Instance.GraphicsDevice.SetRenderTarget(Overlay);
-                Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
-                
-                Engine.Batch.Begin(SpriteSortMode.Deferred,
-                                   BlendState.AlphaBlend,
-                                   SamplerState.PointClamp, null, RasterizerState.CullNone, null);
-
-                GFX.Pixel.Draw(ToolManager.ToolHint, Engine.Config.ToolAccentColor, 0.25f);
-                GFX.Draw.HollowRectangle(ToolManager.ToolHint, Color.Goldenrod);
-                Engine.Batch.End();
+                ToolManager.Render(Overlay);
             }
 
             if (!Dirty) {

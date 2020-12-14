@@ -58,6 +58,9 @@
     <Compile Include="Editor\Scene.cs" />
     <Compile Include="Editor\Actions\TilePlacement.cs" />
     <Compile Include="Editor\ToolManager.cs" />
+    <Compile Include="Editor\Tools\TileDrawTool.cs" />
+    <Compile Include="Editor\Tools\TileRectangleTool.cs" />
+    <Compile Include="Editor\Tools\Tool.cs" />
     <Compile Include="Editor\UI\RoomListWindow.cs" />
     <Compile Include="Editor\UI\ToolWindow.cs" />
     <Compile Include="MapStructure\Tiling\Autotiler.cs" />
