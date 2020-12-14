@@ -1,4 +1,5 @@
-﻿using Starforge.Core;
+﻿using Microsoft.Xna.Framework;
+using Starforge.Core;
 using Starforge.MapStructure;
 using Starforge.MapStructure.Encoding;
 using System;
@@ -10,8 +11,10 @@ namespace Starforge.Mod {
     public static class EntityRegistry {
         private static Dictionary<string, EntityCreator> Creators = new Dictionary<string, EntityCreator>();
 
-        public static Entity Create(Level level, string name) {
+        public static Entity Create(Level level, string name, Vector2 position) {
             EntityData data = new EntityData(name);
+            data.Attributes.Add("x", position.X);
+            data.Attributes.Add("y", position.Y);
 
             if (Creators.ContainsKey(name)) {
                 return Creators[name](level, data);
@@ -72,6 +75,10 @@ namespace Starforge.Mod {
                 Logger.Log(LogLevel.Error, $"Failed to register entity of type {type}");
                 Logger.LogException(e);
             }
+        }
+
+        public static List<string> GetEntities() {
+            return new List<string>(Creators.Keys);
         }
     }
 

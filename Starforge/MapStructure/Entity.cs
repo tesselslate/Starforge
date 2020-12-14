@@ -5,16 +5,7 @@ using System.Collections.Generic;
 
 namespace Starforge.MapStructure {
     public abstract class Entity : MapElement {
-        public float X {
-            get => GetFloat("x");
-            set => SetAttribute("x", value);
-        }
-
-        public float Y {
-            get => GetFloat("y");
-            set => SetAttribute("y", value);
-        }
-
+      
         public float Width {
             get => GetFloat("width");
             set => SetAttribute("width", value);
@@ -25,9 +16,7 @@ namespace Starforge.MapStructure {
             set => SetAttribute("height", value);
         }
 
-        public Vector2 Position {
-            get => new Vector2(X, Y);
-        }
+        public Vector2 Position;
 
         public readonly string Name;
 
@@ -44,6 +33,9 @@ namespace Starforge.MapStructure {
 
             Level = level;
             foreach (KeyValuePair<string, object> pair in data.Attributes) Attributes.Add(pair.Key, pair.Value);
+
+            Position.X = GetFloat("x");
+            Position.Y = GetFloat("y");
         }
 
         public Entity(string name) {
@@ -51,6 +43,10 @@ namespace Starforge.MapStructure {
         }
 
         public override BinaryMapElement ToBinary() {
+
+            SetAttribute("x", Position.X);
+            SetAttribute("y", Position.Y);
+
             BinaryMapElement bin = new BinaryMapElement() {
                 Name = Name
             };

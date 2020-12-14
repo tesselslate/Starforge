@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
 using Starforge.Editor;
-using Starforge.Editor.Actions;
 using Starforge.MapStructure.Encoding;
 using Starforge.Mod;
 using Starforge.Mod.Assets;
@@ -261,7 +260,7 @@ namespace Starforge.MapStructure {
             );
 
             TilePointer = new Point((int)Math.Floor(roomPos.X / 8f), (int)Math.Floor(roomPos.Y / 8f));
-            ToolManager.Manage(m, this);
+            ToolManager.Manage(m);
         }
 
         public void UpdateBounds() {
@@ -287,7 +286,16 @@ namespace Starforge.MapStructure {
         public void Render() {
             if (Selected) {
                 // if selected -> update overlay
-                ToolManager.Render(Overlay);
+                Engine.Instance.GraphicsDevice.SetRenderTarget(Overlay);
+                Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
+
+                Engine.Batch.Begin(SpriteSortMode.Deferred,
+                                   BlendState.AlphaBlend,
+                                   SamplerState.PointClamp, null, RasterizerState.CullNone, null);
+
+                ToolManager.Render();
+
+                Engine.Batch.End();
             }
 
             if (!Dirty) {

@@ -14,7 +14,9 @@ namespace Starforge.Editor.Tools {
         private static Rectangle Hold;
         private static Point HoldStart;
 
-        public override void ManageInput(MouseState m, Level l) {
+        public override void ManageInput(MouseState m) {
+            Level l = Engine.Scene.SelectedLevel;
+
             ToolHint.X = l.TilePointer.X * 8;
             ToolHint.Y = l.TilePointer.Y * 8;
             if (m.LeftButton == ButtonState.Pressed) {
@@ -58,17 +60,13 @@ namespace Starforge.Editor.Tools {
             }
         }
 
-        public override void Render(RenderTarget2D target) {
-            Engine.Instance.GraphicsDevice.SetRenderTarget(target);
-            Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
-
-            Engine.Batch.Begin(SpriteSortMode.Deferred,
-                               BlendState.AlphaBlend,
-                               SamplerState.PointClamp, null, RasterizerState.CullNone, null);
-
+        public override void Render() {
             GFX.Pixel.Draw(ToolHint, Engine.Config.ToolAccentColor, 0.25f);
             GFX.Draw.HollowRectangle(ToolHint, Color.Goldenrod);
-            Engine.Batch.End();
+        }
+
+        public override string getName() {
+            return "Tile Rectangles";
         }
     }
 

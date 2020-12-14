@@ -1,5 +1,6 @@
 ﻿using ImGuiNET;
 using Starforge.Core;
+using Starforge.Mod;
 using System;
 using System.Collections.Generic;
 
@@ -8,9 +9,11 @@ namespace Starforge.Editor.UI {
 
         public static int CurrentBGTileset;
         public static int CurrentFGTileset;
+        public static int CurrentEntity;
 
         public static List<string> BGTilesets;
         public static List<string> FGTilesets;
+        public static List<string> Entities;
 
         public static List<string> Tools;
         public static List<string> Layers;
@@ -21,11 +24,12 @@ namespace Starforge.Editor.UI {
         static ToolWindow() {
             BGTilesets = new List<string>();
             FGTilesets = new List<string>();
+            Entities = EntityRegistry.GetEntities();
 
             // Tools
             Tools = new List<string>();
             foreach (ToolType type in Enum.GetValues(typeof(ToolType))) {
-                Tools.Add(type.ToString());
+                Tools.Add(ToolManager.Tools[type].getName());
             }
 
             // Layers
@@ -52,18 +56,32 @@ namespace Starforge.Editor.UI {
             ImGui.PopStyleVar();
 
             ImGui.SetNextItemWidth(135f);
-            if (CurrentTileType == TileType.Foreground) {
-                ImGui.ListBox("", ref CurrentFGTileset, FGTilesets.ToArray(), FGTilesets.Count, 30);
-            }
-            else {
-                ImGui.ListBox("", ref CurrentBGTileset, BGTilesets.ToArray(), BGTilesets.Count, 30);
+
+            switch (CurrentTool) {
+            case ToolType.EntityPlace:
+                ImGui.ListBox("", ref CurrentEntity, Entities.ToArray(), Entities.Count, 30);
+                break;
+            case ToolType.TileDraw:
+            case ToolType.TileRectangle:
+                switch (CurrentTileType) {
+                case TileType.Foreground:
+                    ImGui.ListBox("", ref CurrentFGTileset, FGTilesets.ToArray(), FGTilesets.Count, 30);
+                    break;
+                case TileType.Background:
+                    ImGui.ListBox("", ref CurrentBGTileset, BGTilesets.ToArray(), BGTilesets.Count, 30);
+                    break;
+                }
+                break;
             }
 
-            int selectedTileType = (int)CurrentTileType;
+            if (CurrentTool != ToolType.EntityPlace) {
+                int selectedTileType = (int)CurrentTileType;
+                ImGui.ListBox("Layer", ref selectedTileType, Layers.ToArray(), Layers.Count);
+                CurrentTileType = (TileType)selectedTileType;
+            }
+
             int selectedTool = (int)CurrentTool;
-            ImGui.ListBox("Layer", ref selectedTileType, Layers.ToArray(), Layers.Count);
             ImGui.ListBox("Tool", ref selectedTool, Tools.ToArray(), Tools.Count);
-            CurrentTileType = (TileType)selectedTileType;
             CurrentTool = (ToolType)selectedTool;
 
             ImGui.End();

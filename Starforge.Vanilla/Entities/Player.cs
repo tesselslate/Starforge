@@ -12,7 +12,9 @@ namespace Starforge.Vanilla.Entities {
         public Player(Level level, EntityData data) : base(level, data) { }
 
         public override void Render() {
-            Sprite.DrawCentered(new Vector2(X, Y - 16));
+            Vector2 pos = Position;
+            pos.Y -= 16f;
+            Sprite.DrawCentered(pos);
         }
     }
 }
