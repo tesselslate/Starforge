@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
+using Starforge.Core.Input;
 using Starforge.Editor;
 using Starforge.MapStructure.Encoding;
 using Starforge.Mod;
@@ -228,7 +229,7 @@ namespace Starforge.MapStructure {
             bin.Children.Add(binaryMapElement);
         }
 
-        public void Update(KeyboardState kbd, MouseState m, GameTime gt) {
+        public void Update(KeyboardState kbd, MouseEvent m, GameTime gt) {
             // Start input cooldown if this level just got selected
             if (!WasSelected) {
                 WasSelected = true;
@@ -253,7 +254,7 @@ namespace Starforge.MapStructure {
                 Redo();
             }
 
-            Vector2 rm = Engine.Scene.Camera.ScreenToReal(new Vector2(m.X, m.Y));
+            Vector2 rm = Engine.Scene.Camera.ScreenToReal(new Vector2(m.Position.X, m.Position.Y));
             Point roomPos = new Point(
                 (int)rm.X - X,
                 (int)rm.Y - Y

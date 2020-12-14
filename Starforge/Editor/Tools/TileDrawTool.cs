@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
+using Starforge.Core.Input;
 using Starforge.Editor.Actions;
 using Starforge.Editor.UI;
 using Starforge.MapStructure;
@@ -13,35 +12,49 @@ namespace Starforge.Editor.Tools {
 
         private static DrawTilePlacement CurrentDrawAction = null;
 
-        public override void ManageInput(MouseState m) {
+        public override void ManageInput(MouseEvent m) {
             Level l = Engine.Scene.SelectedLevel;
 
             ToolHint.X = l.TilePointer.X * 8;
             ToolHint.Y = l.TilePointer.Y * 8;
-            if (m.LeftButton != ButtonState.Pressed) {
-                if (Engine.Scene.PreviousMouseState.LeftButton == ButtonState.Pressed) {
-                    // if the user just let go of press, add action to recent Actions of the level
-                    //l.PastActions.Add(CurrentDrawAction);
-                }
-                return;
-            }
 
-            // when newly pressing button down
-            if (Engine.Scene.PreviousMouseState.LeftButton == ButtonState.Released) {
-                switch (ToolWindow.CurrentTileType) {
-                case TileType.Foreground:
-                    CurrentDrawAction = new DrawTilePlacement(l, ToolWindow.CurrentTileType, ToolWindow.CurrentFGTileset, l.TilePointer);
-                    break;
-                case TileType.Background:
-                    CurrentDrawAction = new DrawTilePlacement(l, ToolWindow.CurrentTileType, ToolWindow.CurrentBGTileset, l.TilePointer);
-                    break;
-                }
-                l.ApplyNewAction(CurrentDrawAction);
-                return;
+            if (m.LeftButtonClick) {
+                OnLeftClick();
             }
+            if (m.LeftButtonDrag) {
+                OnLeftDrag();
+            }
+            if (m.LeftButtonUnclick) {
+                OnLeftUnclick();
+            }
+        }
+
+        private void OnLeftClick() {
+            Level l = Engine.Scene.SelectedLevel;
+
+            switch (ToolWindow.CurrentTileType) {
+            case TileType.Foreground:
+                CurrentDrawAction = new DrawTilePlacement(l, ToolWindow.CurrentTileType, ToolWindow.CurrentFGTileset, l.TilePointer);
+                break;
+            case TileType.Background:
+                CurrentDrawAction = new DrawTilePlacement(l, ToolWindow.CurrentTileType, ToolWindow.CurrentBGTileset, l.TilePointer);
+                break;
+            }
+            l.ApplyNewAction(CurrentDrawAction);
+        }
+
+        private void OnLeftDrag() {
+            Level l = Engine.Scene.SelectedLevel;
 
             // when holding and continuously drawing, add to existing action
-            CurrentDrawAction.AddPoint(l.TilePointer);
+            if (CurrentDrawAction != null) {
+                CurrentDrawAction.AddPoint(l.TilePointer);
+            }
+        }
+
+        private void OnLeftUnclick() {
+            // finished drawing
+            CurrentDrawAction = null;
         }
 
         public override void Render() {

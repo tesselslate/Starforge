@@ -1,8 +1,7 @@
-﻿using Microsoft.Xna.Framework.Input;
-using Starforge.Editor.UI;
+﻿using Starforge.Editor.UI;
 using Starforge.Editor.Tools;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
+using Starforge.Core.Input;
 
 namespace Starforge.Editor {
     public static class ToolManager {
@@ -13,7 +12,7 @@ namespace Starforge.Editor {
             [ToolType.EntityPlace] = new EntityPlaceTool()
         };
 
-        public static void Manage(MouseState m) {
+        public static void Manage(MouseEvent m) {
             Tools[ToolWindow.CurrentTool].ManageInput(m);
         }
 
