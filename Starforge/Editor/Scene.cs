@@ -217,7 +217,7 @@ namespace Starforge.Editor {
 
             Engine.Batch.Begin(SpriteSortMode.Deferred,
                 BlendState.AlphaBlend,
-                SamplerState.PointWrap, null,
+                SamplerState.PointClamp, null,
                 RasterizerState.CullNone, null,
                 Camera.Transform);
 
