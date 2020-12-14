@@ -78,7 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FNA">
-      <HintPath>..\FNA\bin\Release\FNA.dll</HintPath>
+      <HintPath>..\lib\FNA\bin\Release\FNA.dll</HintPath>
     </Reference>
     <Reference Include="ImGui.NET, Version=1.78.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ImGui.NET.1.78.0\lib\netstandard2.0\ImGui.NET.dll</HintPath>
