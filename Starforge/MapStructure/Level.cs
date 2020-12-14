@@ -80,12 +80,17 @@ namespace Starforge.MapStructure {
             private set;
         }
 
+        public Stack<Editor.Actions.Action> PastActions;
+        public Stack<Editor.Actions.Action> FutureActions;
+
         public Level() {
             // Create empty lists for usual level elements (entities, etc)
             Entities = new List<Entity>();
             Triggers = new List<Trigger>();
             BackgroundDecals = new List<Decal>();
             ForegroundDecals = new List<Decal>();
+            PastActions = new Stack<Editor.Actions.Action>();
+            FutureActions = new Stack<Editor.Actions.Action>();
         }
 
         // create a new level from reading the binary
@@ -236,6 +241,18 @@ namespace Starforge.MapStructure {
                 return;
             }
 
+            // Catch Ctrl+Z
+            if (Engine.Scene.PreviousKeyboardState.IsKeyDown(Keys.LeftControl) && kbd.IsKeyDown(Keys.Z)) {
+                InputProcessWait = 0.2;
+                Undo();
+            }
+
+            // Catch Ctrl+Y
+            if (Engine.Scene.PreviousKeyboardState.IsKeyDown(Keys.LeftControl) && kbd.IsKeyDown(Keys.Y)) {
+                InputProcessWait = 0.2;
+                Redo();
+            }
+
             Vector2 rm = Engine.Scene.Camera.ScreenToReal(new Vector2(m.X, m.Y));
             Point roomPos = new Point(
                 (int)rm.X - X,
@@ -243,7 +260,7 @@ namespace Starforge.MapStructure {
             );
 
             TilePointer = new Point((int)Math.Floor(roomPos.X / 8f), (int)Math.Floor(roomPos.Y / 8f));
-            ToolManager.Manage(m, this);
+            ToolManager.Manage(m);
         }
 
         public void UpdateBounds() {
@@ -271,13 +288,13 @@ namespace Starforge.MapStructure {
                 // if selected -> update overlay
                 Engine.Instance.GraphicsDevice.SetRenderTarget(Overlay);
                 Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
-                
+
                 Engine.Batch.Begin(SpriteSortMode.Deferred,
                                    BlendState.AlphaBlend,
                                    SamplerState.PointClamp, null, RasterizerState.CullNone, null);
 
-                GFX.Pixel.Draw(ToolManager.ToolHint, Engine.Config.ToolAccentColor, 0.25f);
-                GFX.Draw.HollowRectangle(ToolManager.ToolHint, Color.Goldenrod);
+                ToolManager.Render();
+
                 Engine.Batch.End();
             }
 
@@ -350,6 +367,43 @@ namespace Starforge.MapStructure {
                 // delete overlay when this becomes deselected
                 Overlay.Dispose();
             }
+        }
+
+        public void ApplyNewAction(Editor.Actions.Action action) {
+            if (action.Apply()) {
+                Dirty = true;
+            }
+            PastActions.Push(action);
+            FutureActions.Clear();
+        }
+
+        // Undoes the most recent User action for this level
+        public void Undo() {
+            if (PastActions.Count == 0) {
+                return;
+            }
+
+            // Take last of the Past actions, Undo it and add it to the Future Actions
+            Editor.Actions.Action action = PastActions.Pop();
+            if (action.Undo()) {
+                Dirty = true;
+            }
+
+            FutureActions.Push(action);
+        }
+
+        // Redoes the last undone user action
+        public void Redo() {
+            if (FutureActions.Count == 0) {
+                return;
+            }
+
+            Editor.Actions.Action action = FutureActions.Pop();
+            if (action.Apply()) {
+                Dirty = true;
+            }
+
+            PastActions.Push(action);
         }
 
     }

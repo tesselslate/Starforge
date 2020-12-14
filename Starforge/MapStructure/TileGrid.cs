@@ -50,7 +50,7 @@ namespace Starforge.MapStructure {
         public void Empty() {
             for (int i = 0; i < Width; i++) {
                 for (int j = 0; j < Height; j++) {
-                    Tiles[i, j] = 48;
+                    Tiles[i, j] = '0';
                 }
             }
         }
