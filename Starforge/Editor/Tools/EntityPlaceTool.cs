@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
+using Starforge.Editor.Actions;
 using Starforge.Editor.UI;
 using Starforge.MapStructure;
 using Starforge.Mod;
@@ -19,7 +20,10 @@ namespace Starforge.Editor.Tools {
             Level l = Engine.Scene.SelectedLevel;
 
             if (heldEntity == null || heldEntity.Name != ToolWindow.Entities[ToolWindow.CurrentEntity]) {
-                heldEntity = makeEntityAtPosition(ToolWindow.Entities[ToolWindow.CurrentEntity], l.TilePointer);
+                heldEntity = EntityRegistry.Create(
+                    Engine.Scene.SelectedLevel,
+                    ToolWindow.Entities[ToolWindow.CurrentEntity],
+                    new Vector2(l.TilePointer.X * 8f, l.TilePointer.Y * 8f));
             }
 
             heldEntity.Position = new Vector2(l.TilePointer.X * 8f, l.TilePointer.Y * 8f);
@@ -32,9 +36,8 @@ namespace Starforge.Editor.Tools {
             }
 
             // if just clicked
-            Entity newEntity = makeEntityAtPosition(ToolWindow.Entities[ToolWindow.CurrentEntity], l.TilePointer);
+            l.ApplyNewAction(new EntityPlacement(l, ToolWindow.Entities[ToolWindow.CurrentEntity], l.TilePointer));
 
-            l.Entities.Add(newEntity);
             l.Dirty = true;
         }
 
@@ -46,13 +49,6 @@ namespace Starforge.Editor.Tools {
 
         public override string getName() {
             return "Entity Placing";
-        }
-
-        private Entity makeEntityAtPosition(string name, Point p) {
-            return EntityRegistry.Create(
-                Engine.Scene.SelectedLevel,
-                name,
-                new Vector2(p.X * 8f, p.Y * 8f));
         }
 
     }
