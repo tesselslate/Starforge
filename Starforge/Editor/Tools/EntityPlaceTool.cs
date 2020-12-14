@@ -37,8 +37,6 @@ namespace Starforge.Editor.Tools {
 
             // if just clicked
             l.ApplyNewAction(new EntityPlacement(l, ToolWindow.Entities[ToolWindow.CurrentEntity], l.TilePointer));
-
-            l.Dirty = true;
         }
 
         public override void Render() {
