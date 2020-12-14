@@ -13,7 +13,7 @@ namespace Starforge.Core {
         private static Rectangle Rect;
 
         public static void Load() {
-            Gameplay = Atlas.FromAtlas(Path.Combine(Engine.Config.ContentDirectory, "Graphics", "Atlases/") + "Gameplay", AtlasFormat.Packer);
+            Gameplay = Atlas.FromAtlas(Path.Combine(Engine.ContentDirectory, "Graphics", "Atlases/") + "Gameplay", AtlasFormat.Packer);
 
             Pixel = Gameplay["util/pixel"];
             Empty = new DrawableTexture(Gameplay.Sources[0], new Rectangle(4094, 4094, 1, 1), Vector2.Zero, 1, 1);

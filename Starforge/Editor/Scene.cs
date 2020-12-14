@@ -61,8 +61,8 @@ namespace Starforge.Editor {
                 SelectedLevel.SetSelected(true);
             }
 
-            BGAutotiler = new Autotiler($"{Engine.Config.ContentDirectory}/Graphics/BackgroundTiles.xml");
-            FGAutotiler = new Autotiler($"{Engine.Config.ContentDirectory}/Graphics/ForegroundTiles.xml");
+            BGAutotiler = new Autotiler($"{Engine.ContentDirectory}/Graphics/BackgroundTiles.xml");
+            FGAutotiler = new Autotiler($"{Engine.ContentDirectory}/Graphics/ForegroundTiles.xml");
 
             Camera.Zoom = 1f;
             Camera.GotoCentered(new Vector2(-SelectedLevel.Bounds.Center.X, -SelectedLevel.Bounds.Center.Y));
@@ -235,8 +235,13 @@ namespace Starforge.Editor {
             // Render ImGUI content
             Engine.GUI.BeforeLayout(gt);
 
+            MenuBar.Render();
             RoomListWindow.Render();
             ToolWindow.Render();
+
+            if (MenuBar.Settings) {
+                SettingsWindow.Render();
+            }
 
             Engine.GUI.AfterLayout();
         }
