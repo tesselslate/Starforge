@@ -49,6 +49,7 @@
     <Compile Include="Core\Engine.Settings.cs" />
     <Compile Include="Core\Engine.Game.cs" />
     <Compile Include="Core\GFX.cs" />
+    <Compile Include="Core\Interop\NFD.cs" />
     <Compile Include="Editor\Actions\DrawTilePlacement.cs" />
     <Compile Include="Editor\Actions\EntityPlacement.cs" />
     <Compile Include="Editor\Actions\RectangleTilePlacement.cs" />

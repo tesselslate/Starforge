@@ -21,4 +21,5 @@ Starforge is licensed under the [MIT License.](https://github.com/WoofWoofDoggo/
 - [FNA](https://github.com/FNA-XNA/FNA), which is under the [Microsoft Public License.](https://github.com/FNA-XNA/FNA/blob/master/licenses/LICENSE)
 - [ImGUI.NET](https://github.com/mellinoe/ImGui.NET), which is under the [MIT License.](https://github.com/mellinoe/ImGui.NET/blob/master/LICENSE)
 
+Additionally, Starforge makes use of a [fork](https://github.com/WoofWoofDoggo/nativefiledialog) of [nativefiledialog](https://github.com/mlabbe/nativefiledialog), as well as a C# wrapper for it based off of [nfd-sharp.](https://github.com/benklett/nfd-sharp)
 ---
