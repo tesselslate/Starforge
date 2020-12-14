@@ -8,12 +8,13 @@ namespace Starforge.Vanilla.Entities {
     [EntityDefinition("spinner")]
     public class CrystalSpinner : Entity {
 
-        DrawableTexture Sprite = GFX.Gameplay["danger/crystal/fg_blue03"];
+        DrawableTexture Sprite;
 
         public CrystalSpinner(Level level, EntityData data) : base(level, data) {
 
             if(data.GetBool("dust")) {
                 // Dust bunny
+                Sprite = GFX.Gameplay["danger/dustcreature/base00"];
             } else {
                 switch(data.GetString("color").ToLower()) {
                     case "red":

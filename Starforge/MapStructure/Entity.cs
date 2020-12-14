@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Starforge.Core;
 using Starforge.MapStructure.Encoding;
 using Starforge.Mod;
 using System.Collections.Generic;
@@ -81,8 +83,16 @@ namespace Starforge.MapStructure {
     }
 
     public class UnknownEntity : Entity {
+        private static readonly Color BgColor = Color.Cyan * 0.2f;
+        private static readonly Color OutlineColor = Color.Cyan;
+
         public UnknownEntity(Level level, EntityData data) : base(level, data) { }
 
-        public override void Render() { }
+        public override void Render() {
+            // default width/height of 4 for non-rectangular entities works pretty well
+            Rectangle renderPos = new Rectangle((int)Position.X, (int)Position.Y, GetInt("width", 4), GetInt("height", 4));
+            GFX.Pixel.Draw(renderPos, BgColor);
+            GFX.Draw.HollowRectangle(renderPos, OutlineColor);
+        }
     }
 }
