@@ -11,10 +11,12 @@ namespace Starforge.Mod {
     public static class EntityRegistry {
         private static Dictionary<string, EntityCreator> Creators = new Dictionary<string, EntityCreator>();
 
-        public static Entity Create(Level level, string name, Vector2 position) {
+        public static Entity Create(Level level, string name, Rectangle size) {
             EntityData data = new EntityData(name);
-            data.Attributes.Add("x", position.X);
-            data.Attributes.Add("y", position.Y);
+            data.Attributes.Add("x", size.X);
+            data.Attributes.Add("y", size.Y);
+            data.Attributes.Add("width", size.Width);
+            data.Attributes.Add("height", size.Height);
 
             if (Creators.ContainsKey(name)) {
                 return Creators[name](level, data);

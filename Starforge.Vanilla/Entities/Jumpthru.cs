@@ -8,7 +8,9 @@ using Starforge.Util;
 namespace Starforge.Vanilla.Entities {
     [EntityDefinition("jumpThru")]
     public class Jumpthru : Entity {
-        public Jumpthru(Level level, EntityData data) : base(level, data) { }
+        public Jumpthru(Level level, EntityData data) : base(level, data) {
+            StretchableX = true;
+        }
 
         public override void Render() {
             string type = GetString("texture", "wood");

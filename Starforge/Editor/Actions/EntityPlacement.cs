@@ -10,19 +10,19 @@ namespace Starforge.Editor.Actions {
         private Entity ChangedEntity;
 
         private string Name;
-        private Point Position;
+        private Rectangle Area;
 
-        public EntityPlacement(Level l, string name, Point position)
+        public EntityPlacement(Level l, string name, Rectangle rect)
             : base(l) {
             Name = name;
-            Position = position;
+            Area = rect;
         }
 
         public override bool Apply() {
             if (ChangedEntity != null) {
                 return false;
             }
-            ChangedEntity = MakeEntityAtPosition(Name, Position);
+            ChangedEntity = MakeEntityAtPosition(Name, Area);
             Level.Entities.Add(ChangedEntity);
             return true;
         }
@@ -36,11 +36,11 @@ namespace Starforge.Editor.Actions {
             return true;
         }
 
-        private Entity MakeEntityAtPosition(string name, Point p) {
+        private Entity MakeEntityAtPosition(string name, Rectangle rect) {
             return EntityRegistry.Create(
                 Engine.Scene.SelectedLevel,
                 name,
-                new Vector2(p.X * 8f, p.Y * 8f));
+                rect);
         }
     }
 

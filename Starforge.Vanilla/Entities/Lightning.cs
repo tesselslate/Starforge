@@ -10,7 +10,11 @@ namespace Starforge.Vanilla.Entities
     public class Lightning : Entity {
         private static readonly Color BgColor = MiscHelper.HexToColor("fcf579") * 0.2f;
         private static readonly Color OutlineColor = MiscHelper.HexToColor("fcf579");
-        public Lightning(Level level, EntityData data) : base(level, data) { }
+
+        public Lightning(Level level, EntityData data) : base(level, data) {
+            StretchableX = true;
+            StretchableY = true;
+        }
 
         public override void Render() {
             Rectangle renderPos = new Rectangle((int)Position.X, (int)Position.Y, GetInt("width", 8), GetInt("height", 8));
