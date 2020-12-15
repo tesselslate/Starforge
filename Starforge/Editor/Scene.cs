@@ -140,7 +140,7 @@ namespace Starforge.Editor {
         }
 
         private void HandleUserInput(MouseEvent m, KeyboardState kbd, GameTime gt) {
-            if (m.hasAny()) {
+            if (m.HasAny()) {
                 UpdateZoom(m);
                 UpdateDrag(m);
                 UpdateClick(m);
@@ -165,12 +165,12 @@ namespace Starforge.Editor {
 
             if (m.ScrollDistance > 0) {
                 // Scrolled up
-                Camera.ZoomIn(m.getVectorPosition());
+                Camera.ZoomIn(m.GetVectorPosition());
             }
 
             if (m.ScrollDistance < 0) {
                 // Scrolled down
-                Camera.ZoomOut(m.getVectorPosition());
+                Camera.ZoomOut(m.GetVectorPosition());
             }
         }
 
@@ -188,7 +188,7 @@ namespace Starforge.Editor {
             }
 
             // User clicked mouse
-            Vector2 realPos = Camera.ScreenToReal(m.getVectorPosition());
+            Vector2 realPos = Camera.ScreenToReal(m.GetVectorPosition());
             Point point = new Point((int)realPos.X, (int)realPos.Y);
 
             // Search for room that was clicked on

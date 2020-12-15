@@ -49,14 +49,14 @@ namespace Starforge.Core.Input {
         }
 
         // returns true if any event occured
-        public bool hasAny() {
+        public bool HasAny() {
             return LeftButtonClick || LeftButtonDrag || LeftButtonUnclick 
                 || MiddleButtonClick || MiddleButtonDrag || MiddleButtonUnclick
                 || RightButtonClick || RightButtonDrag || RightButtonUnclick
                 || MouseMoved || Scrolled;
         }
 
-        public Vector2 getVectorPosition() {
+        public Vector2 GetVectorPosition() {
             return new Vector2(Position.X, Position.Y);
         }
 
