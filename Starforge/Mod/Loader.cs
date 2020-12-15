@@ -40,7 +40,7 @@ namespace Starforge.Mod {
             // TODO: Load plugins from mods folder
 
             // Hardcoded for development purposes
-            LoadAssembly(Path.GetFullPath("..\\..\\..\\Starforge.Vanilla\\_bin\\Debug\\Starforge.Vanilla.dll"));
+            LoadAssembly(Path.GetFullPath(".\\Starforge.Vanilla.dll"));
         }
     }
 }

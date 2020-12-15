@@ -103,6 +103,7 @@ namespace Starforge.Core {
 
         private void ResizeHandler(object sender, EventArgs e) {
             Scene.Camera.UpdateViewport();
+            RoomListWindow.UpdateListHeight();
         }
     }
 }

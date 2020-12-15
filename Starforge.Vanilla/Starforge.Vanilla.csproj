@@ -50,4 +50,8 @@
     <Compile Include="Entities\Refill.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if $(ConfigurationName) == Debug copy .\\Starforge.Vanilla.dll ..\\..\\..\\Starforge\\_bin\\Debug\\Starforge.Vanilla.dll
+if $(ConfigurationName) == Release copy .\\Starforge.Vanilla.dll ..\\..\\..\\Starforge\\_bin\\Release\\Starforge.Vanilla.dll</PostBuildEvent>
+  </PropertyGroup>
 </Project>

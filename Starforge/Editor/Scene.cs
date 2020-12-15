@@ -220,43 +220,45 @@ namespace Starforge.Editor {
         }
 
         public void Render(GameTime gt) {
-            // Rerender "dirty" levels (those which need to be rerendered)
-            foreach (Level level in VisibleLevels) {
-                level.Render();
+            if (Engine.Instance.IsActive) {
+                // Rerender "dirty" levels (those which need to be rerendered)
+                foreach (Level level in VisibleLevels) {
+                    level.Render();
+                }
+
+                Engine.Instance.GraphicsDevice.SetRenderTarget(null);
+                Engine.Instance.GraphicsDevice.Clear(Engine.Config.BackgroundColor);
+
+                Engine.Batch.Begin(SpriteSortMode.Deferred,
+                    BlendState.AlphaBlend,
+                    SamplerState.PointClamp, null,
+                    RasterizerState.CullNone, null,
+                    Camera.Transform);
+
+                LoadedMap.Render();
+
+                // draw each level
+                foreach (Level level in VisibleLevels) {
+                    Engine.Batch.Draw(level.Target, level.Position, Color.White);
+                }
+                // draw the selected level's overlay
+                Engine.Batch.Draw(SelectedLevel.Overlay, SelectedLevel.Position, Color.White);
+
+                Engine.Batch.End();
+
+                // Render ImGUI content
+                Engine.GUI.BeforeLayout(gt);
+
+                MenuBar.Render();
+                RoomListWindow.Render();
+                ToolWindow.Render();
+
+                if (MenuBar.Settings) {
+                    SettingsWindow.Render();
+                }
+
+                Engine.GUI.AfterLayout();
             }
-
-            Engine.Instance.GraphicsDevice.SetRenderTarget(null);
-            Engine.Instance.GraphicsDevice.Clear(Engine.Config.BackgroundColor);
-
-            Engine.Batch.Begin(SpriteSortMode.Deferred,
-                BlendState.AlphaBlend,
-                SamplerState.PointClamp, null,
-                RasterizerState.CullNone, null,
-                Camera.Transform);
-
-            LoadedMap.Render();
-
-            // draw each level
-            foreach (Level level in VisibleLevels) {
-                Engine.Batch.Draw(level.Target, level.Position, Color.White);
-            }
-            // draw the selected level's overlay
-            Engine.Batch.Draw(SelectedLevel.Overlay, SelectedLevel.Position, Color.White);
-            
-            Engine.Batch.End();
-
-            // Render ImGUI content
-            Engine.GUI.BeforeLayout(gt);
-
-            MenuBar.Render();
-            RoomListWindow.Render();
-            ToolWindow.Render();
-
-            if (MenuBar.Settings) {
-                SettingsWindow.Render();
-            }
-
-            Engine.GUI.AfterLayout();
         }
     }
 }

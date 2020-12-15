@@ -12,6 +12,13 @@ namespace Starforge.Editor.UI {
 
         public static string[] RoomNames;
 
+        private static int RoomListHeight = 30;
+
+        public static void UpdateListHeight(int height = 0) {
+            int h = (height == 0) ? Engine.Instance.GraphicsDevice.Viewport.Height : height;
+            RoomListHeight = (int)((h - ImGui.GetTextLineHeightWithSpacing() * 10) / ImGui.GetTextLineHeightWithSpacing());
+        }
+
         public static void Render() {
             ImGui.SetNextWindowPos(new System.Numerics.Vector2(0f, MenuBar.MenuBarSize));
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(250f, Engine.Instance.GraphicsDevice.Viewport.Height - MenuBar.MenuBarSize));
@@ -29,7 +36,7 @@ namespace Starforge.Editor.UI {
             ImGui.PopStyleVar(3);
 
             ImGui.SetNextItemWidth(235f);
-            ImGui.ListBox("", ref CurrentRoom, RoomNames, RoomNames.Length, 30);
+            ImGui.ListBox("", ref CurrentRoom, RoomNames, RoomNames.Length, RoomListHeight);
             ImGui.Text($"Rooms: {RoomNames.Length}");
 
             MouseState m = Mouse.GetState();
