@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
+using Starforge.Core.Input;
 using Starforge.Editor.Actions;
 using Starforge.Editor.UI;
 using Starforge.MapStructure;
@@ -12,11 +11,7 @@ namespace Starforge.Editor.Tools {
 
         private Entity heldEntity = null;
 
-        public EntityPlaceTool() {
-            Level l = Engine.Scene.SelectedLevel;
-        }
-
-        public override void ManageInput(MouseState m) {
+        public override void ManageInput(MouseEvent m) {
             Level l = Engine.Scene.SelectedLevel;
 
             if (heldEntity == null || heldEntity.Name != ToolWindow.Entities[ToolWindow.CurrentEntity]) {
@@ -29,14 +24,13 @@ namespace Starforge.Editor.Tools {
             heldEntity.Level = l;
             heldEntity.Position = new Vector2(l.TilePointer.X * 8f, l.TilePointer.Y * 8f);
 
-            if (m.LeftButton != ButtonState.Pressed) {
-                return;
+            if (m.LeftButtonClick) {
+                OnLeftClick();
             }
-            if (Engine.Scene.PreviousMouseState.LeftButton == ButtonState.Pressed) {
-                return;
-            }
+        }
 
-            // if just clicked
+        private void OnLeftClick() {
+            Level l = Engine.Scene.SelectedLevel;
             l.ApplyNewAction(new EntityPlacement(l, ToolWindow.Entities[ToolWindow.CurrentEntity], l.TilePointer));
         }
 

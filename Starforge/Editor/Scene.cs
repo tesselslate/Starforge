@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
+using Starforge.Core.Input;
 using Starforge.Editor.UI;
 using Starforge.MapStructure;
 using Starforge.MapStructure.Tiling;
@@ -52,6 +53,10 @@ namespace Starforge.Editor {
 
             PreviousKeyboardState = new KeyboardState();
             PreviousMouseState = new MouseState();
+
+            InputHandler.RegisterShortcut(new Shortcut(Undo, Keys.LeftControl, Keys.Z));
+            InputHandler.RegisterShortcut(new Shortcut(Redo, Keys.LeftControl, Keys.LeftShift, Keys.Z));
+            InputHandler.RegisterShortcut(new Shortcut(Redo, Keys.LeftControl, Keys.Y));
         }
 
         public void LoadMap(Map map) {
@@ -89,14 +94,16 @@ namespace Starforge.Editor {
         }
 
         public void Update(GameTime gt) {
+            MouseState mouseState = Mouse.GetState();
+
             KeyboardState kbd = Keyboard.GetState();
-            MouseState m = Mouse.GetState();
+            MouseEvent mouseEvent = new MouseEvent(mouseState);
             ImGuiIOPtr io = ImGui.GetIO();
 
             // Only process input for editor if ImGUI doesn't currently want user input
             // (e.g. user is not hovering over/focused on GUI elements)
             if (!io.WantCaptureKeyboard && !io.WantCaptureMouse && Engine.Instance.IsActive) {
-                HandleUserInput(m, kbd, gt);
+                HandleUserInput(mouseEvent, kbd, gt);
             }
 
             // Detect if user changed selected room
@@ -104,9 +111,11 @@ namespace Starforge.Editor {
                 ChangeSelectedRoom(RoomListWindow.CurrentRoom, true);
             }
 
+            InputHandler.Handle(kbd);
+
             // Set previous keyboard/mouse state
             PreviousKeyboardState = kbd;
-            PreviousMouseState = m;
+            PreviousMouseState = mouseState;
         }
 
         private void ChangeSelectedRoom(int newRoom, bool moveCamera) {
@@ -130,57 +139,61 @@ namespace Starforge.Editor {
             RoomListWindow.SetCurrentRoom(newRoom);
         }
 
-        private void HandleUserInput(MouseState m, KeyboardState kbd, GameTime gt) {
-            UpdateZoom(m);
-            UpdateDrag(m);
-            UpdateClick(m);
+        private void HandleUserInput(MouseEvent m, KeyboardState kbd, GameTime gt) {
+            if (m.hasAny()) {
+                UpdateZoom(m);
+                UpdateDrag(m);
+                UpdateClick(m);
+            }
 
             // Send inputs to level for further processing
             SelectedLevel.Update(kbd, m, gt);
         }
 
-        private void UpdateZoom(MouseState m) {
-            if (m.ScrollWheelValue > PreviousMouseState.ScrollWheelValue) {
-                // Scrolled up
-                Camera.ZoomIn(new Vector2(m.X, m.Y));
-            }
-            else if (m.ScrollWheelValue < PreviousMouseState.ScrollWheelValue) {
-                // Scrolled down
-                Camera.ZoomOut(new Vector2(m.X, m.Y));
-            }
+        private void Undo() {
+            SelectedLevel.Undo();
         }
 
-        private void UpdateDrag(MouseState m) {
-            if (m.RightButton != ButtonState.Pressed) {
+        private void Redo() {
+            SelectedLevel.Redo();
+        }
+
+        private void UpdateZoom(MouseEvent m) {
+            if (!m.Scrolled) {
                 return;
             }
-            if (m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
-                // User is dragging mouse
-                Camera.Move(new Vector2(PreviousMouseState.X - m.X, PreviousMouseState.Y - m.Y) / Camera.Zoom);
+
+            if (m.ScrollDistance > 0) {
+                // Scrolled up
+                Camera.ZoomIn(m.getVectorPosition());
+            }
+
+            if (m.ScrollDistance < 0) {
+                // Scrolled down
+                Camera.ZoomOut(m.getVectorPosition());
             }
         }
 
-        private void UpdateClick(MouseState m) {
-            if (m.LeftButton != ButtonState.Pressed) {
+        private void UpdateDrag(MouseEvent m) {
+            if (!m.RightButtonDrag) {
+                return;
+            }
+
+            Camera.Move(m.MouseMovement / Camera.Zoom);
+        }
+
+        private void UpdateClick(MouseEvent m) {
+            if (!m.LeftButtonClick) {
                 return;
             }
 
             // User clicked mouse
-            Vector2 realPos = Camera.ScreenToReal(new Vector2(m.X, m.Y));
+            Vector2 realPos = Camera.ScreenToReal(m.getVectorPosition());
             Point point = new Point((int)realPos.X, (int)realPos.Y);
 
             // Search for room that was clicked on
             // Most common option, check for currently selected level first
             if (SelectedLevel.Bounds.Contains(point)) {
-                return;
-            }
-
-            if (PreviousMouseState.LeftButton == ButtonState.Pressed) {
-                // no new click -> exit
-                return;
-            }
-            if (m.X != PreviousMouseState.X || m.Y != PreviousMouseState.Y) {
-                // User is dragging mouse
                 return;
             }
 
