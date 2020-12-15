@@ -111,22 +111,22 @@ namespace Starforge.MapStructure.Tiling {
             }
         }
 
-        public bool CheckTile(TileGrid grid, Tileset t, int x, int y) {
+        public bool CheckTile(TileGrid grid, Tileset t, int x, int y, bool edgesExtend) {
             // If position is out of bounds in a given TileGrid, assume there is a tile there
-            if (x < 0 || x > grid.Width - 1 || y < 0 || y > grid.Height - 1) return true;
+            if (x < 0 || x > grid.Width - 1 || y < 0 || y > grid.Height - 1) return edgesExtend;
 
             return grid[x, y] != '0' && !(t.ID != grid[x, y] && (t.Ignores.Contains((char)grid[x, y]) || t.Ignores.Contains('*')));
         }
 
 
-        public StaticTexture[] GenerateTextureMap(TileGrid grid, int offsetX, int offsetY) {
+        public StaticTexture[] GenerateTextureMap(TileGrid grid, int offsetX, int offsetY, bool edgesExtend = true) {
             StaticTexture[] textures = new StaticTexture[grid.Width * grid.Height];
 
             for (int i = 0; i < grid.Tiles.GetLength(0); i++) {
                 for (int j = 0; j < grid.Tiles.GetLength(1); j++) {
                     StaticTexture tex = new StaticTexture(GFX.Empty);
                     if (grid[i, j] != '0') {
-                        textures[j * grid.Width + i] = GenerateTileTexture(grid, i, j);
+                        textures[j * grid.Width + i] = GenerateTileTexture(grid, i, j, edgesExtend);
                     }
                 }
             }
@@ -134,7 +134,7 @@ namespace Starforge.MapStructure.Tiling {
             return textures;
         }
 
-        public StaticTexture GenerateTileTexture(TileGrid grid, int i, int j) {
+        public StaticTexture GenerateTileTexture(TileGrid grid, int i, int j, bool edgesExtend = true) {
             if (grid[i, j] == '0') {
                 return new StaticTexture(GFX.Empty);
             }
@@ -149,7 +149,7 @@ namespace Starforge.MapStructure.Tiling {
 
             for (int y = -1; y < 2; y++) {
                 for (int x = -1; x < 2; x++) {
-                    bool res = CheckTile(grid, t, i + x, j + y);
+                    bool res = CheckTile(grid, t, i + x, j + y, edgesExtend);
                     if (res) {
                         adjacent[num++] = 1;
                     }
@@ -161,10 +161,10 @@ namespace Starforge.MapStructure.Tiling {
             }
 
             if (center) {
-                if (!CheckTile(grid, t, i - 2, j)
-                    || !CheckTile(grid, t, i + 2, j)
-                    || !CheckTile(grid, t, i, j - 2)
-                    || !CheckTile(grid, t, i, j + 2)) {
+                if (!CheckTile(grid, t, i - 2, j, edgesExtend)
+                    || !CheckTile(grid, t, i + 2, j, edgesExtend)
+                    || !CheckTile(grid, t, i, j - 2, edgesExtend)
+                    || !CheckTile(grid, t, i, j + 2, edgesExtend)) {
                     tex.Texture = MiscHelper.Choose(i, j, t.Padding);
                 }
                 else {

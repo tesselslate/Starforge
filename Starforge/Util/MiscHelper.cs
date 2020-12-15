@@ -110,5 +110,13 @@ namespace Starforge.Util {
         public static Color Vect3ToColor(System.Numerics.Vector3 v) {
             return new Color(v.X, v.Y, v.Z);
         }
+
+        public static float Angle(Vector2 from, Vector2 to) {
+            return (float)Math.Atan2(to.Y - from.Y, to.X - from.X);
+        }
+
+        public static Vector2 AngleToVector(float angleRadians, float length) {
+            return new Vector2((float)Math.Cos(angleRadians) * length, (float)Math.Sin(angleRadians) * length);
+        }
     }
 }

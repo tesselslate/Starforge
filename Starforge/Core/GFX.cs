@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Starforge.Mod.Assets;
+using Starforge.Util;
 using System.IO;
 
 namespace Starforge.Core {
@@ -64,6 +66,40 @@ namespace Starforge.Core {
 
             public static void HollowRectangle(Rectangle r, int thickness, Color c) {
                 HollowRectangle(r.X, r.Y, r.Width, r.Height, thickness, c);
+            }
+
+            public static void Rectangle(Rectangle r, Color c) {
+                Pixel.Draw(r, c);
+            }
+
+            public static void Rectangle(int x, int y, int w, int h, Color c) {
+                Pixel.Draw(new Rectangle(x, y, w, h), c);
+            }
+
+            // resolution specifies how many sides the drawn polygon should have. The higher, the better the circle
+            // high resolutions can make this function really slow!
+            // "borrowed" from Celeste
+            public static void Circle(Vector2 position, float radius, Color color, int resolution) {
+                Vector2 angleVector = Vector2.UnitX * radius;
+                Vector2 perpendicular = angleVector.Perpendicular();
+                for (int i = 1; i <= resolution; i++) {
+                    Vector2 nextAngleVector = MiscHelper.AngleToVector(i * MathHelper.PiOver2 / resolution, radius);
+                    Vector2 nextPerpendicular = nextAngleVector.Perpendicular();
+                    Line(position + angleVector, position + nextAngleVector, color);
+                    Line(position - angleVector, position - nextAngleVector, color);
+                    Line(position + perpendicular, position + nextPerpendicular, color);
+                    Line(position - perpendicular, position - nextPerpendicular, color);
+                    angleVector = nextAngleVector;
+                    perpendicular = nextPerpendicular;
+                }
+            }
+
+            public static void Line(Vector2 start, Vector2 end, Color color) {
+                LineAngle(start, MiscHelper.Angle(start, end), Vector2.Distance(start, end), color);
+            }
+
+            public static void LineAngle(Vector2 start, float angle, float length, Color color) {
+                Engine.Batch.Draw(Pixel.Texture.Texture, start, Pixel.ClipRect, color, angle, Vector2.Zero, new Vector2(length, 1f), SpriteEffects.None, 0f);
             }
         }
     }

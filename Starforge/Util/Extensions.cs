@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Xml;
 
 namespace Starforge.Util {
@@ -9,6 +10,10 @@ namespace Starforge.Util {
 
         public static char AttrChar(this XmlElement el, string attributeName) {
             return Convert.ToChar(el.Attributes[attributeName].Value);
+        }
+
+        public static Vector2 Perpendicular(this Vector2 vector) {
+            return new Vector2(-vector.Y, vector.X);
         }
     }
 }

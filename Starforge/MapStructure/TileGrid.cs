@@ -55,6 +55,14 @@ namespace Starforge.MapStructure {
             }
         }
 
+        public void Fill(int tile) {
+            for (int i = 0; i < Width; i++) {
+                for (int j = 0; j < Height; j++) {
+                    Tiles[i, j] = tile;
+                }
+            }
+        }
+
         public void SetTile(int x, int y, int t) {
             if (x < 0 || y < 0 || x > Width - 1 || y > Height - 1) return;
             this[x, y] = t;

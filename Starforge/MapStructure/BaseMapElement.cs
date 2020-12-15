@@ -44,6 +44,10 @@ namespace Starforge.MapStructure {
             return GetAttribute(name, defaultValue).ToString();
         }
 
+        public char GetChar(string name, char defaultValue = '0') {
+            return char.Parse(GetAttribute(name, defaultValue).ToString());
+        }
+
         public void SetAttribute(string name, object value) {
             if (value == null) {
                 Attributes.Remove(name);
