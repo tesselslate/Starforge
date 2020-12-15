@@ -26,18 +26,12 @@ namespace Starforge.Vanilla.Entities {
                 if (i == 0) {
                     // left side
                     xOffset = 0;
-                    if (Position.Y >= 0 && (int)Position.Y < Level.Height && Position.X >= 8 && Position.X < Level.Width)
-                        yOffset = Level.ForegroundTiles[(int)(Position.X / 8) - 1, (int)Position.Y / 8] == '0' ? 1 : 0;
-                    else
-                        yOffset = 1;
+                    yOffset = Level.ForegroundTiles.GetTile(((int)Position.X / 8) - 1, (int)Position.Y / 8) == '0' ? 1 : 0;
                 }
                 else if (i == columns - 1) {
                     // right side
                     xOffset = textureTiles - 1;
-                    if (Position.Y >= 0 && (int)Position.Y < Level.Height && Position.X >= 0 && (Position.X + width) < Level.Width-1)
-                        yOffset = Level.ForegroundTiles[(int)((Position.X + width) / 8), (int)Position.Y / 8] == '0' ? 1 : 0;
-                    else
-                        yOffset = 1;
+                    yOffset = Level.ForegroundTiles.GetTile(((int)Position.X + width) / 8, (int)Position.Y / 8) == '0' ? 1 : 0;
                 }
                 else {
                     // middle
