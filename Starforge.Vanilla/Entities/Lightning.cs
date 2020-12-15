@@ -4,8 +4,7 @@ using Starforge.MapStructure;
 using Starforge.Mod;
 using Starforge.Util;
 
-namespace Starforge.Vanilla.Entities
-{
+namespace Starforge.Vanilla.Entities {
     [EntityDefinition("lightning")]
     public class Lightning : Entity {
         private static readonly Color BgColor = MiscHelper.HexToColor("fcf579") * 0.2f;
