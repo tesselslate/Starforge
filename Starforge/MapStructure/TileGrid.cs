@@ -60,6 +60,14 @@ namespace Starforge.MapStructure {
             this[x, y] = t;
         }
 
+        /// <summary>
+        /// Returns the tile at x,y. If the tile is outside of the bounds of the TileGrid, '0' is returned.
+        /// </summary>
+        public int GetTile(int x, int y) {
+            if (x < 0 || y < 0 || x > Width - 1 || y > Height - 1) return '0';
+            return this[x, y];
+        }
+
         public override string ToString() {
             string[] resultArray = new string[Height];
             int[] filledTiles = new int[Height];
