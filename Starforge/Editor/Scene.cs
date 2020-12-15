@@ -53,6 +53,10 @@ namespace Starforge.Editor {
 
             PreviousKeyboardState = new KeyboardState();
             PreviousMouseState = new MouseState();
+
+            InputHandler.RegisterShortcut(new Shortcut(Undo, Keys.LeftControl, Keys.Z));
+            InputHandler.RegisterShortcut(new Shortcut(Redo, Keys.LeftControl, Keys.LeftShift, Keys.Z));
+            InputHandler.RegisterShortcut(new Shortcut(Redo, Keys.LeftControl, Keys.Y));
         }
 
         public void LoadMap(Map map) {
@@ -107,6 +111,8 @@ namespace Starforge.Editor {
                 ChangeSelectedRoom(RoomListWindow.CurrentRoom, true);
             }
 
+            InputHandler.Handle(kbd);
+
             // Set previous keyboard/mouse state
             PreviousKeyboardState = kbd;
             PreviousMouseState = mouseState;
@@ -142,6 +148,14 @@ namespace Starforge.Editor {
 
             // Send inputs to level for further processing
             SelectedLevel.Update(kbd, m, gt);
+        }
+
+        private void Undo() {
+            SelectedLevel.Undo();
+        }
+
+        private void Redo() {
+            SelectedLevel.Redo();
         }
 
         private void UpdateZoom(MouseEvent m) {

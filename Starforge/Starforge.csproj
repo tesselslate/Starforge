@@ -51,7 +51,7 @@
     <Compile Include="Core\GFX.cs" />
     <Compile Include="Core\Input\InputHandler.cs" />
     <Compile Include="Core\Input\MouseEvent.cs" />
-    <Compile Include="Core\Input\Pressable.cs" />
+    <Compile Include="Core\Input\Shortcut.cs" />
     <Compile Include="Editor\Actions\DrawTilePlacement.cs" />
     <Compile Include="Editor\Actions\EntityPlacement.cs" />
     <Compile Include="Editor\Actions\RectangleTilePlacement.cs" />

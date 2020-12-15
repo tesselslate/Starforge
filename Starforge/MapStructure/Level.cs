@@ -242,18 +242,6 @@ namespace Starforge.MapStructure {
                 return;
             }
 
-            // Catch Ctrl+Z
-            if (Engine.Scene.PreviousKeyboardState.IsKeyDown(Keys.LeftControl) && kbd.IsKeyDown(Keys.Z)) {
-                InputProcessWait = 0.2;
-                Undo();
-            }
-
-            // Catch Ctrl+Y
-            if (Engine.Scene.PreviousKeyboardState.IsKeyDown(Keys.LeftControl) && kbd.IsKeyDown(Keys.Y)) {
-                InputProcessWait = 0.2;
-                Redo();
-            }
-
             Vector2 rm = Engine.Scene.Camera.ScreenToReal(new Vector2(m.Position.X, m.Position.Y));
             Point roomPos = new Point(
                 (int)rm.X - X,
