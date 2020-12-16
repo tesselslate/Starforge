@@ -4,6 +4,7 @@
 # Binaries
 _bin
 _obj
+obj
 packages
 
 # Celeste Content
