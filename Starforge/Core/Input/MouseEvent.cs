@@ -27,7 +27,7 @@ namespace Starforge.Core.Input {
         public MouseEvent(MouseState mouseState) {
             Position = new Point() { X = mouseState.X, Y = mouseState.Y };
 
-            MouseState previousMouseState = Engine.Scene.PreviousMouseState;
+            MouseState previousMouseState = InputHandler.LastMouseRaw;
             LeftButtonClick     = mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed;
             LeftButtonDrag      = mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton == ButtonState.Pressed;
             LeftButtonUnclick   = mouseState.LeftButton != ButtonState.Pressed && previousMouseState.LeftButton == ButtonState.Pressed;

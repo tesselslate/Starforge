@@ -12,35 +12,13 @@ using System.Collections.Generic;
 
 namespace Starforge.Editor {
     public class Scene {
-        public Camera Camera {
-            get;
-            private set;
-        }
-
-        public Map LoadedMap;
+        public Camera Camera { get; private set; }
+        public Map LoadedMap { get; private set; }
+        public List<Level> VisibleLevels { get; private set; }
+        public Level SelectedLevel { get; private set; }
 
         public Autotiler BGAutotiler;
         public Autotiler FGAutotiler;
-
-        public KeyboardState PreviousKeyboardState {
-            get;
-            private set;
-        }
-
-        public MouseState PreviousMouseState {
-            get;
-            private set;
-        }
-
-        public List<Level> VisibleLevels {
-            get;
-            private set;
-        }
-
-        public Level SelectedLevel {
-            get;
-            private set;
-        }
 
         public Scene() {
             VisibleLevels = new List<Level>();
@@ -51,15 +29,16 @@ namespace Starforge.Editor {
             Camera.PositionChange += UpdateVisibleLevels;
             Camera.Update();
 
-            PreviousKeyboardState = new KeyboardState();
-            PreviousMouseState = new MouseState();
-
             InputHandler.RegisterShortcut(new Shortcut(Undo, Keys.LeftControl, Keys.Z));
             InputHandler.RegisterShortcut(new Shortcut(Redo, Keys.LeftControl, Keys.LeftShift, Keys.Z));
             InputHandler.RegisterShortcut(new Shortcut(Redo, Keys.LeftControl, Keys.Y));
         }
 
         public void LoadMap(Map map) {
+            // Dispose of previously loaded map
+            
+
+            // Load new map
             LoadedMap = map;
             if (LoadedMap.Levels.Count > 0) {
                 SelectedLevel = LoadedMap.Levels[0];
@@ -94,28 +73,18 @@ namespace Starforge.Editor {
         }
 
         public void Update(GameTime gt) {
-            MouseState mouseState = Mouse.GetState();
-
-            KeyboardState kbd = Keyboard.GetState();
-            MouseEvent mouseEvent = new MouseEvent(mouseState);
             ImGuiIOPtr io = ImGui.GetIO();
 
             // Only process input for editor if ImGUI doesn't currently want user input
             // (e.g. user is not hovering over/focused on GUI elements)
             if (!io.WantCaptureKeyboard && !io.WantCaptureMouse && Engine.Instance.IsActive) {
-                HandleUserInput(mouseEvent, kbd, gt);
+                HandleUserInput(gt);
             }
 
             // Detect if user changed selected room
             if (LoadedMap.Levels[RoomListWindow.CurrentRoom] != SelectedLevel && RoomListWindow.LastRoom != RoomListWindow.CurrentRoom) {
                 ChangeSelectedRoom(RoomListWindow.CurrentRoom, true);
             }
-
-            InputHandler.Handle(kbd);
-
-            // Set previous keyboard/mouse state
-            PreviousKeyboardState = kbd;
-            PreviousMouseState = mouseState;
         }
 
         private void ChangeSelectedRoom(int newRoom, bool moveCamera) {
@@ -139,7 +108,9 @@ namespace Starforge.Editor {
             RoomListWindow.SetCurrentRoom(newRoom);
         }
 
-        private void HandleUserInput(MouseEvent m, KeyboardState kbd, GameTime gt) {
+        private void HandleUserInput(GameTime gt) {
+            MouseEvent m = InputHandler.Current.Mouse;
+
             if (m.HasAny()) {
                 UpdateZoom(m);
                 UpdateDrag(m);
@@ -147,7 +118,7 @@ namespace Starforge.Editor {
             }
 
             // Send inputs to level for further processing
-            SelectedLevel.Update(kbd, m, gt);
+            SelectedLevel.Update(gt);
         }
 
         private void Undo() {
@@ -219,46 +190,37 @@ namespace Starforge.Editor {
             VisibleLevels = visible;
         }
 
-        public void Render(GameTime gt) {
-            if (Engine.Instance.IsActive) {
-                // Rerender "dirty" levels (those which need to be rerendered)
-                foreach (Level level in VisibleLevels) {
-                    level.Render();
-                }
-
-                Engine.Instance.GraphicsDevice.SetRenderTarget(null);
-                Engine.Instance.GraphicsDevice.Clear(Engine.Config.BackgroundColor);
-
-                Engine.Batch.Begin(SpriteSortMode.Deferred,
-                    BlendState.AlphaBlend,
-                    SamplerState.PointClamp, null,
-                    RasterizerState.CullNone, null,
-                    Camera.Transform);
-
-                LoadedMap.Render();
-
-                // draw each level
-                foreach (Level level in VisibleLevels) {
-                    Engine.Batch.Draw(level.Target, level.Position, Color.White);
-                }
-                // draw the selected level's overlay
-                Engine.Batch.Draw(SelectedLevel.Overlay, SelectedLevel.Position, Color.White);
-
-                Engine.Batch.End();
-
-                // Render ImGUI content
-                Engine.GUI.BeforeLayout(gt);
-
-                MenuBar.Render();
-                RoomListWindow.Render();
-                ToolWindow.Render();
-
-                if (MenuBar.Settings) {
-                    SettingsWindow.Render();
-                }
-
-                Engine.GUI.AfterLayout();
+        public void Render() {
+            // Rerender "dirty" levels (those which need to be rerendered)
+            foreach (Level level in VisibleLevels) {
+                level.Render();
             }
+
+            Engine.Instance.GraphicsDevice.SetRenderTarget(null);
+            Engine.Instance.GraphicsDevice.Clear(Engine.Config.BackgroundColor);
+
+            Engine.Batch.Begin(SpriteSortMode.Deferred,
+                BlendState.AlphaBlend,
+                SamplerState.PointClamp, null,
+                RasterizerState.CullNone, null,
+                Camera.Transform);
+
+            foreach (Rectangle filler in LoadedMap.Fillers) {
+                GFX.Draw.Rectangle(filler, Color.Gray);
+            }
+
+            // draw each level
+            foreach (Level level in VisibleLevels) {
+                Engine.Batch.Draw(level.Target, level.Position, Color.White);
+            }
+            // draw the selected level's overlay
+            Engine.Batch.Draw(SelectedLevel.Overlay, SelectedLevel.Position, Color.White * 0.75f);
+
+            Engine.Batch.End();
+
+            // Render map GUI content
+            RoomListWindow.Render();
+            ToolWindow.Render();
         }
     }
 }

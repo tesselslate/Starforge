@@ -188,10 +188,10 @@ namespace Starforge.MapStructure {
                 Attributes = Attributes
             };
 
-            addListToBinary(ref bin, Entities, "entities");
-            addListToBinary(ref bin, Triggers, "triggers");
-            addListToBinary(ref bin, BackgroundDecals, "bgdecals");
-            addListToBinary(ref bin, ForegroundDecals, "fgdecals");
+            bin.AddList(Entities, "entities");
+            bin.AddList(Triggers, "triggers");
+            bin.AddList(BackgroundDecals, "bgdecals");
+            bin.AddList(ForegroundDecals, "fgdecals");
 
             // Add background tiles
             BinaryMapElement bgTiles = new BinaryMapElement() {
@@ -217,19 +217,10 @@ namespace Starforge.MapStructure {
             return bin;
         }
 
-        private static void addListToBinary<T>(ref BinaryMapElement bin, List<T> objects, string name) where T : MapElement {
-            if (objects.Count <= 0) return;
+        public void Update(GameTime gt) {
+            KeyboardState kbd = InputHandler.Current.Keyboard;
+            MouseEvent m = InputHandler.Current.Mouse;
 
-            BinaryMapElement binaryMapElement = new BinaryMapElement() {
-                Name = name
-            };
-            foreach (T obj in objects) {
-                binaryMapElement.Children.Add(obj.ToBinary());
-            }
-            bin.Children.Add(binaryMapElement);
-        }
-
-        public void Update(KeyboardState kbd, MouseEvent m, GameTime gt) {
             // Start input cooldown if this level just got selected
             if (!WasSelected) {
                 WasSelected = true;
@@ -265,8 +256,6 @@ namespace Starforge.MapStructure {
         }
 
         private void RegenerateTileGrids() {
-            Parent.ResetRNG();
-
             BgGrid = Engine.Scene.BGAutotiler.GenerateTextureMap(BackgroundTiles, X, Y);
             FgGrid = Engine.Scene.FGAutotiler.GenerateTextureMap(ForegroundTiles, X, Y);
             TilesDirty = false;

@@ -7,7 +7,7 @@
 		<ApplicationIcon>../assets/logo_128.ico</ApplicationIcon>
 		<StartupObject />
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<Platforms>AnyCPU</Platforms>
+		<Platforms>x86</Platforms>
 	</PropertyGroup>
 
 	<Choose>
@@ -25,7 +25,9 @@
 
 	<ItemGroup>
 		<Reference Include="FNA" HintPath="..\lib\FNA\bin\Release\FNA.dll" />
-		<Reference Include="Starforge" HintPath="..\Starforge\bin\Debug\net472\Starforge.exe" />
+		<Reference Include="Starforge">
+		  <HintPath>..\Starforge\bin\x86\Debug\net472\Starforge.exe</HintPath>
+		</Reference>
 		<Reference Include="System" />
 	</ItemGroup>
 </Project>

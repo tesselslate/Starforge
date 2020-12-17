@@ -1,5 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ImGuiNET;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Starforge.Core.Input;
 using Starforge.Editor;
 using Starforge.Editor.UI;
 using Starforge.MapStructure;
@@ -85,13 +88,44 @@ namespace Starforge.Core {
         }
 
         protected override void Draw(GameTime gameTime) {
-            Scene.Render(gameTime);
             base.Draw(gameTime);
+
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Clear(Config.BackgroundColor);
+
+            // Render global GUI elements
+            GUI.BeforeLayout(gameTime);
+            MenuBar.Render();
+
+            if (MenuBar.Settings) {
+                SettingsWindow.Render();
+            }
+
+            // If map is loaded, render it
+            if (Scene.LoadedMap != null) {
+                Scene.Render();
+            }
+
+            GUI.AfterLayout();
         }
 
         protected override void Update(GameTime gameTime) {
-            Scene.Update(gameTime);
             base.Update(gameTime);
+
+            // If window is not focused, don't respond to user input
+            if (!IsActive) {
+                return;
+            }
+
+            InputHandler.Update();
+
+            if (Scene.LoadedMap != null) {
+                Scene.Update(gameTime);
+            }
+
+            // Set InputHandler previous states
+            InputHandler.LastMouseRaw = Mouse.GetState();
+            InputHandler.Previous = InputHandler.Current;
         }
 
         protected override void OnExiting(object sender, EventArgs args) {
