@@ -4,15 +4,22 @@ using System.Collections.Generic;
 
 namespace Starforge.Core.Input {
     public static class InputHandler {
-
         private static List<Shortcut> ShortcutCallbacks = new List<Shortcut>();
+        public static InputState Current;
+        public static InputState Previous;
+        public static MouseState LastMouseRaw;
 
-        public static void Handle(KeyboardState keyboardState) {
+        public static void Update() {
+            Current = new InputState()
+            {
+                Mouse = new MouseEvent(Mouse.GetState()),
+                Keyboard = Keyboard.GetState()
+            };
+
             foreach(Shortcut shortcut in ShortcutCallbacks) {
-                if (shortcut.Handle(keyboardState)) {
+                if (shortcut.Handle(Current.Keyboard)) {
                     return;
                 }
-                
             }
         }
 
@@ -24,6 +31,10 @@ namespace Starforge.Core.Input {
             }
             ShortcutCallbacks.Add(shortcut);
         }
+    }
 
+    public struct InputState {
+        public MouseEvent Mouse;
+        public KeyboardState Keyboard;
     }
 }

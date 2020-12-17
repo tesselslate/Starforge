@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 
+#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
+
 namespace Starforge.Core.Input {
     public class Shortcut {
 
@@ -54,7 +56,7 @@ namespace Starforge.Core.Input {
             return true;
         }
 
-        public override bool Equals(Object other) {
+        public override bool Equals(object other) {
             if (other.GetType() != GetType()) {
                 return false;
             }

@@ -1,61 +1,33 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{72E25310-E160-4839-A0C5-1BA231A25658}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Starforge.Vanilla</RootNamespace>
-    <AssemblyName>Starforge.Vanilla</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>.\_bin\Debug\</OutputPath>
-    <BaseIntermediateOutputPath>.\_obj\Debug\</BaseIntermediateOutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>.\_bin\Release\</OutputPath>
-    <BaseIntermediateOutputPath>.\_obj\Release\</BaseIntermediateOutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="FNA">
-      <HintPath>..\lib\FNA\bin\Release\FNA.dll</HintPath>
-    </Reference>
-    <Reference Include="Starforge">
-      <HintPath>..\Starforge\_bin\Debug\Starforge.exe</HintPath>
-    </Reference>
-    <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Entities\CrystalSpinner.cs" />
-    <Compile Include="Entities\DashBlock.cs" />
-    <Compile Include="Entities\Feather.cs" />
-    <Compile Include="Entities\IntroCar.cs" />
-    <Compile Include="Entities\Jumpthru.cs" />
-    <Compile Include="Entities\Lightning.cs" />
-    <Compile Include="Entities\Player.cs" />
-    <Compile Include="Entities\Refill.cs" />
-    <Compile Include="Entities\Water.cs" />
-    <Compile Include="Entities\Waterfall.cs" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug copy .\\Starforge.Vanilla.dll ..\\..\\..\\Starforge\\_bin\\Debug\\Starforge.Vanilla.dll
-if $(ConfigurationName) == Release copy .\\Starforge.Vanilla.dll ..\\..\\..\\Starforge\\_bin\\Release\\Starforge.Vanilla.dll</PostBuildEvent>
-  </PropertyGroup>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFramework>net472</TargetFramework>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<RootNamespace>Starforge</RootNamespace>
+		<ApplicationIcon>../assets/logo_128.ico</ApplicationIcon>
+		<StartupObject />
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Platforms>x86</Platforms>
+	</PropertyGroup>
+
+	<Choose>
+		<When Condition="'$(Configuration)' == 'Debug'">
+			<PropertyGroup>
+				<PostBuildEvent>copy $(OutDir)Starforge.Vanilla.dll $(SolutionDir)Starforge\bin\x86\Debug\net472\Starforge.Vanilla.dll</PostBuildEvent>
+			</PropertyGroup>
+		</When>
+		<Otherwise>
+			<PropertyGroup>
+				<PostBuildEvent>copy $(OutDir)Starforge.Vanilla.dll $(SolutionDir)Starforge\bin\x86\Release\net472\Starforge.Vanilla.dll</PostBuildEvent>
+			</PropertyGroup>
+		</Otherwise>
+	</Choose>
+
+	<ItemGroup>
+		<Reference Include="FNA" HintPath="..\lib\FNA\bin\Release\FNA.dll" />
+		<Reference Include="Starforge">
+		  <HintPath>..\Starforge\bin\x86\Debug\net472\Starforge.exe</HintPath>
+		</Reference>
+		<Reference Include="System" />
+	</ItemGroup>
 </Project>

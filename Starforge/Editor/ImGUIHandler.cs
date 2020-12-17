@@ -101,7 +101,9 @@ namespace Starforge.Editor {
 
         public virtual void BeforeLayout(GameTime gt) {
             ImGui.GetIO().DeltaTime = (float)gt.ElapsedGameTime.TotalSeconds;
-            UpdateInput();
+            if (Engine.IsActive) {
+                UpdateInput();
+            }
             ImGui.NewFrame();
         }
 
