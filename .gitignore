@@ -2,8 +2,7 @@
 .vs
 
 # Binaries
-_bin
-_obj
+bin
 obj
 packages
 
