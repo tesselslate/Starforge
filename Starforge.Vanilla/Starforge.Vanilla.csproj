@@ -12,22 +12,20 @@
 
 	<Choose>
 		<When Condition="'$(Configuration)' == 'Debug'">
-			<PropertyGroup>
-				<PostBuildEvent>copy $(OutDir)Starforge.Vanilla.dll $(SolutionDir)Starforge\bin\x86\Debug\net472\Starforge.Vanilla.dll</PostBuildEvent>
-			</PropertyGroup>
+			<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+				<Exec Command="copy $(OutDir)Starforge.Vanilla.dll $(SolutionDir)Starforge\bin\x86\Debug\net472\Starforge.Vanilla.dll" />
+			</Target>
 		</When>
 		<Otherwise>
-			<PropertyGroup>
-				<PostBuildEvent>copy $(OutDir)Starforge.Vanilla.dll $(SolutionDir)Starforge\bin\x86\Release\net472\Starforge.Vanilla.dll</PostBuildEvent>
-			</PropertyGroup>
+			<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+				<Exec Command="copy $(OutDir)Starforge.Vanilla.dll $(SolutionDir)Starforge\bin\x86\Release\net472\Starforge.Vanilla.dll" />
+			</Target>
 		</Otherwise>
 	</Choose>
 
 	<ItemGroup>
 		<Reference Include="FNA" HintPath="..\lib\FNA\bin\Release\FNA.dll" />
-		<Reference Include="Starforge">
-		  <HintPath>..\Starforge\bin\x86\Debug\net472\Starforge.exe</HintPath>
-		</Reference>
+		<Reference Include="Starforge" HintPath="..\Starforge\bin\x86\Debug\net472\Starforge.exe" />
 		<Reference Include="System" />
 	</ItemGroup>
 </Project>

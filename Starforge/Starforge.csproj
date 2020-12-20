@@ -25,6 +25,10 @@
 		<Reference Include="System.Xml" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Editor\" />
+	</ItemGroup>
+
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 	  <Exec Command="copy $(SolutionDir)\lib\nfd_d.dll $(OutDir)\nfd_d.dll" />
 	</Target>

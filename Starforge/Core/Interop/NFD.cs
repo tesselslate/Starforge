@@ -8,12 +8,6 @@ using System.Text;
 
 namespace Starforge.Core.Interop {
     public static class NFD {
-        public enum NfdResult {
-            NFD_ERROR,
-            NFD_OKAY,
-            NFD_CANCEL
-        }
-
         [DllImport("nfd_d", CallingConvention = CallingConvention.Cdecl)]
         private static extern NfdResult NFD_OpenDialog(
             IntPtr filterList,
@@ -37,13 +31,13 @@ namespace Starforge.Core.Interop {
             Marshal.FreeHGlobal(filterListPtr);
             Marshal.FreeHGlobal(defaultPathPtr);
 
-            path = res != NfdResult.NFD_OKAY ? null : NFDParser.FromNfdString(outPath);
+            path = res != NfdResult.OKAY ? null : NFDParser.FromNfdString(outPath);
 
             // Here, we *should* free the outPath pointer.
             // However, doing so causes a crash!
             // Does not doing so cause a memory leak? Probably. :)
 
-            if (res == NfdResult.NFD_ERROR) {
+            if (res == NfdResult.ERROR) {
                 Logger.Log(LogLevel.Error, "nativefiledialog error:");
                 Logger.Log(LogLevel.Error, GetError());
             }
@@ -59,11 +53,11 @@ namespace Starforge.Core.Interop {
             Marshal.FreeHGlobal(filterListPtr);
             Marshal.FreeHGlobal(defaultPathPtr);
 
-            path = res != NfdResult.NFD_OKAY ? null : NFDParser.FromNfdString(outPath);
+            path = res != NfdResult.OKAY ? null : NFDParser.FromNfdString(outPath);
 
             // The outPath pointer should also probably be freed here.
 
-            if (res == NfdResult.NFD_ERROR) {
+            if (res == NfdResult.ERROR) {
                 Logger.Log(LogLevel.Error, "nativefiledialog error:");
                 Logger.Log(LogLevel.Error, GetError());
             }
@@ -112,5 +106,11 @@ namespace Starforge.Core.Interop {
 
             return Encoding.UTF8.GetString(res);
         }
+    }
+
+    public enum NfdResult {
+        ERROR,
+        OKAY,
+        CANCEL
     }
 }

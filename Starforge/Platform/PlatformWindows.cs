@@ -41,7 +41,6 @@ namespace Starforge.Platform {
             return null;
         }
 
-
         private List<string> GetSteamLibraries() {
             List<string> libraries = new List<string>();
             string steamInstall = GetSteamInstallPath();

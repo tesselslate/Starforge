@@ -1,100 +1,11 @@
-﻿using Starforge.Mod;
-using Starforge.Platform;
-using System;
+﻿using Starforge.Map;
+using System.Diagnostics;
 using System.IO;
 
 namespace Starforge.Core {
     public partial class Engine {
-        public static bool Loaded {
-            get;
-            private set;
-        }
-
-        public static string CelesteDirectory;
-        public static string ContentDirectory;
-        public static readonly string StarforgeDirectory;
-
-        public static Engine Instance;
-
-        public static PlatformBase Platform;
-
-        static Engine() {
-            StarforgeDirectory = Environment.CurrentDirectory;
-            Loaded = false;
-        }
-
         public static void Main(string[] args) {
-            if (File.Exists("./log_old.txt")) File.Delete("./log_old.txt");
-            if (File.Exists("./log.txt")) File.Move("./log.txt", "./log_old.txt");
-
-            // Set log stream
-            FileStream logStream = File.OpenWrite(Path.Combine(
-                StarforgeDirectory,
-                "log.txt"
-            ));
-
-            Logger.SetOutputStream(new StreamWriter(logStream));
-
-            // Set up platform-specific helper
-            // TODO: Implement Mac/Linux helpers
-            switch(SDL2.SDL.SDL_GetPlatform()) {
-            case "Windows":
-                Platform = new PlatformWindows();
-                break;
-            case "Mac OS X":
-                throw new PlatformNotSupportedException("Mac OS is currently unsupported.");
-            case "Linux":
-                throw new PlatformNotSupportedException("Linux is currently unsupported.");
-            default: 
-                throw new PlatformNotSupportedException($"Invalid platform: {SDL2.SDL.SDL_GetPlatform()}");
-            }
-
-            // Read configuration file
-            if (File.Exists("./Starforge.cfg")) {
-                Config.ReadConfig(File.ReadAllLines("./Starforge.cfg"));
-            }
-
-            // TODO: More robust Celeste install detection
-            if (Config.CelesteAutodetect) {
-                CelesteDirectory = Platform.GetCelesteDirectories()[0];
-            }
-
-            if (Config.ContentAutodetect) {
-                ContentDirectory = Path.Combine(CelesteDirectory, "Content");
-            }
-
-            // Load plugins (first stage mod loading)
-            Loader.LoadPluginAssemblies();
-
-            using (Engine sf = new Engine()) {
-                Logger.Log("Beginning game loop");
-                Instance = sf;
-                sf.Run();
-            }
-        }
-
-        public static void Exit(int code = 0, bool exit = true) {
-            if (File.Exists("./Starforge.cfg")) {
-                // Backup configuration file in case saving fails.
-                if (File.Exists("./Starforge.cfg.bak")) {
-                    File.Delete("./Starforge.cfg.bak");
-                }
-                File.Move("./Starforge.cfg", "./Starforge.cfg.bak");
-            }
-
-            using (FileStream stream = File.OpenWrite("./Starforge.cfg")) {
-                using (StreamWriter writer = new StreamWriter(stream)) {
-                    Logger.Log("Writing configuration file");
-                    Config.WriteConfig(writer);
-                }
-            }
-
-            Logger.Log("Closing Starforge.");
-            Logger.Close();
-
-            if (exit) {
-                Environment.Exit(code);
-            }
+            
         }
     }
 }
