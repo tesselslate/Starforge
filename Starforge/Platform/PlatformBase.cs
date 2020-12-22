@@ -7,6 +7,12 @@ namespace Starforge.Platform {
     /// </summary>
     public abstract class PlatformBase {
         /// <summary>
+        /// Returns the location of the folder where Starforge configurations are stored.
+        /// </summary>
+        /// <returns></returns>
+        public abstract string GetAppDataFolder();
+
+        /// <summary>
         /// Finds Celeste install locations on the user's system.
         /// </summary>
         /// <returns>A list of paths to Celeste installs on the user's system.</returns>

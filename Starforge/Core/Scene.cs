@@ -1,4 +1,6 @@
-﻿namespace Starforge.Core {
+﻿using Microsoft.Xna.Framework;
+
+namespace Starforge.Core {
     /// <summary>
     /// A Scene is used to represent a collection of UI and graphical elements, such as the map editor.
     /// </summary>
@@ -11,26 +13,17 @@
         /// <summary>
         /// Called before the Scene is destroyed. This is where cleanup tasks should go.
         /// </summary>
-        public abstract void End();
-
-        /// <summary>
-        /// Called when the user switches to the Scene from another Scene.
-        /// </summary>
-        public abstract void Focus();
-
-        /// <summary>
-        /// Called when the user switches away from the Scene to another Scene.
-        /// </summary>
-        public abstract void Unfocus();
+        /// <returns>Whether or not the Scene should be ended.</returns>
+        public abstract bool End();
 
         /// <summary>
         /// Called every frame when the Scene is focused to do drawing tasks.
         /// </summary>
-        public abstract void Render();
+        public abstract void Render(GameTime gt);
 
         /// <summary>
-        /// Called every frame before Render. This should be used to respond to inputs and whatnot.
+        /// Called every frame before Render.
         /// </summary>
-        public abstract void Update();
+        public abstract void Update(GameTime gt);
     }
 }

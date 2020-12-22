@@ -21,6 +21,11 @@ namespace Starforge.Core.Interop {
             out IntPtr outPath);
 
         [DllImport("nfd_d", CallingConvention = CallingConvention.Cdecl)]
+        private static extern NfdResult NFD_PickFolder(
+            IntPtr defaultPath,
+            out IntPtr outPath);
+
+        [DllImport("nfd_d", CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr NFD_GetError();
 
         public static NfdResult OpenDialog(string filterList, string defaultPath, out string path) {
@@ -65,6 +70,22 @@ namespace Starforge.Core.Interop {
             return res;
         }
 
+        public static NfdResult PickFolder(string defaultPath, out string path) {
+            IntPtr defaultPathPtr = NFDParser.ToNfdString(defaultPath);
+
+            NfdResult res = NFD_PickFolder(defaultPathPtr, out IntPtr outPath);
+            Marshal.FreeHGlobal(defaultPathPtr);
+
+            path = res != NfdResult.OKAY ? null : NFDParser.FromNfdString(outPath);
+
+            if (res == NfdResult.ERROR) {
+                Logger.Log(LogLevel.Error, "nativefiledialog error:");
+                Logger.Log(LogLevel.Error, GetError());
+            }
+
+            return res;
+        }
+
         public static string GetError() {
             return NFDParser.FromNfdString(NFD_GetError());
         }
@@ -94,7 +115,7 @@ namespace Starforge.Core.Interop {
             int i = 0;
 
             // While string is not null terminated, copy bytes
-            while(i < 4095 && bytes[i++] != 0) {
+            while (i < 4095 && bytes[i++] != 0) {
                 Marshal.Copy(ptr, bytes, 0, i + 1);
             }
 
