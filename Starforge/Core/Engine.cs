@@ -5,6 +5,7 @@ using SDL2;
 using Starforge.Core.Boot;
 using Starforge.Core.Interop;
 using Starforge.Editor;
+using Starforge.Map;
 using Starforge.Mod.Content;
 using Starforge.Platform;
 using System;

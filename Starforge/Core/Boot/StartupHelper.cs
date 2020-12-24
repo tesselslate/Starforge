@@ -157,6 +157,15 @@ namespace Starforge.Core.Boot {
             GFX.Pixel = new DrawableTexture(GFX.Gameplay.Sources[0], 13, 13, 1, 1);
             GFX.Scenery = new Tileset(GFX.Gameplay["tilesets/scenery"], 8, 8);
 
+            // PICO-8 font loading
+            DrawableTexture font = GFX.Gameplay["pico8/font"];
+            GFX.Font = new DrawableTexture[font.Width / 4 * (font.Height / 6)];
+            for(int i = 0; i < font.Height / 6; i++) {
+                for(int j = 0; j < font.Width / 4; j++) {
+                    GFX.Font[j + i * (font.Width / 4)] = new DrawableTexture(font, j * 4, i * 6, 4, 6);
+                }
+            }
+
             Finished = true;
         }
 

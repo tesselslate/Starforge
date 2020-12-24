@@ -51,6 +51,11 @@ namespace Starforge.Core {
         public static Color SelectedRoomColor = new Color(60, 60, 60);
 
         /// <summary>
+        /// The color of triggers on the map.
+        /// </summary>
+        public static Color TriggerColor = new Color(224, 108, 49);
+
+        /// <summary>
         /// Attempts to load the configuration file from the given path.
         /// </summary>
         /// <param name="path">The path to load the configuration file from.</param>

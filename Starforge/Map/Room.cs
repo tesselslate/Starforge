@@ -62,13 +62,13 @@ namespace Starforge.Map {
                     break;
                 case "entities":
                     foreach (MapElement entity in child.Children) {
-                        r.Entities.Add(new Entity(new EntityData(entity), r));
+                        r.Entities.Add(new Entity(entity, r));
                     }
 
                     break;
                 case "triggers":
                     foreach (MapElement trigger in child.Children) {
-                        r.Triggers.Add(new Entity(new EntityData(trigger), r));
+                        r.Triggers.Add(new Entity(trigger, r));
                     }
 
                     break;

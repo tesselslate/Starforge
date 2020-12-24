@@ -48,10 +48,10 @@ namespace Starforge.Map {
                 case "Filler":
                     foreach (MapElement filler in child.Children) {
                         l.Fillers.Add(new Rectangle(
-                            filler.GetInt("x"),
-                            filler.GetInt("y"),
-                            filler.GetInt("w"),
-                            filler.GetInt("h")
+                            filler.GetInt("x") * 8,
+                            filler.GetInt("y") * 8,
+                            filler.GetInt("w") * 8,
+                            filler.GetInt("h") * 8
                         ));
                     }
 
@@ -86,10 +86,10 @@ namespace Starforge.Map {
             MapElement fillers = new MapElement() { Name = "Filler" };
             foreach (Rectangle filler in Fillers) {
                 MapElement fillerEl = new MapElement() { Name = "rect" };
-                fillerEl.SetAttribute("x", filler.X);
-                fillerEl.SetAttribute("y", filler.Y);
-                fillerEl.SetAttribute("w", filler.Width);
-                fillerEl.SetAttribute("h", filler.Height);
+                fillerEl.SetAttribute("x", filler.X / 8);
+                fillerEl.SetAttribute("y", filler.Y / 8);
+                fillerEl.SetAttribute("w", filler.Width / 8);
+                fillerEl.SetAttribute("h", filler.Height / 8);
                 fillers.Children.Add(fillerEl);
             }
             el.Children.Add(fillers);
