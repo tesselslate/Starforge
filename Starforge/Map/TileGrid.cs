@@ -62,7 +62,7 @@ namespace Starforge.Map {
             Map = new short[(Width = width) * (Height = height)];
             Fill(DefaultValue = defaultValue);
 
-            string[] rows = grid.Split('\n');
+            string[] rows = grid.Replace("\r", "").Split('\n');
             int yInc;
             for (int y = 0; y < rows.Length; y++) {
                 yInc = y * width;
@@ -86,7 +86,7 @@ namespace Starforge.Map {
 
             if (string.IsNullOrEmpty(grid)) return;
 
-            string[] rows = grid.Split('\n');
+            string[] rows = grid.Replace("\r", "").Split('\n');
             int yInc;
             for (int y = 0; y < rows.Length; y++) {
                 yInc = y * width;

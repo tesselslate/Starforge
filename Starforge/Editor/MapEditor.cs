@@ -11,6 +11,8 @@ namespace Starforge.Editor {
         public Autotiler FGAutotiler { get; private set; }
         public Camera Camera { get; private set; }
         public Level Level { get; private set; }
+        
+        public static MapEditor Instance { get; private set; }
 
         /// <summary>
         /// The renderer responsible for drawing the level onscreen.
@@ -35,11 +37,18 @@ namespace Starforge.Editor {
         #region Scene
 
         public override void Begin() {
+            Instance = this;
             Logger.Log("Beginning map editor.");
         }
 
         public override bool End() {
-            throw new System.NotImplementedException();
+            if (Unsaved) return false;
+
+            Engine.MapLoaded = false;
+            Engine.OnViewportUpdate -= Camera.UpdateViewport;
+            Renderer.Dispose();
+
+            return true;
         }
 
         public override void Render(GameTime gt) {
@@ -77,6 +86,8 @@ namespace Starforge.Editor {
         /// </summary>
         /// <param name="level">The level to load.</param>
         public void LoadLevel(Level level) {
+            Engine.MapLoaded = true;
+
             if (Level != null) {
                 Logger.Log(LogLevel.Warning, $"MapEditor: Attempted to load {level.Package} while {Level.Package} was already loaded.");
                 return;
@@ -95,7 +106,7 @@ namespace Starforge.Editor {
             // Center camera on first room and update it.
             if (Level.Rooms.Count > 0) {
                 Camera.GotoCentered(new Vector2(-Level.Rooms[0].X, -Level.Rooms[0].Y));
-           }
+            }
             Camera.Update();
         }
 

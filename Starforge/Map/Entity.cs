@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Starforge.Mod.API;
 using System.Collections.Generic;
 
 namespace Starforge.Map {
@@ -11,14 +12,13 @@ namespace Starforge.Map {
 
         public Room Parent;
 
-        public Entity(MapElement el, Room room) {
-            Attributes = new Dictionary<string, object>(el.Attributes);
+        public Entity(EntityData data, Room room) {
+            Attributes = new Dictionary<string, object>(data.Attributes);
 
-            Name = el.Name;
-            Nodes = new List<Vector2>();
+            Name = data.Name;
+            Nodes = new List<Vector2>(data.Nodes);
 
-            foreach (MapElement node in el.Children) Nodes.Add(new Vector2(node.GetFloat("x"), node.GetFloat("y")));
-            Position = new Vector2(el.GetFloat("x"), el.GetFloat("y"));
+            Position = new Vector2((int)data.Attributes["x"], (int)data.Attributes["y"]);
             Parent = room;
         }
 
@@ -29,6 +29,10 @@ namespace Starforge.Map {
                 Attributes = Attributes
             };
 
+            el.SetAttribute("x", Position.X);
+            el.SetAttribute("y", Position.Y);
+            el.SetAttribute("id", ID);
+
             foreach(Vector2 node in Nodes) {
                 MapElement nodeEl = new MapElement() { Name = "node" };
                 nodeEl.SetAttribute("x", node.X);
@@ -38,5 +42,7 @@ namespace Starforge.Map {
 
             return el;
         }
+
+        public virtual void Render() { }
     }
 }

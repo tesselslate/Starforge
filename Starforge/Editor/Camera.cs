@@ -54,10 +54,7 @@ namespace Starforge.Editor {
             Viewport = Engine.Instance.GraphicsDevice.Viewport;
             Bounds = Viewport.Bounds;
 
-            Engine.OnViewportUpdate += () => {
-                Viewport = Engine.Instance.GraphicsDevice.Viewport;
-                Update();
-            };
+            Engine.OnViewportUpdate += UpdateViewport;
         }
 
         /// <summary>
@@ -160,5 +157,10 @@ namespace Starforge.Editor {
         /// <param name="pos">The position to convert.</param>
         /// <returns>The converted position.</returns>
         public Vector2 ScreenToReal(Vector2 pos) => Vector2.Transform(pos, Inverse);
+
+        public void UpdateViewport() {
+            Viewport = Engine.Instance.GraphicsDevice.Viewport;
+            Update();
+        }
     }
 }

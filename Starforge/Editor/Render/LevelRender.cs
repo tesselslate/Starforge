@@ -2,12 +2,14 @@
 using Microsoft.Xna.Framework.Graphics;
 using Starforge.Core;
 using Starforge.Map;
+using Starforge.Mod.API;
 using Starforge.Mod.Content;
 using Starforge.Util;
+using System;
 using System.Collections.Generic;
 
 namespace Starforge.Editor.Render {
-    public class LevelRender {
+    public class LevelRender : IDisposable {
         /// <summary>
         /// The RenderTargetUsage to use when drawing rooms.
         /// </summary>
@@ -61,6 +63,15 @@ namespace Starforge.Editor.Render {
                     }
                 }
             };
+        }
+
+        /// <summary>
+        /// Disposes of the LevelRender.
+        /// </summary>
+        public void Dispose() {
+            foreach(DrawableRoom room in Rooms.Values) {
+                room.Target.Dispose();
+            }
         }
 
         /// <summary>
@@ -135,10 +146,11 @@ namespace Starforge.Editor.Render {
             // Background decals
             foreach (StaticTexture t in room.BGDecals) t.DrawCentered();
 
+            // Entities
+            foreach (Entity e in room.Room.Entities) e.Render();
+
             // Foreground tiles
             room.FGTiles.Draw();
-
-            // TODO: Entities
 
             // Object tiles
             foreach (StaticTexture t in room.OBTiles) t.Draw();

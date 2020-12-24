@@ -11,15 +11,6 @@ namespace Starforge.Core {
         public static StreamWriter Writer { get; private set; }
 
         /// <summary>
-        /// Writes the stacktrace of an exception to the log.
-        /// </summary>
-        /// <param name="e">The exception to write.</param>
-        public static void LogException(Exception e) {
-            Writer.WriteLine(e.ToString());
-            Writer.Flush();
-        }
-
-        /// <summary>
         /// Writes a message to the log, at the Info level.
         /// </summary>
         /// <param name="msg">The message to write.</param>
@@ -40,6 +31,19 @@ namespace Starforge.Core {
                 Writer.WriteLine($"[{DateTime.Now.ToString()}] | [{level.ToString()}] {msg}");
                 Writer.Flush();
             }
+        }
+
+        /// <summary>
+        /// Writes the stacktrace of an exception to the log.
+        /// </summary>
+        /// <param name="e">The exception to write.</param>
+        public static void LogException(Exception e) {
+            Writer.WriteLine(e.ToString());
+            Writer.Flush();
+        }
+
+        public static void LogStackTrace() {
+            Log(new StackTrace(true).ToString());
         }
 
         /// <summary>

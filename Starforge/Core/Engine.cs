@@ -24,11 +24,6 @@ namespace Starforge.Core {
         public static SpriteBatch Batch { get; private set; }
 
         /// <summary>
-        /// The current map editor (if one is currently running.)
-        /// </summary>
-        public static MapEditor Editor { get; private set; }
-
-        /// <summary>
         /// The graphics device manager for the Starforge window.
         /// </summary>
         public static GraphicsDeviceManager GDM { get; private set; }

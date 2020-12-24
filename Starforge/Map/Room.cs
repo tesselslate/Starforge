@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using Starforge.Mod;
+using Starforge.Mod.API;
 using System.Collections.Generic;
 
 namespace Starforge.Map {
@@ -62,13 +64,13 @@ namespace Starforge.Map {
                     break;
                 case "entities":
                     foreach (MapElement entity in child.Children) {
-                        r.Entities.Add(new Entity(entity, r));
+                        r.Entities.Add(Registry.CreateEntity(entity, r));
                     }
 
                     break;
                 case "triggers":
                     foreach (MapElement trigger in child.Children) {
-                        r.Triggers.Add(new Entity(trigger, r));
+                        r.Triggers.Add(new Entity(new EntityData(trigger), r));
                     }
 
                     break;

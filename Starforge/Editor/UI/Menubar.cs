@@ -2,6 +2,7 @@
 using Starforge.Core;
 using Starforge.Core.Interop;
 using Starforge.Map;
+using System;
 using System.IO;
 
 namespace Starforge.Editor.UI {
@@ -26,8 +27,8 @@ namespace Starforge.Editor.UI {
             }
 
             if (ImGui.BeginMenu("Edit")) {
-                if (ImGui.MenuItem("Undo", "CTRL+Z", false, Engine.MapLoaded && Engine.Editor.CanUndo)) Engine.Editor.Undo();
-                if (ImGui.MenuItem("Redo", "CTRL+SHIFT+Z", false, Engine.MapLoaded && Engine.Editor.CanRedo)) Engine.Editor.Redo();
+                if (ImGui.MenuItem("Undo", "CTRL+Z", false, Engine.MapLoaded && MapEditor.Instance.CanUndo)) MapEditor.Instance.Undo();
+                if (ImGui.MenuItem("Redo", "CTRL+SHIFT+Z", false, Engine.MapLoaded && MapEditor.Instance.CanRedo)) MapEditor.Instance.Redo();
 
                 ImGui.EndMenu();
             }
@@ -37,6 +38,11 @@ namespace Starforge.Editor.UI {
             }
 
             if (ImGui.BeginMenu("Tools")) {
+                if(Settings.DebugMode) {
+                    ImGui.Separator();
+                    if (ImGui.MenuItem("Force GC")) GC.Collect(2, GCCollectionMode.Forced, true, true);
+                }
+                
                 ImGui.EndMenu();
             }
 

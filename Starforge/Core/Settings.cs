@@ -21,19 +21,24 @@ namespace Starforge.Core {
         public static bool AlwaysRerender = false;
 
         /// <summary>
-        /// The directory in which Celeste and its files are located.
-        /// </summary>
-        public static string CelesteDirectory;
-
-        /// <summary>
         /// The background color of the editor.
         /// </summary>
         public static Color BackgroundColor = new Color(14, 14, 14);
 
         /// <summary>
+        /// The directory in which Celeste and its files are located.
+        /// </summary>
+        public static string CelesteDirectory;
+
+        /// <summary>
         /// Whether or not the editor should be in dark mode.
         /// </summary>
         public static bool DarkTheme = true;
+
+        /// <summary>
+        /// Whether or not the editor should grant access to debug features.
+        /// </summary>
+        public static bool DebugMode = true;
 
         /// <summary>
         /// The maximum amount of simultaneous threads to run when launching.
