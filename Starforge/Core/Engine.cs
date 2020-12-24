@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using SDL2;
 using Starforge.Core.Boot;
 using Starforge.Core.Interop;
+using Starforge.Editor;
 using Starforge.Mod.Content;
 using Starforge.Platform;
 using System;
@@ -19,6 +20,11 @@ namespace Starforge.Core {
         /// The globally used SpriteBatch.
         /// </summary>
         public static SpriteBatch Batch { get; private set; }
+
+        /// <summary>
+        /// The current map editor (if one is currently running.)
+        /// </summary>
+        public static MapEditor Editor { get; private set; }
 
         /// <summary>
         /// The graphics device manager for the Starforge window.
@@ -51,9 +57,20 @@ namespace Starforge.Core {
         public static bool StartupComplete = false;
 
         /// <summary>
+        /// Whether or not a map is currently loaded.
+        /// </summary>
+        public static bool MapLoaded = false;
+
+        /// <summary>
         /// The list of currently loaded textures.
         /// </summary>
         public static List<VirtualTexture> VirtualContent;
+
+        /// <summary>
+        /// Event which is fired when the window size changes.
+        /// </summary>
+        public static ViewportUpdate OnViewportUpdate;
+        public delegate void ViewportUpdate();
 
         /// <summary>
         /// The current scene.
@@ -75,6 +92,7 @@ namespace Starforge.Core {
             IsMouseVisible = true;
 
             Window.AllowUserResizing = true;
+            Window.ClientSizeChanged += (object sender, EventArgs e) => OnViewportUpdate?.Invoke();
         }
         
         private static void Main(string[] args) {
@@ -93,7 +111,7 @@ namespace Starforge.Core {
                 break;
             }
 
-            Thread.CurrentThread.Name = "Starforge Main";
+            Thread.CurrentThread.Name = "Starforge";
 
             Settings.ConfigDirectory = Platform.GetAppDataFolder();
 

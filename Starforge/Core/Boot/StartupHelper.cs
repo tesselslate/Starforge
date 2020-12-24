@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Starforge.Mod.Content;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -16,9 +18,14 @@ namespace Starforge.Core.Boot {
         public static bool CurrentlyStarting { get; private set; } = false;
 
         /// <summary>
-        /// Whether or not the tasks have finished.
+        /// Whether or not loading has finished.
         /// </summary>
         public static bool Finished { get; private set; } = false;
+
+        /// <summary>
+        /// Whether or not the first stage of loading (all but textures) has finished.
+        /// </summary>
+        public static bool FinishedFirstStage { get; private set; } = false;
 
         /// <summary>
         /// The amount of finished startup tasks.
@@ -135,9 +142,20 @@ namespace Starforge.Core.Boot {
 
             // Finished loading - all tasks completed
             if (UnstartedTasks.Count == 0 && UnfinishedTasks.Count == 0) {
-                Finished = true;
+                FinishedFirstStage = true;
                 CurrentlyStarting = false;
             }
+        }
+
+        /// <summary>
+        /// Unpacks any texture atlases that needs to be loaded.
+        /// </summary>
+        public static void UnpackAtlases() {
+            GFX.Gameplay = Atlas.FromAtlas(Path.Combine(Settings.CelesteDirectory, "Content", "Graphics", "Atlases", "Gameplay"), AtlasFormat.Packer);
+            GFX.Pixel = new DrawableTexture(GFX.Gameplay.Sources[0], 13, 13, 1, 1);
+            GFX.Empty = new DrawableTexture(GFX.Gameplay.Sources[0], 4094, 4094, 1, 1);
+
+            Finished = true;
         }
 
         /// <summary>

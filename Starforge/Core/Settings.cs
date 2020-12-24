@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Starforge.Util;
 using System.Collections.Generic;
 using System.IO;
@@ -10,14 +11,19 @@ namespace Starforge.Core {
     /// </summary>
     public static class Settings {
         /// <summary>
-        /// The directory in which Celeste and its files are located.
-        /// </summary>
-        public static string CelesteDirectory;
-
-        /// <summary>
         /// The directory in which Starforge's configuration files are stored.
         /// </summary>
         public static string ConfigDirectory { get; set; }
+
+        /// <summary>
+        /// Whether or not rooms should always be rerendered.
+        /// </summary>
+        public static bool AlwaysRerender = false;
+
+        /// <summary>
+        /// The directory in which Celeste and its files are located.
+        /// </summary>
+        public static string CelesteDirectory;
 
         /// <summary>
         /// The background color of the editor.

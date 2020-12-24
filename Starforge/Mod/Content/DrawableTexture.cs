@@ -72,6 +72,10 @@ namespace Starforge.Mod.Content {
         public void Draw(Vector2 position) {
             Engine.Batch.Draw(Texture.Texture, position, NullableClipRect, Color.White);
         }
+        
+        public void Draw(Vector2 position, float alpha) {
+            Engine.Batch.Draw(Texture.Texture, position, NullableClipRect, Color.White * alpha);
+        }
 
         public void Draw(Rectangle destination) {
             Engine.Batch.Draw(Texture.Texture, destination, NullableClipRect, Color.White);

@@ -18,6 +18,7 @@ namespace Starforge.Core.Boot {
         private float LogoRotation = 0f;
         private float TaskInterval = 0.1f;
         private float Alpha = 1f;
+        private bool UnpackAtlases = false;
 
         public override void Begin() {
             AutolocatedInstalls = Engine.Platform.GetCelesteDirectories().ToArray();
@@ -100,6 +101,10 @@ namespace Starforge.Core.Boot {
                     ImGui.EndPopup();
                 }
             } else {
+                if(UnpackAtlases && !StartupHelper.Finished) {
+                    StartupHelper.UnpackAtlases();
+                }
+
                 // Show the launch window.
                 Engine.Batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null);
                 Engine.Batch.Draw(GFX.Logo, new Vector2(Engine.Instance.GraphicsDevice.Viewport.Width / 2 - 128, Engine.Instance.GraphicsDevice.Viewport.Height / 2), GFX.Logo.Bounds, Color.White * Alpha, LogoRotation, new Vector2(GFX.Logo.Bounds.Center.X, GFX.Logo.Bounds.Center.Y), 1f, SpriteEffects.None, 0f);
@@ -113,15 +118,23 @@ namespace Starforge.Core.Boot {
 
                 ImGui.Begin("", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize);
 
-                if (StartupHelper.HasErrored) {
-                    ImGui.Text("Starforge encountered an error.");
-                    if (ImGui.Button("Open log")) {
-                        Logger.Close();
-                        Process.Start(Path.Combine(Settings.ConfigDirectory, "log.txt"));
-                    }
+                if (StartupHelper.FinishedFirstStage) {
+                    ImGui.Text("Loading textures...");
+                    ImGui.Text("This may take a moment.");
+                    
+                    // Use this workaround to wait a frame to unpack atlases
+                    UnpackAtlases = true;
                 } else {
-                    ImGui.Text("Launching Starforge...");
-                    ImGui.Text($"{StartupHelper.FinishedTasks} / {StartupHelper.TotalTasks} tasks complete");
+                    if (StartupHelper.HasErrored) {
+                        ImGui.Text("Starforge encountered an error.");
+                        if (ImGui.Button("Open log")) {
+                            Logger.Close();
+                            Process.Start(Path.Combine(Settings.ConfigDirectory, "log.txt"));
+                        }
+                    } else {
+                        ImGui.Text("Launching Starforge...");
+                        ImGui.Text($"{StartupHelper.FinishedTasks} / {StartupHelper.TotalTasks} tasks complete");
+                    }
                 }
 
                 ImGui.End();
@@ -131,6 +144,7 @@ namespace Starforge.Core.Boot {
         }
 
         public override void Update(GameTime gt) {
+
             if (!StartupHelper.HasErrored) {
                 LogoRotation = LogoRotation % (MathHelper.Pi * 2) + (float)gt.ElapsedGameTime.TotalSeconds * 2;
             } else {
