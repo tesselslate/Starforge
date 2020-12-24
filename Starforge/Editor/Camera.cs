@@ -42,7 +42,7 @@ namespace Starforge.Editor {
         /// </summary>
         public float Zoom {
             get => ZoomLevel;
-            private set {
+            set {
                 ZoomLevel = MathHelper.Clamp(value, 0.001953125f, 4f);
                 Update();
             }
@@ -54,7 +54,10 @@ namespace Starforge.Editor {
             Viewport = Engine.Instance.GraphicsDevice.Viewport;
             Bounds = Viewport.Bounds;
 
-            Engine.OnViewportUpdate += UpdateViewport;
+            Engine.OnViewportUpdate += () => {
+                Viewport = Engine.Instance.GraphicsDevice.Viewport;
+                Update();
+            };
         }
 
         /// <summary>
@@ -71,7 +74,7 @@ namespace Starforge.Editor {
         /// </summary>
         /// <param name="position">The position to go to.</param>
         public void Goto(Vector2 position) {
-            Position = position;
+            Position = -position;
             Update();
         }
 
@@ -80,7 +83,6 @@ namespace Starforge.Editor {
         /// </summary>
         /// <param name="position">The position to center on.</param>
         public void GotoCentered(Vector2 position) {
-            Zoom = 1f;
             Position = new Vector2(position.X - (Viewport.Width / 2), position.Y - (Viewport.Height / 2));
             Update();
         }
@@ -158,10 +160,5 @@ namespace Starforge.Editor {
         /// <param name="pos">The position to convert.</param>
         /// <returns>The converted position.</returns>
         public Vector2 ScreenToReal(Vector2 pos) => Vector2.Transform(pos, Inverse);
-
-        private void UpdateViewport() {
-            Viewport = Engine.Instance.GraphicsDevice.Viewport;
-            Update();
-        }
     }
 }

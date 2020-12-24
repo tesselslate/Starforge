@@ -20,6 +20,13 @@ namespace Starforge.Editor {
         public DrawableTexture this[int x, int y] => Tiles[x,y];
 
         /// <summary>
+        /// Retrieves the tile texture at the specified index.
+        /// </summary>
+        /// <param name="index">The index to retrieve the texture from.</param>
+        /// <returns>The texture at the specified index, or an empty texture if the index is below zero.</returns>
+        public DrawableTexture this[int index] => (index < 0 ? GFX.Empty : this[index % Tiles.GetLength(0), index / Tiles.GetLength(0)]);
+
+        /// <summary>
         /// The textures for each tile in the grid.
         /// </summary>
         private DrawableTexture[,] Tiles;

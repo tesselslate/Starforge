@@ -41,6 +41,16 @@ namespace Starforge.Core {
         public static int MaxStartupThreads = 2;
 
         /// <summary>
+        /// The background color of rooms on the map.
+        /// </summary>
+        public static Color RoomColor = new Color(40, 40, 40);
+
+        /// <summary>
+        /// The background color of selected rooms on the map.
+        /// </summary>
+        public static Color SelectedRoomColor = new Color(60, 60, 60);
+
+        /// <summary>
         /// Attempts to load the configuration file from the given path.
         /// </summary>
         /// <param name="path">The path to load the configuration file from.</param>

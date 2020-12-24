@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ImGuiNET;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDL2;
 using Starforge.Core.Boot;
@@ -165,6 +166,9 @@ namespace Starforge.Core {
             base.Draw(gt);
             GUIRenderer.BeforeLayout(gt);
             Scene.Render(gt);
+
+            // Set render target back to the window so we don't accidentally render UI content on top of a room.
+            GraphicsDevice.SetRenderTarget(null);
             GUIRenderer.AfterLayout();
         }
 

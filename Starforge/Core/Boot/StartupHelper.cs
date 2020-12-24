@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Starforge.Editor;
 using Starforge.Mod.Content;
 using System;
 using System.Collections.Generic;
@@ -152,8 +153,9 @@ namespace Starforge.Core.Boot {
         /// </summary>
         public static void UnpackAtlases() {
             GFX.Gameplay = Atlas.FromAtlas(Path.Combine(Settings.CelesteDirectory, "Content", "Graphics", "Atlases", "Gameplay"), AtlasFormat.Packer);
-            GFX.Pixel = new DrawableTexture(GFX.Gameplay.Sources[0], 13, 13, 1, 1);
             GFX.Empty = new DrawableTexture(GFX.Gameplay.Sources[0], 4094, 4094, 1, 1);
+            GFX.Pixel = new DrawableTexture(GFX.Gameplay.Sources[0], 13, 13, 1, 1);
+            GFX.Scenery = new Tileset(GFX.Gameplay["tilesets/scenery"], 8, 8);
 
             Finished = true;
         }

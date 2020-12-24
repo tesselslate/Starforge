@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Starforge.Core;
+using Starforge.Editor;
 using Starforge.Util;
 using System.IO;
 using System.Reflection;
@@ -32,11 +33,14 @@ namespace Starforge.Mod.Content {
         public static DrawableTexture Pixel;
 
         /// <summary>
+        /// The Scenery (object tiles) tileset.
+        /// </summary>
+        public static Tileset Scenery;
+
+        /// <summary>
         /// The Starforge logo texture.
         /// </summary>
         public static Texture2D Logo { get; private set; }
-
-        private static Rectangle Rect;
 
         #endregion
 
@@ -50,6 +54,8 @@ namespace Starforge.Mod.Content {
         }
 
         public static class Draw {
+            private static Rectangle Rect;
+
             public static void HollowRectangle(int x, int y, int w, int h, Color c) {
                 Rect.X = x;
                 Rect.Y = y;

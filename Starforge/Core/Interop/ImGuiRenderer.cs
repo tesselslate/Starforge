@@ -141,6 +141,9 @@ namespace Starforge.Core.Interop {
         }
 
         protected void UpdateInput() {
+            // Make sure the window is focused before responding to input.
+            if (!Engine.IsActive) return;
+
             ImGuiIOPtr io = ImGui.GetIO();
 
             MouseState m = Mouse.GetState();
