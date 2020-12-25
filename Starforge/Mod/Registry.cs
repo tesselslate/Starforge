@@ -10,10 +10,12 @@ namespace Starforge.Mod {
     public static class Registry {
         private static Dictionary<string, EntityCreator> EntityCreators;
         private static Dictionary<string, EntityCreator> TriggerCreators;
+        private static Dictionary<Type, PropertyInfo[]> EntityCache;
 
         static Registry() {
             EntityCreators = new Dictionary<string, EntityCreator>();
             TriggerCreators = new Dictionary<string, EntityCreator>();
+            EntityCache = new Dictionary<Type, PropertyInfo[]>();
         }
 
         public static Entity CreateEntity(MapElement el, Room room) {
@@ -95,6 +97,8 @@ namespace Starforge.Mod {
             });
 
             if (ctor != null) {
+                EntityCache.Add(type, type.GetProperties());
+
                 dict.Add(id, (EntityData d, Room r) => (Entity)ctor.Invoke(new object[] { d, r }));
                 Logger.Log($"Registered entity {id} of type {type}");
             } else {

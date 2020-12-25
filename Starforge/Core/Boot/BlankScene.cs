@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ImGuiNET;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Starforge.Editor.UI;
 using System;
@@ -8,6 +9,9 @@ namespace Starforge.Core.Boot {
         private ShortcutManager Shortcuts;
 
         public override void Begin() {
+            if (Settings.DarkTheme) ImGui.StyleColorsDark();
+            else ImGui.StyleColorsLight();
+
             Shortcuts = new ShortcutManager();
             Shortcuts.RegisterShortcut(new Shortcut(new Action(Menubar.Open), Keys.LeftControl, Keys.O));
         }
@@ -16,8 +20,6 @@ namespace Starforge.Core.Boot {
 
         public override void Render(GameTime gt) {
             Engine.Instance.GraphicsDevice.Clear(Settings.BackgroundColor);
-
-            Menubar.Render(false);
         }
 
         public override void Update(GameTime gt) {

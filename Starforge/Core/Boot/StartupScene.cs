@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Starforge.Core.Interop;
 using Starforge.Mod.Content;
+using Starforge.Util;
 using System.Diagnostics;
 using System.IO;
 
@@ -37,8 +38,7 @@ namespace Starforge.Core.Boot {
             if (ShowInstallWindow) {
                 // Show the window for selecting a Celeste installation.
 
-                ImGui.SetNextWindowSize(new System.Numerics.Vector2(500f, 280f));
-                ImGui.SetNextWindowPos(new System.Numerics.Vector2(Engine.Instance.GraphicsDevice.Viewport.Width / 2 - 250, Engine.Instance.GraphicsDevice.Viewport.Height / 2 - 140));
+                UIHelper.CenterWindow(new Vector2(500f, 280f));
                 ImGui.Begin("Startup",
                     ImGuiWindowFlags.NoScrollbar |
                     ImGuiWindowFlags.NoResize |
@@ -93,8 +93,7 @@ namespace Starforge.Core.Boot {
                 if (Popup) {
                     ImGui.OpenPopup("Notification");
 
-                    ImGui.SetNextWindowSize(new System.Numerics.Vector2(200f, 100f));
-                    ImGui.SetNextWindowPos(new System.Numerics.Vector2(Engine.Instance.GraphicsDevice.Viewport.Width / 2 - 100, Engine.Instance.GraphicsDevice.Viewport.Height / 2 - 50));
+                    UIHelper.CenterWindow(new Vector2(200f, 100f));
                     if (ImGui.BeginPopupModal("Notification", ref Popup, ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize)) {
                         ImGui.TextWrapped(PopupMsg);
                     }

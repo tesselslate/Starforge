@@ -5,6 +5,7 @@ using SDL2;
 using Starforge.Core.Boot;
 using Starforge.Core.Interop;
 using Starforge.Editor;
+using Starforge.Editor.UI;
 using Starforge.Map;
 using Starforge.Mod.Content;
 using Starforge.Platform;
@@ -64,6 +65,11 @@ namespace Starforge.Core {
         public static List<VirtualTexture> VirtualContent;
 
         /// <summary>
+        /// A list of open ImGui windows.
+        /// </summary>
+        public static List<Window> Windows;
+
+        /// <summary>
         /// Event which is fired when the window size changes.
         /// </summary>
         public static ViewportUpdate OnViewportUpdate;
@@ -90,11 +96,13 @@ namespace Starforge.Core {
 
             Window.AllowUserResizing = true;
             Window.ClientSizeChanged += (object sender, EventArgs e) => OnViewportUpdate?.Invoke();
+
+            Windows = new List<Window>();
         }
-        
+
         private static void Main(string[] args) {
             // Set up platform helper
-            switch(SDL.SDL_GetPlatform()) {
+            switch (SDL.SDL_GetPlatform()) {
             case "Windows":
                 Platform = new PlatformWindows();
                 break;
@@ -122,7 +130,7 @@ namespace Starforge.Core {
             }
 
             string logOld = Path.Combine(Settings.ConfigDirectory, "log_old.txt");
-            string log    = Path.Combine(Settings.ConfigDirectory, "log.txt");
+            string log = Path.Combine(Settings.ConfigDirectory, "log.txt");
 
             if (File.Exists(logOld)) File.Delete(logOld);
             if (File.Exists(log)) File.Move(log, logOld);
@@ -163,14 +171,27 @@ namespace Starforge.Core {
             GUIRenderer.BeforeLayout(gt);
             Scene.Render(gt);
 
+            List<Window> toRemove = new List<Window>();
+
             // Set render target back to the window so we don't accidentally render UI content on top of a room.
+            foreach (Window win in Windows) {
+                if (win.Visible) win.Render();
+                else toRemove.Add(win);
+            }
+
+            foreach (Window win in toRemove) {
+                Windows.Remove(win);
+            }
+
+            Menubar.Render(MapLoaded);
+
             GraphicsDevice.SetRenderTarget(null);
             GUIRenderer.AfterLayout();
         }
 
         protected override void Update(GameTime gt) {
             base.Update(gt);
-            
+
             Input.Update();
             Scene.Update(gt);
             Input.UpdatePrevious();
@@ -215,6 +236,22 @@ namespace Starforge.Core {
                 Scene.Begin();
                 return true;
             }
+        }
+
+        /// <summary>
+        /// Adds a window to the list of currently open ImGui windows.
+        /// </summary>
+        /// <param name="win">The window to add.</param>
+        public static void CreateWindow(Window win) {
+            Windows.Add(win);
+        }
+
+        /// <summary>
+        /// Removes a window from the list of currently open ImGui windows.
+        /// </summary>
+        /// <param name="win">The window to remove.</param>
+        public static void DeleteWindow(Window win) {
+            Windows.Remove(win);
         }
     }
 }

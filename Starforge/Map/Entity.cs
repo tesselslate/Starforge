@@ -3,12 +3,11 @@ using Starforge.Mod.API;
 using System.Collections.Generic;
 
 namespace Starforge.Map {
-    public class Entity : IPackable {
+    public class Entity : AttributeHolder, IPackable {
         public int ID;
         public readonly string Name;
         public List<Vector2> Nodes;
         public Vector2 Position;
-        public Dictionary<string, object> Attributes;
 
         public Room Parent;
 
@@ -18,7 +17,7 @@ namespace Starforge.Map {
             Name = data.Name;
             Nodes = new List<Vector2>(data.Nodes);
 
-            Position = new Vector2((int)data.Attributes["x"], (int)data.Attributes["y"]);
+            Position = new Vector2((int)GetFloat("x"), (int)GetFloat("y"));
             Parent = room;
         }
 

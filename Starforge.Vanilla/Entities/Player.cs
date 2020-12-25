@@ -1,20 +1,21 @@
 ﻿using Microsoft.Xna.Framework;
-using Starforge.Core;
-using Starforge.MapStructure;
-using Starforge.Mod;
-using Starforge.Mod.Assets;
+using Starforge.Map;
+using Starforge.Mod.API;
+using Starforge.Mod.Content;
 
-namespace Starforge.Vanilla.Entities {
+namespace Starforge.Entities {
     [EntityDefinition("player")]
     public class Player : Entity {
-        private static DrawableTexture Sprite = GFX.Gameplay["characters/player/sitDown00"];
+        private DrawableTexture Texture;
 
-        public Player(Level level, EntityData data) : base(level, data) { }
+        public Player(EntityData data, Room room) : base(data, room) {
+            Texture = GFX.Gameplay["characters/player/sitDown00"];
+        }
 
         public override void Render() {
             Vector2 pos = Position;
             pos.Y -= 16f;
-            Sprite.DrawCentered(pos);
+            Texture.DrawCentered(pos);
         }
     }
 }

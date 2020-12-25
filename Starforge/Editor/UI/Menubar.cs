@@ -21,7 +21,7 @@ namespace Starforge.Editor.UI {
                 if (ImGui.MenuItem("New")) New();
                 if (ImGui.MenuItem("Open", "CTRL+O")) Open();
                 if (ImGui.MenuItem("Save", "CTRL+S", false, Engine.MapLoaded)) Save();
-                if (ImGui.MenuItem("Save As", "", false, Engine.MapLoaded)) Save();
+                if (ImGui.MenuItem("Save As", "", false, Engine.MapLoaded)) SaveAs();
 
                 ImGui.EndMenu();
             }
@@ -38,11 +38,11 @@ namespace Starforge.Editor.UI {
             }
 
             if (ImGui.BeginMenu("Tools")) {
-                if(Settings.DebugMode) {
+                if (Settings.DebugMode) {
                     ImGui.Separator();
                     if (ImGui.MenuItem("Force GC")) GC.Collect(2, GCCollectionMode.Forced, true, true);
                 }
-                
+
                 ImGui.EndMenu();
             }
 
@@ -56,22 +56,44 @@ namespace Starforge.Editor.UI {
         #region File
 
         public static void New() {
-
+            if (Engine.MapLoaded && MapEditor.Instance.Unsaved) {
+                // Unsaved changes - notify user
+                Engine.CreateWindow(new WindowUnsavedChanges(New));
+            } else {
+                Engine.CreateWindow(new WindowNewMap());
+            }
         }
 
         public static void Open() {
             if (NfdResult.OKAY == NFD.OpenDialog("bin", Settings.CelesteDirectory, out string mapPath)) {
                 MapEditor editor = new MapEditor();
-                using (FileStream stream = File.OpenRead(mapPath)) {
-                    using (BinaryReader reader = new BinaryReader(stream)) {
-                        editor.LoadLevel(Level.Decode(MapPacker.ReadMapBinary(reader)));
-                        Engine.SetScene(editor);
-                    }
-                }
+                editor.LoadLevel(mapPath);
+                Engine.SetScene(editor);
             }
         }
 
-        public static void Save() {
+        public static bool Save() {
+            if (Engine.MapLoaded && MapEditor.Instance.Unsaved) {
+                if (string.IsNullOrEmpty(MapEditor.Instance.Path)) {
+                    if (NfdResult.OKAY == NFD.SaveDialog("bin", Settings.CelesteDirectory, out string mapPath)) {
+                        MapEditor.Instance.Path = mapPath;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(MapEditor.Instance.Path)) return false;
+
+                using (FileStream stream = File.OpenWrite(MapEditor.Instance.Path)) {
+                    using (BinaryWriter writer = new BinaryWriter(stream)) {
+                        MapPacker.WriteMapBinary(writer, MapEditor.Instance.Level.Encode());
+                        return true;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        public static void SaveAs() {
 
         }
 

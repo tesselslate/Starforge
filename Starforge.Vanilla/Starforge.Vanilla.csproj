@@ -12,14 +12,14 @@
 
 	<Choose>
 		<When Condition="'$(Configuration)' == 'Debug'">
-			<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-				<Exec Command="copy $(OutDir)Starforge.Vanilla.dll $(SolutionDir)Starforge\bin\x86\Debug\net472\Starforge.Vanilla.dll" />
-			</Target>
+			<PropertyGroup>
+				<PostBuildEvent>copy $(OutDir)Starforge.Vanilla.dll $(SolutionDir)Starforge\bin\x86\Debug\net472\Starforge.Vanilla.dll</PostBuildEvent>
+			</PropertyGroup>
 		</When>
 		<Otherwise>
-			<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-				<Exec Command="copy $(OutDir)Starforge.Vanilla.dll $(SolutionDir)Starforge\bin\x86\Release\net472\Starforge.Vanilla.dll" />
-			</Target>
+			<PropertyGroup>
+				<PostBuildEvent>copy $(OutDir)Starforge.Vanilla.dll $(SolutionDir)Starforge\bin\x86\Release\net472\Starforge.Vanilla.dll</PostBuildEvent>
+			</PropertyGroup>
 		</Otherwise>
 	</Choose>
 
