@@ -1,9 +1,11 @@
 ﻿using ImGuiNET;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
 using Starforge.Editor.Render;
 using Starforge.Editor.UI;
 using Starforge.Map;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -13,14 +15,18 @@ namespace Starforge.Editor {
         public Autotiler FGAutotiler { get; private set; }
         public Camera Camera { get; private set; }
         public Level Level { get; private set; }
-        public string Path;
-
-        public static MapEditor Instance { get; private set; }
 
         /// <summary>
-        /// The renderer responsible for drawing the level onscreen.
+        /// The currently selected room.
         /// </summary>
-        private LevelRender Renderer;
+        public Room SelectedRoom { get; private set; }
+
+        /// <summary>
+        /// The path of the map on the disk.
+        /// </summary>
+        public string MapPath;
+
+        public static MapEditor Instance { get; private set; }
 
         /// <summary>
         /// Whether or not there are actions which can be undone.
@@ -37,29 +43,61 @@ namespace Starforge.Editor {
         /// </summary>
         public bool Unsaved { get; private set; } = false;
 
+        /// <summary>
+        /// The renderer responsible for drawing the level onscreen.
+        /// </summary>
+        private LevelRender Renderer;
+        private WindowRoomList RoomListWindow;
+        private ShortcutManager Shortcuts;
+
         #region Scene
 
         public override void Begin() {
             Instance = this;
             Logger.Log("Beginning map editor.");
+
+            // Initialize room list window
+            RoomListWindow = new WindowRoomList();
+
+            List<string> roomNames = new List<string>();
+            foreach (Room room in Level.Rooms) roomNames.Add(room.Name);
+            RoomListWindow.RoomNames = roomNames.ToArray();
+
+            Engine.CreateWindow(RoomListWindow);
+
+            // TODO: Initialize tool window
+
+            // Initialize shortcuts
+            Shortcuts = new ShortcutManager();
+
+            Shortcuts.RegisterShortcut(new Shortcut(Menubar.Open, Keys.LeftControl, Keys.O));
+            Shortcuts.RegisterShortcut(new Shortcut(new Action(() => { Menubar.Save(); }), Keys.LeftControl, Keys.S));
+            Shortcuts.RegisterShortcut(new Shortcut(Menubar.SaveAs, Keys.LeftControl, Keys.LeftShift, Keys.S));
+            Shortcuts.RegisterShortcut(new Shortcut(Undo, Keys.LeftControl, Keys.Z));
+            Shortcuts.RegisterShortcut(new Shortcut(Redo, Keys.LeftControl, Keys.LeftShift, Keys.Z));
         }
 
         public override bool End() {
-            if (Unsaved) return false;
+            if (Unsaved) {
+                return false;
+            }
 
             Engine.MapLoaded = false;
             Engine.OnViewportUpdate -= Camera.UpdateViewport;
             Renderer.Dispose();
 
+            // Remove windows
+            RoomListWindow.Visible = false;
+
             return true;
         }
 
         public override void Render(GameTime gt) {
+            RoomListWindow.UpdateListHeight();
             Renderer.Render();
         }
 
         public override void Update(GameTime gt) {
-
             // If ImGui wants user input or the window isn't focused, dont respond.
             ImGuiIOPtr io = ImGui.GetIO();
             if (io.WantCaptureMouse || io.WantCaptureKeyboard || !Engine.Instance.IsActive) return;
@@ -107,18 +145,18 @@ namespace Starforge.Editor {
 
             Logger.Log($"MapEditor: Loading level {Level.Package}");
 
-            // Load level
+            // Initialize autotiler
             BGAutotiler = new Autotiler($"{Settings.CelesteDirectory}/Content/Graphics/BackgroundTiles.xml");
             FGAutotiler = new Autotiler($"{Settings.CelesteDirectory}/Content/Graphics/ForegroundTiles.xml");
 
+            // Initialize camera and level renderer
             Camera = new Camera();
             Renderer = new LevelRender(this, Level, true);
-
-            // Center camera on first room and update it.
-            if (Level.Rooms.Count > 0) {
-                Camera.GotoCentered(new Vector2(-Level.Rooms[0].X, -Level.Rooms[0].Y));
-            }
             Camera.Update();
+
+            if (Level.Rooms.Count > 0) {
+                SelectRoom(0);
+            }
         }
 
         /// <summary>
@@ -133,6 +171,15 @@ namespace Starforge.Editor {
         /// </summary>
         public void Redo() {
 
+        }
+
+        public void SelectRoom(int index) {
+            // Rerender previously selected room
+            if (SelectedRoom != null) Renderer.RenderRoom(Renderer.Rooms[index]);
+            SelectedRoom = Level.Rooms[index];
+
+            Camera.Zoom = 1f;
+            Camera.GotoCentered(new Vector2(-SelectedRoom.Meta.Bounds.Center.X, -SelectedRoom.Meta.Bounds.Center.Y));
         }
     }
 }

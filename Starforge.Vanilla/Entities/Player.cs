@@ -3,7 +3,7 @@ using Starforge.Map;
 using Starforge.Mod.API;
 using Starforge.Mod.Content;
 
-namespace Starforge.Entities {
+namespace Starforge.Vanilla.Entities {
     [EntityDefinition("player")]
     public class Player : Entity {
         private DrawableTexture Texture;

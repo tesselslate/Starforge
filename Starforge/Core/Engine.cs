@@ -90,8 +90,8 @@ namespace Starforge.Core {
             GDM.PreferredBackBufferWidth = 1280;
             GDM.PreferredBackBufferHeight = 720;
             GDM.PreferMultiSampling = false;
-            GDM.SynchronizeWithVerticalRetrace = true;
-            IsFixedTimeStep = true;
+            GDM.SynchronizeWithVerticalRetrace = Settings.VerticalSync;
+            IsFixedTimeStep = Settings.VerticalSync;
             IsMouseVisible = true;
 
             Window.AllowUserResizing = true;
@@ -180,6 +180,7 @@ namespace Starforge.Core {
             }
 
             foreach (Window win in toRemove) {
+                win.End();
                 Windows.Remove(win);
             }
 

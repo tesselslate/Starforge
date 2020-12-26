@@ -10,12 +10,15 @@ namespace Starforge.Editor.UI {
     /// The menubar of the window.
     /// </summary>
     public static class Menubar {
+        public static float MenubarHeight { get; private set; }
+
         /// <summary>
         /// Renders the window menubar.
         /// </summary>
         /// <param name="hasEditor">Whether or not the map editor is currently loaded.</param>
         public static void Render(bool hasEditor = false) {
             if (!ImGui.BeginMainMenuBar()) return;
+            MenubarHeight = ImGui.GetWindowHeight();
 
             if (ImGui.BeginMenu("File")) {
                 if (ImGui.MenuItem("New")) New();
@@ -38,6 +41,8 @@ namespace Starforge.Editor.UI {
             }
 
             if (ImGui.BeginMenu("Tools")) {
+                if (ImGui.MenuItem("Settings")) Engine.CreateWindow(new WindowSettings());
+
                 if (Settings.DebugMode) {
                     ImGui.Separator();
                     if (ImGui.MenuItem("Force GC")) GC.Collect(2, GCCollectionMode.Forced, true, true);
@@ -56,7 +61,7 @@ namespace Starforge.Editor.UI {
         #region File
 
         public static void New() {
-            if (Engine.MapLoaded && MapEditor.Instance.Unsaved) {
+            if (MapEditor.Instance != null && MapEditor.Instance.Unsaved) {
                 // Unsaved changes - notify user
                 Engine.CreateWindow(new WindowUnsavedChanges(New));
             } else {
@@ -65,7 +70,10 @@ namespace Starforge.Editor.UI {
         }
 
         public static void Open() {
-            if (NfdResult.OKAY == NFD.OpenDialog("bin", Settings.CelesteDirectory, out string mapPath)) {
+            if(MapEditor.Instance != null && MapEditor.Instance.Unsaved) {
+                Engine.CreateWindow(new WindowUnsavedChanges(Open));
+                return;
+            } else if (NfdResult.OKAY == NFD.OpenDialog("bin", Settings.CelesteDirectory, out string mapPath)) {
                 MapEditor editor = new MapEditor();
                 editor.LoadLevel(mapPath);
                 Engine.SetScene(editor);
@@ -74,15 +82,15 @@ namespace Starforge.Editor.UI {
 
         public static bool Save() {
             if (Engine.MapLoaded && MapEditor.Instance.Unsaved) {
-                if (string.IsNullOrEmpty(MapEditor.Instance.Path)) {
+                if (string.IsNullOrEmpty(MapEditor.Instance.MapPath)) {
                     if (NfdResult.OKAY == NFD.SaveDialog("bin", Settings.CelesteDirectory, out string mapPath)) {
-                        MapEditor.Instance.Path = mapPath;
+                        MapEditor.Instance.MapPath = mapPath;
                     }
                 }
 
-                if (string.IsNullOrEmpty(MapEditor.Instance.Path)) return false;
+                if (string.IsNullOrEmpty(MapEditor.Instance.MapPath)) return false;
 
-                using (FileStream stream = File.OpenWrite(MapEditor.Instance.Path)) {
+                using (FileStream stream = File.OpenWrite(MapEditor.Instance.MapPath)) {
                     using (BinaryWriter writer = new BinaryWriter(stream)) {
                         MapPacker.WriteMapBinary(writer, MapEditor.Instance.Level.Encode());
                         return true;

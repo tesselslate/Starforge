@@ -61,6 +61,11 @@ namespace Starforge.Core {
         public static Color TriggerColor = new Color(224, 108, 49);
 
         /// <summary>
+        /// Whether or not the editor should enable VSync.
+        /// </summary>
+        public static bool VerticalSync = true;
+
+        /// <summary>
         /// Attempts to load the configuration file from the given path.
         /// </summary>
         /// <param name="path">The path to load the configuration file from.</param>

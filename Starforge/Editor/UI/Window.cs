@@ -3,5 +3,7 @@
         public bool Visible = true;
 
         public abstract void Render();
+
+        public virtual void End() { }
     }
 }

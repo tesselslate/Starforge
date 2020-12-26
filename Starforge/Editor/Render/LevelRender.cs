@@ -18,7 +18,7 @@ namespace Starforge.Editor.Render {
         /// <summary>
         /// The list of RenderTargets for each room in the map.
         /// </summary>
-        private Dictionary<string, DrawableRoom> Rooms;
+        public List<DrawableRoom> Rooms;
 
         /// <summary>
         /// The list of rooms which are visible onscreen.
@@ -43,21 +43,21 @@ namespace Starforge.Editor.Render {
         public LevelRender(MapEditor editor, Level level, bool prerenderAll = false) {
             // Create room render targets
             TargetUsage = Settings.AlwaysRerender ? RenderTargetUsage.DiscardContents : RenderTargetUsage.PreserveContents;
-            Rooms = new Dictionary<string, DrawableRoom>();
+            Rooms = new List<DrawableRoom>();
             Editor = editor;
             Level = level;
 
             foreach (Room room in Level.Rooms) {
-                Rooms.Add(room.Name, new DrawableRoom(room, TargetUsage));
+                Rooms.Add(new DrawableRoom(room, TargetUsage));
             }
 
             if (prerenderAll) {
-                foreach (DrawableRoom room in Rooms.Values) RenderRoom(room);
+                foreach (DrawableRoom room in Rooms) RenderRoom(room);
             }
 
             Editor.Camera.OnPositionChange += () => {
                 VisibleRooms = new List<DrawableRoom>();
-                foreach (DrawableRoom room in Rooms.Values) {
+                foreach (DrawableRoom room in Rooms) {
                     if (Editor.Camera.VisibleArea.Intersects(room.Room.Meta.Bounds)) {
                         VisibleRooms.Add(room);
                     }
@@ -69,7 +69,7 @@ namespace Starforge.Editor.Render {
         /// Disposes of the LevelRender.
         /// </summary>
         public void Dispose() {
-            foreach(DrawableRoom room in Rooms.Values) {
+            foreach(DrawableRoom room in Rooms) {
                 room.Target.Dispose();
             }
         }

@@ -66,5 +66,13 @@ namespace Starforge.Util {
             res.B = (byte)hex;
             return res;
         }
+
+        public static System.Numerics.Vector3 ColorToVect3(Color c) {
+            return new System.Numerics.Vector3((float)c.R / 255, (float)c.G / 255, (float)c.B / 255);
+        }
+
+        public static Color Vect3ToColor(System.Numerics.Vector3 v) {
+            return new Color(v.X, v.Y, v.Z);
+        }
     }
 }
