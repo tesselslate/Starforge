@@ -89,40 +89,6 @@ namespace Starforge.Map {
             return list.ToArray();
         }
 
-        /// <summary>
-        /// Parses an attribute value.
-        /// </summary>
-        /// <param name="value">The string value to parse.</param>
-        /// <param name="type">Outputs the type of the value.</param>
-        /// <param name="result">The parsed result.</param>
-        public static void ParseValue(string value, out ValueType type, out object result) {
-            // This method may seem like it is useless, and that it could just return the type.
-            // However, doing it this way lets us "compress" certain types down:
-            // e.g. int -> short if (value < short.MaxValue)
-            // or   int -> byte  if (value < byte.MaxValue)
-            // This can result in fairly sizable space savings, at the cost of some performance while encoding the map.
-
-            if (bool.TryParse(value, out bool oBool)) {
-                type = ValueType.Boolean;
-                result = oBool;
-            } else if (byte.TryParse(value, out byte oByte)) {
-                type = ValueType.Byte;
-                result = oByte;
-            } else if (short.TryParse(value, out short oShort)) {
-                type = ValueType.Short;
-                result = oShort;
-            } else if (int.TryParse(value, out int oInt)) {
-                type = ValueType.Int;
-                result = oInt;
-            } else if (float.TryParse(value, out float oFloat)) {
-                type = ValueType.Float;
-                result = oFloat;
-            } else {
-                type = ValueType.Lookup;
-                result = value;
-            }
-        }
-
         public static MapElement ReadMapBinary(BinaryReader reader) {
             if (reader.ReadString() != "CELESTE MAP") {
                 throw new InvalidDataException("Invalid map header.");
@@ -244,8 +210,8 @@ namespace Starforge.Map {
 
                         // RLE strings are preceded by a short containing their length.
                         // If this exceeds the max value of a short, the map will corrupt.
-                        // Writing a normal string instead will result in a huge increase in size (likely),
-                        // but will prevent the map data from getting corrupted.
+                        // Writing a normal string instead will result in a size increase,
+                        // but will (hopefully) prevent the map data from getting corrupted.
                         if (array.Length > short.MaxValue) {
                             writer.Write((byte)ValueType.String);
                             writer.Write(el.GetString("innerText"));
@@ -259,31 +225,26 @@ namespace Starforge.Map {
                         writer.Write(el.GetString("innerText"));
                     }
                 } else {
-                    ValueType type;
-                    object res;
-                    ParseValue(pair.Value.ToString(), out type, out res);
-
-                    writer.Write((byte)type);
-
-                    switch (type) {
-                    case ValueType.Boolean:
-                        writer.Write((bool)res);
-                        break;
-                    case ValueType.Byte:
-                        writer.Write((byte)res);
-                        break;
-                    case ValueType.Short:
-                        writer.Write((short)res);
-                        break;
-                    case ValueType.Int:
-                        writer.Write((int)res);
-                        break;
-                    case ValueType.Float:
-                        writer.Write((float)res);
-                        break;
-                    case ValueType.Lookup:
-                        writer.Write(LookupKeys[(string)res]);
-                        break;
+                    if(pair.Value is bool) {
+                        writer.Write((byte)ValueType.Boolean);
+                        writer.Write((bool)pair.Value);
+                    } else if(pair.Value is int) {
+                        if((int)pair.Value < byte.MaxValue) {
+                            writer.Write((byte)ValueType.Byte);
+                            writer.Write((byte)pair.Value);
+                        } else if((int)pair.Value < short.MaxValue) {
+                            writer.Write((byte)ValueType.Short);
+                            writer.Write((short)pair.Value);
+                        } else {
+                            writer.Write((byte)ValueType.Int);
+                            writer.Write((int)pair.Value);
+                        }
+                    } else if(pair.Value is float) {
+                        writer.Write((byte)ValueType.Float);
+                        writer.Write((float)pair.Value);
+                    } else if(pair.Value is string) {
+                        writer.Write((byte)ValueType.Lookup);
+                        writer.Write(LookupKeys[pair.Value.ToString()]);
                     }
                 }
             }

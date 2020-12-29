@@ -1,7 +1,5 @@
 ﻿using ImGuiNET;
-using Microsoft.Xna.Framework;
 using Starforge.Core;
-using Starforge.Util;
 using System;
 
 namespace Starforge.Editor.UI {
@@ -10,8 +8,9 @@ namespace Starforge.Editor.UI {
         private int VisibleRoomCount = 0;
         public string[] RoomNames;
 
-        public void UpdateListHeight() {
-            VisibleRoomCount = (int)((Engine.Instance.GraphicsDevice.Viewport.Height - ImGui.GetTextLineHeightWithSpacing() * 10) / ImGui.GetTextLineHeightWithSpacing());
+        public void UpdateListHeight(int height = 0) {
+            if (height == 0) height = Engine.Instance.GraphicsDevice.Viewport.Height;
+            VisibleRoomCount = (int)((height - ImGui.GetTextLineHeightWithSpacing() * 10) / ImGui.GetTextLineHeightWithSpacing());
         }
 
         public override void Render() {
@@ -34,8 +33,8 @@ namespace Starforge.Editor.UI {
             ImGui.SetNextItemWidth(235f);
             ImGui.ListBoxHeader("", RoomNames.Length, VisibleRoomCount);
             for (int i = 0; i < RoomNames.Length; i++) {
-                if (ImGui.Selectable(RoomNames[i], RoomNames[i] == MapEditor.Instance.SelectedRoom.Name)) {
-                    MapEditor.Instance.SelectRoom(i);
+                if (ImGui.Selectable(RoomNames[i], RoomNames[i] == MapEditor.Instance.State.SelectedRoom.Name)) {
+                    MapEditor.Instance.SelectRoom(i, true);
                 }
             }
             ImGui.ListBoxFooter();
@@ -43,8 +42,10 @@ namespace Starforge.Editor.UI {
             ImGui.Text($"Rooms: {RoomNames.Length}");
 
             if (Settings.DebugMode) {
-                ImGui.SetCursorPosY(Engine.Instance.GraphicsDevice.Viewport.Height - ImGui.GetTextLineHeightWithSpacing() * 3 - Menubar.MenubarHeight - 10);
+                ImGui.SetCursorPosY(Engine.Instance.GraphicsDevice.Viewport.Height - ImGui.GetTextLineHeightWithSpacing() * 5 - Menubar.MenubarHeight - 10);
                 ImGui.Text($"{Math.Round(1000f / ImGui.GetIO().Framerate, 2)} ms/frame ({Math.Round(ImGui.GetIO().Framerate)} FPS)");
+                ImGui.NewLine();
+                ImGui.Text($"Pointer: {MapEditor.Instance.State.TilePointer}");
                 ImGui.Text($"Cursor: {MapEditor.Instance.Camera.ScreenToReal(Input.Mouse.GetVectorPos())}");
                 ImGui.Text($"Camera: {MapEditor.Instance.Camera.Position}");
             }

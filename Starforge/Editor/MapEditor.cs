@@ -1,7 +1,9 @@
 ﻿using ImGuiNET;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
+using Starforge.Editor.Actions;
 using Starforge.Editor.Render;
 using Starforge.Editor.UI;
 using Starforge.Map;
@@ -14,56 +16,35 @@ namespace Starforge.Editor {
         public Autotiler BGAutotiler { get; private set; }
         public Autotiler FGAutotiler { get; private set; }
         public Camera Camera { get; private set; }
-        public Level Level { get; private set; }
-
-        /// <summary>
-        /// The currently selected room.
-        /// </summary>
-        public Room SelectedRoom { get; private set; }
-
-        /// <summary>
-        /// The path of the map on the disk.
-        /// </summary>
-        public string MapPath;
-
+        public EditorState State { get; private set; }
         public static MapEditor Instance { get; private set; }
 
-        /// <summary>
-        /// Whether or not there are actions which can be undone.
-        /// </summary>
-        public bool CanUndo { get; private set; } = false;
+        // Level rendering
+        public LevelRender Renderer { get; private set; }
+        public RenderFlags Rerender = RenderFlags.None;
 
-        /// <summary>
-        /// Whether or not there are actions which can be redone.
-        /// </summary>
-        public bool CanRedo { get; private set; } = false;
-
-        /// <summary>
-        /// Whether or not the level has unsaved changes.
-        /// </summary>
-        public bool Unsaved { get; private set; } = false;
-
-        /// <summary>
-        /// The renderer responsible for drawing the level onscreen.
-        /// </summary>
-        private LevelRender Renderer;
+        // Windows and UI elements
         private WindowRoomList RoomListWindow;
+        private WindowToolList ToolListWindow;
         private ShortcutManager Shortcuts;
 
         #region Scene
 
         public override void Begin() {
             Instance = this;
+            Engine.MapLoaded = true;
             Logger.Log("Beginning map editor.");
 
             // Initialize room list window
             RoomListWindow = new WindowRoomList();
+            ToolListWindow = new WindowToolList(BGAutotiler, FGAutotiler);
 
             List<string> roomNames = new List<string>();
-            foreach (Room room in Level.Rooms) roomNames.Add(room.Name);
+            foreach (Room room in State.LoadedLevel.Rooms) roomNames.Add(room.Name);
             RoomListWindow.RoomNames = roomNames.ToArray();
 
             Engine.CreateWindow(RoomListWindow);
+            Engine.CreateWindow(ToolListWindow);
 
             // TODO: Initialize tool window
 
@@ -73,12 +54,10 @@ namespace Starforge.Editor {
             Shortcuts.RegisterShortcut(new Shortcut(Menubar.Open, Keys.LeftControl, Keys.O));
             Shortcuts.RegisterShortcut(new Shortcut(new Action(() => { Menubar.Save(); }), Keys.LeftControl, Keys.S));
             Shortcuts.RegisterShortcut(new Shortcut(Menubar.SaveAs, Keys.LeftControl, Keys.LeftShift, Keys.S));
-            Shortcuts.RegisterShortcut(new Shortcut(Undo, Keys.LeftControl, Keys.Z));
-            Shortcuts.RegisterShortcut(new Shortcut(Redo, Keys.LeftControl, Keys.LeftShift, Keys.Z));
         }
 
         public override bool End() {
-            if (Unsaved) {
+            if (State.Unsaved) {
                 return false;
             }
 
@@ -88,26 +67,53 @@ namespace Starforge.Editor {
 
             // Remove windows
             RoomListWindow.Visible = false;
+            ToolListWindow.Visible = false;
 
             return true;
         }
 
         public override void Render(GameTime gt) {
             RoomListWindow.UpdateListHeight();
+            ToolListWindow.UpdateListHeight();
+
+            if (State.SelectedRoom != null) {
+                Engine.Instance.GraphicsDevice.SetRenderTarget(Renderer.Overlay);
+                Engine.Batch.Begin(
+                    SpriteSortMode.Deferred,
+                    BlendState.AlphaBlend,
+                    SamplerState.PointClamp,
+                    DepthStencilState.None,
+                    RasterizerState.CullNone,
+                    null
+                );
+                ToolManager.Render();
+                Engine.Batch.End();
+
+                Renderer.RenderSelectedRoom(Rerender);
+            }
+
             Renderer.Render();
+            Rerender = RenderFlags.None;
         }
 
         public override void Update(GameTime gt) {
-            // If ImGui wants user input or the window isn't focused, dont respond.
+            UpdateState();
+
+            // Ignore user input in certain cases
             ImGuiIOPtr io = ImGui.GetIO();
             if (io.WantCaptureMouse || io.WantCaptureKeyboard || !Engine.Instance.IsActive) return;
+            if (Shortcuts.Update()) return;
 
+            //////////////////////
             // Handle user inputs
+            //////////////////////
+
+            // Right click drag - move camera
             if (Input.Mouse.RightHold && Input.Mouse.Moved) {
-                // Dragging right click - move camera
                 Camera.Move(Input.Mouse.Movement / Camera.Zoom);
             }
 
+            // Scrolled - zoom camera
             if (Input.Mouse.Scrolled) {
                 if (Input.Mouse.ScrollAmount > 0) {
                     // User scrolled up
@@ -116,6 +122,32 @@ namespace Starforge.Editor {
                     // User scrolled down
                     Camera.ZoomOut(Input.Mouse.GetVectorPos());
                 }
+            }
+
+            // Left click - select room or edit room
+            if (Input.Mouse.LeftClick) {
+                Vector2 rm = Camera.ScreenToReal(Input.Mouse.GetVectorPos());
+                Point realPoint = new Point((int)rm.X, (int)rm.Y);
+
+                // Check to see if selected room should change
+                if (!State.SelectedRoom.Meta.Bounds.Contains(realPoint)) {
+                    foreach (DrawableRoom room in Renderer.VisibleRooms) {
+                        if (room.Room.Meta.Bounds.Contains(realPoint)) {
+                            SelectRoom(room);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            if (State.SelectedRoom != null) ToolManager.Update();
+        }
+
+        public void UpdateState() {
+            if (State == null) return;
+            if (State.SelectedRoom != null) {
+                Vector2 rm = Camera.ScreenToReal(Input.Mouse.GetVectorPos());
+                State.TilePointer = new Point((int)Math.Floor((rm.X - State.SelectedRoom.X) / 8), (int)Math.Floor((rm.Y - State.SelectedRoom.Y) / 8));
             }
         }
 
@@ -130,20 +162,26 @@ namespace Starforge.Editor {
 
             using (FileStream stream = File.OpenRead(mapPath)) {
                 using (BinaryReader reader = new BinaryReader(stream)) {
-                    LoadLevel(Level.Decode(MapPacker.ReadMapBinary(reader)));
+                    LoadLevel(Level.Decode(MapPacker.ReadMapBinary(reader)), mapPath);
                 }
             }
         }
 
-        public void LoadLevel(Level level) {
-            if (Level != null) {
-                Logger.Log(LogLevel.Warning, $"MapEditor: Attempted to load {level.Package} while {Level.Package} was already loaded.");
+        public void LoadLevel(Level level, string path) {
+            if (State != null && State.LoadedLevel != null) {
+                Logger.Log(LogLevel.Warning, $"MapEditor: Attempted to load {level.Package} while {State.LoadedLevel.Package} was already loaded.");
                 return;
             }
 
-            Level = level;
+            State = new EditorState();
+            State.PastActions = new Stack<EditorAction>();
+            State.FutureActions = new Stack<EditorAction>();
 
-            Logger.Log($"MapEditor: Loading level {Level.Package}");
+            Engine.MapLoaded = true;
+            State.LoadedLevel = level;
+            State.LoadedPath = path;
+
+            Logger.Log($"MapEditor: Loading level {level.Package}");
 
             // Initialize autotiler
             BGAutotiler = new Autotiler($"{Settings.CelesteDirectory}/Content/Graphics/BackgroundTiles.xml");
@@ -151,35 +189,38 @@ namespace Starforge.Editor {
 
             // Initialize camera and level renderer
             Camera = new Camera();
-            Renderer = new LevelRender(this, Level, true);
+            Renderer = new LevelRender(this, State.LoadedLevel, true);
             Camera.Update();
 
-            if (Level.Rooms.Count > 0) {
-                SelectRoom(0);
+            if (State.LoadedLevel.Rooms.Count > 0) {
+                SelectRoom(0, true);
             }
         }
 
-        /// <summary>
-        /// Undoes the previous action.
-        /// </summary>
-        public void Undo() {
-
+        public void RerenderAll(RenderFlags toRender) {
+            foreach (DrawableRoom room in Renderer.Rooms) Renderer.RenderRoom(room, toRender);
         }
 
         /// <summary>
-        /// Redoes the previously undone action.
+        /// Selects the given room.
         /// </summary>
-        public void Redo() {
-
-        }
-
-        public void SelectRoom(int index) {
+        /// <param name="index">The index of the room to select.</param>
+        /// <param name="moveCamera"></param>
+        public void SelectRoom(int index, bool moveCamera = false) {
             // Rerender previously selected room
-            if (SelectedRoom != null) Renderer.RenderRoom(Renderer.Rooms[index]);
-            SelectedRoom = Level.Rooms[index];
+            if (State.SelectedRoom != null) Renderer.RenderRoom(Renderer.Rooms[index], Menubar.RerenderFlags);
+            State.SelectedRoom = State.LoadedLevel.Rooms[index];
 
+            Renderer.SetSelected(State.LoadedLevel.Rooms[index]);
+            Renderer.RenderSelectedRoom(RenderFlags.All);
+
+            if (!moveCamera) return;
             Camera.Zoom = 1f;
-            Camera.GotoCentered(new Vector2(-SelectedRoom.Meta.Bounds.Center.X, -SelectedRoom.Meta.Bounds.Center.Y));
+            Camera.GotoCentered(new Vector2(-State.SelectedRoom.Meta.Bounds.Center.X, -State.SelectedRoom.Meta.Bounds.Center.Y));
+        }
+
+        public void SelectRoom(DrawableRoom room, bool moveCamera = false) {
+            SelectRoom(Renderer.Rooms.IndexOf(room), moveCamera);
         }
     }
 }

@@ -33,7 +33,7 @@ namespace Starforge.Editor.UI {
         public override void End() {
             if (!Clicked) return;
             MapEditor editor = new MapEditor();
-            editor.LoadLevel(new Level(MapName));
+            editor.LoadLevel(new Level(MapName), null);
             Engine.SetScene(editor);
         }
     }

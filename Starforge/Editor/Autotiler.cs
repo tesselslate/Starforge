@@ -47,6 +47,7 @@ namespace Starforge.Editor {
 
                 char c = el.AttrChar("id");
                 Tileset t = new Tileset(GFX.Gameplay["tilesets/" + el.Attr("path")], 8, 8);
+                t.Path = el.Attr("path");
                 t.ID = c;
 
                 t.Ignores = new HashSet<char>();
@@ -92,14 +93,15 @@ namespace Starforge.Editor {
 
                     int pos = 0;
                     for (int i = 0; i < orig.Length; i++) {
-                        switch(orig[i]) {
+                        switch (orig[i]) {
                         case '0':
                             mask[pos++] = 0;
                             break;
                         case '1':
                             mask[pos++] = 1;
                             break;
-                        case 'x': case 'X':
+                        case 'x':
+                        case 'X':
                             mask[pos++] = 2;
                             break;
                         }
@@ -139,8 +141,8 @@ namespace Starforge.Editor {
             return map;
         }
 
-        public StaticTexture GenerateTileTexture(TileGrid grid, int i, int j, bool edgesExtend = true, int yInc = 0) {
-            if (grid[i, j] == '0') {
+        private StaticTexture GenerateTileTexture(TileGrid grid, int x, int y, bool edgesExtend = true, int yInc = 0) {
+            if (grid[x, y] == '0') {
                 return new StaticTexture() { Visible = false };
             }
 
@@ -150,11 +152,11 @@ namespace Starforge.Editor {
             byte[] adjacent = new byte[9];
             bool center = true;
 
-            Tileset t = Tilesets[(char)grid[i, j]];
+            Tileset t = Tilesets[(char)grid[x, y]];
 
-            for (int y = -1; y < 2; y++) {
-                for (int x = -1; x < 2; x++) {
-                    bool res = CheckTile(grid, t, i + x, j + y, edgesExtend);
+            for (int ty = -1; ty < 2; ty++) {
+                for (int tx = -1; tx < 2; tx++) {
+                    bool res = CheckTile(grid, t, x + tx, y + ty, edgesExtend);
                     if (res) {
                         adjacent[num++] = 1;
                     } else {
@@ -165,13 +167,13 @@ namespace Starforge.Editor {
             }
 
             if (center) {
-                if (!CheckTile(grid, t, i - 2, j, edgesExtend)
-                    || !CheckTile(grid, t, i + 2, j, edgesExtend)
-                    || !CheckTile(grid, t, i, j - 2, edgesExtend)
-                    || !CheckTile(grid, t, i, j + 2, edgesExtend)) {
-                    tex.Texture = t.Padding[TileRand[i + yInc] % t.Padding.Count];
+                if (!CheckTile(grid, t, x - 2, y, edgesExtend)
+                    || !CheckTile(grid, t, x + 2, y, edgesExtend)
+                    || !CheckTile(grid, t, x, y - 2, edgesExtend)
+                    || !CheckTile(grid, t, x, y + 2, edgesExtend)) {
+                    tex.Texture = t.Padding[TileRand[x + yInc] % t.Padding.Count];
                 } else {
-                    tex.Texture = t.Center[TileRand[i + yInc] % t.Center.Count];
+                    tex.Texture = t.Center[TileRand[x + yInc] % t.Center.Count];
                 }
             } else {
                 tex.Texture = GFX.Empty; // Set to arbitrary texture incase there isn't a valid mask.
@@ -186,16 +188,53 @@ namespace Starforge.Editor {
                     }
 
                     if (found) {
-                        tex.Texture = m.Textures[TileRand[i + yInc] % m.Textures.Count];
+                        tex.Texture = m.Textures[TileRand[x + yInc] % m.Textures.Count];
                         tex.Visible = true;
                         break;
                     }
                 }
             }
 
-            tex.Position = new Vector2(i * 8, j * 8);
+            tex.Position = new Vector2(x * 8, y * 8);
 
             return tex;
+        }
+
+        /// <returns>A list of all the registered tilesets.</returns>
+        public List<Tileset> GetTilesetList() {
+            return new List<Tileset>(Tilesets.Values);
+        }
+
+        /// <summary>
+        /// Updates the given tile in the given room.
+        /// </summary>
+        /// <param name="room">The room to update the tile in.</param>
+        /// <param name="fg">Whether the foreground or background layer should be updated.</param>
+        /// <param name="point">The tile location to update.</param>
+        public void Update(DrawableRoom room, bool fg, Point point) {
+            Update(room, fg, new Rectangle(point.X, point.Y, 1, 1));
+        }
+
+        /// <summary>
+        /// Updates the given area of tiles in the given room.
+        /// </summary>
+        /// <param name="room">The room to update the tiles in.</param>
+        /// <param name="fg">Whether the foreground or background layer should be updated.</param>
+        /// <param name="r">The rectangular area within which tiles should be updated.</param>
+        public void Update(DrawableRoom room, bool fg, Rectangle r) {
+            TileGrid grid = fg ? room.Room.ForegroundTiles : room.Room.BackgroundTiles;
+            TextureMap map = fg ? room.FGTiles : room.BGTiles;
+
+            Rectangle rect = new Rectangle(r.X - 2, r.Y - 2, r.Width + 4, r.Height + 4);
+
+            for (int y = 0; y < rect.Height; y++) {
+                int yInc = (y + rect.Y) * grid.Width;
+                for (int x = 0; x < rect.Width; x++) {
+                    if (x + rect.X < 0 || x + rect.X > grid.Width - 1 || y + rect.Y < 0 || y + rect.Y > grid.Height - 1) continue;
+
+                    map.Textures[x + yInc] = GenerateTileTexture(grid, x, y, true, yInc);
+                }
+            }
         }
     }
 }

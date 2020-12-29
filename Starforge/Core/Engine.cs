@@ -1,12 +1,9 @@
-﻿using ImGuiNET;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDL2;
 using Starforge.Core.Boot;
 using Starforge.Core.Interop;
-using Starforge.Editor;
 using Starforge.Editor.UI;
-using Starforge.Map;
 using Starforge.Mod.Content;
 using Starforge.Platform;
 using System;
@@ -169,6 +166,7 @@ namespace Starforge.Core {
         protected override void Draw(GameTime gt) {
             base.Draw(gt);
             GUIRenderer.BeforeLayout(gt);
+
             Scene.Render(gt);
 
             List<Window> toRemove = new List<Window>();
@@ -226,6 +224,9 @@ namespace Starforge.Core {
         public static bool SetScene(Scene scene) {
             if (Scene != null) {
                 if (Scene.End()) {
+                    // Reset input state
+                    Input.Reset();
+
                     Scene = scene;
                     Scene.Begin();
                     return true;

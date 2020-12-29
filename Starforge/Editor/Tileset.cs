@@ -37,6 +37,7 @@ namespace Starforge.Editor {
         private int TileHeight;
         private int Height;
 
+        public string Path;
         public char ID;
         public HashSet<char> Ignores;
         public List<DrawableTexture> Center;

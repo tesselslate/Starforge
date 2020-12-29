@@ -1,8 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
+using Starforge.Map;
 using System;
 using System.Collections.Generic;
 
 namespace Starforge.Util {
+    /// <summary>
+    /// Contains various miscellaneous functions.
+    /// </summary>
     public static class MiscHelper {
         public static float Angle(Vector2 from, Vector2 to) {
             return (float)Math.Atan2(to.Y - from.Y, to.X - from.X);
@@ -28,6 +32,10 @@ namespace Starforge.Util {
             words.Add(char.ToUpper(word[0]) + word.Substring(1));
 
             return string.Join(" ", words.ToArray());
+        }
+
+        public static Room CloneRoom(Room room) {
+            return Room.Decode(room.Encode(), room.Parent);
         }
 
         public static string ColorToHex(Color c) {

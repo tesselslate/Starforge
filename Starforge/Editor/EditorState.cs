@@ -1,0 +1,88 @@
+﻿using Microsoft.Xna.Framework;
+using Starforge.Editor.Actions;
+using Starforge.Map;
+using System.Collections.Generic;
+using System.IO;
+
+namespace Starforge.Editor {
+    /// <summary>
+    /// Contains information about the current state of the editor.
+    /// </summary>
+    public class EditorState {
+        /// <summary>
+        /// The currently loaded level.
+        /// </summary>
+        public Level LoadedLevel;
+
+        /// <summary>
+        /// The path, on disk, of the currently loaded level.
+        /// </summary>
+        public string LoadedPath;
+
+        /// <summary>
+        /// Whether or not the level has unsaved changes.
+        /// </summary>
+        public bool Unsaved;
+
+        /// <summary>
+        /// The currently selected room.
+        /// </summary>
+        public Room SelectedRoom;
+        
+        /// <summary>
+        /// The position of the cursor, in tiles, in the selected room.
+        /// </summary>
+        public Point TilePointer;
+
+        /// <summary>
+        /// A list of previously applied actions which can be undone.
+        /// </summary>
+        public Stack<EditorAction> PastActions;
+
+        /// <summary>
+        /// A list of previously undone actions which can be reapplied.
+        /// </summary>
+        public Stack<EditorAction> FutureActions;
+
+        /// <returns>Whether or not there are changes that can be redone.</returns>
+        public bool CanRedo() => true;
+
+        /// <returns>Whether or not there are changes that can be undone.</returns>
+        public bool CanUndo() => true;
+
+        /// <summary>
+        /// Applies a new action to the level.
+        /// </summary>
+        /// <param name="action">The action to apply.</param>
+        public void Apply(EditorAction action) {
+            PastActions.Push(action);
+            action.Apply();
+        }
+
+        /// <summary>
+        /// Undoes the last action, if one is available.
+        /// </summary>
+        public void Undo() {
+
+        }
+
+        /// <summary>
+        /// Applies the previously undone action, if one is available.
+        /// </summary>
+        public void Redo() {
+
+        }
+
+        /// <summary>
+        /// Saves the currently loaded map.
+        /// </summary>
+        public void Save() {
+            using (FileStream stream = File.OpenWrite(LoadedPath)) {
+                using (BinaryWriter writer = new BinaryWriter(stream)) {
+                    MapPacker.WriteMapBinary(writer, LoadedLevel.Encode());
+                    Unsaved = false;
+                }
+            }
+        }
+    }
+}

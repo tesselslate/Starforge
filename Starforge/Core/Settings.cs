@@ -56,6 +56,11 @@ namespace Starforge.Core {
         public static Color SelectedRoomColor = new Color(60, 60, 60);
 
         /// <summary>
+        /// The color of the tool hint.
+        /// </summary>
+        public static Color ToolColor = new Color(237, 210, 31);
+
+        /// <summary>
         /// The color of triggers on the map.
         /// </summary>
         public static Color TriggerColor = new Color(224, 108, 49);
