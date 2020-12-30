@@ -6,7 +6,7 @@ using Starforge.Mod.Content;
 namespace Starforge.Vanilla.Entities {
     [EntityDefinition("player")]
     public class Player : Entity {
-        private DrawableTexture Texture;
+        private static DrawableTexture Texture;
 
         public Player(EntityData data, Room room) : base(data, room) {
             Texture = GFX.Gameplay["characters/player/sitDown00"];
@@ -17,5 +17,10 @@ namespace Starforge.Vanilla.Entities {
             pos.Y -= 16f;
             Texture.DrawCentered(pos);
         }
+
+        public static PlacementList Placements = new PlacementList()
+        {
+            new Placement("Player (Spawn Point)")
+        };
     }
 }

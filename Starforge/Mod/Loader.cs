@@ -22,7 +22,7 @@ namespace Starforge.Mod {
                 foreach (Type type in asm.GetTypes()) {
                     if (type.IsSubclassOf(typeof(Entity))) {
                         if (type.GetCustomAttribute<EntityDefinitionAttribute>() != null || type.GetCustomAttribute<TriggerDefinitionAttribute>() != null) {
-                            Registry.Register(type);
+                            EntityRegistry.Register(type);
                         } else {
                             Logger.Log(LogLevel.Warning, $"Assembly {asm.GetName()} contains {type} without an appropriate definition attribute");
                         }

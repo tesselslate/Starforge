@@ -10,7 +10,7 @@ namespace Starforge.Mod.API {
         public readonly string Name;
         public readonly MapElement Element;
         public readonly List<Vector2> Nodes = new List<Vector2>();
-        public readonly Dictionary<string, object> Attributes;
+        public Dictionary<string, object> Attributes;
 
         public EntityData(MapElement el) {
             Element = el;

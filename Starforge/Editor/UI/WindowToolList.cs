@@ -1,14 +1,19 @@
 ﻿using ImGuiNET;
 using Starforge.Core;
 using Starforge.Editor.Tools;
+using Starforge.Mod;
+using Starforge.Mod.API;
 using Starforge.Util;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Starforge.Editor.UI {
     public class WindowToolList : Window {
         public List<string> BGTilesets;
         public List<string> FGTilesets;
+
+        public Dictionary<string, Placement> Placements;
 
         public List<string> Tools;
 
@@ -24,8 +29,13 @@ namespace Starforge.Editor.UI {
             FGTilesets.Add("Air");
             foreach (Tileset t in fg.GetTilesetList()) FGTilesets.Add(MiscHelper.CleanCamelCase(t.Path));
 
+            Placements = new Dictionary<string, Placement>(EntityRegistry.GetRegisteredPlacements());
+
             Tools = new List<string>();
             foreach (ToolType type in Enum.GetValues(typeof(ToolType))) Tools.Add(ToolManager.Tools[type].GetName());
+
+            ToolManager.SelectedEntity = EntityRegistry.GetRegisteredPlacements().Values.First();
+            ((EntityTool)ToolManager.Tools[ToolType.Entity]).UpdateHeldEntity();
         }
 
         public void UpdateListHeight() {
@@ -104,6 +114,15 @@ namespace Starforge.Editor.UI {
                 break;
             case ToolType.Entity:
                 ImGui.Text("Entities");
+                ImGui.SetNextItemWidth(235f);
+
+                ImGui.ListBoxHeader("EntitiesList", Placements.Count, VisibleItemsCount);
+                foreach(KeyValuePair<string, Placement> pair in Placements) {
+                    if (ImGui.Selectable(pair.Key, pair.Value == ToolManager.SelectedEntity)) {
+                        ToolManager.SelectedEntity = pair.Value;
+                        ((EntityTool)ToolManager.Tools[ToolType.Entity]).UpdateHeldEntity();
+                    }
+                }
 
                 break;
             }

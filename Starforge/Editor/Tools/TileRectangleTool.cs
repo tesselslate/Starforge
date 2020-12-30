@@ -7,7 +7,7 @@ using Starforge.Mod.Content;
 namespace Starforge.Editor.Tools {
     public class TileRectangleTool : Tool {
         private Rectangle Hint = new Rectangle(0, 0, 8, 8);
-        private Rectangle Hold;
+        private Rectangle Hold = new Rectangle(-1, -1, 0, 0);
         private Point Start;
 
         public override string GetName() => "Tiles (Rectangle)";

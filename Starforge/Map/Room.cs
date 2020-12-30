@@ -64,7 +64,7 @@ namespace Starforge.Map {
                     break;
                 case "entities":
                     foreach (MapElement entity in child.Children) {
-                        r.Entities.Add(Registry.CreateEntity(entity, r));
+                        r.Entities.Add(EntityRegistry.CreateEntity(entity, r));
                     }
 
                     break;

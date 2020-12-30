@@ -1,5 +1,5 @@
 ﻿using Starforge.Editor.Tools;
-using Starforge.Map;
+using Starforge.Mod.API;
 using System.Collections.Generic;
 
 namespace Starforge.Editor {
@@ -10,9 +10,9 @@ namespace Starforge.Editor {
         public static Dictionary<ToolType, Tool> Tools;
 
         /// <summary>
-        /// The currently selected entity.
+        /// The currently selected entity placement.
         /// </summary>
-        public static Entity SelectedEntity;
+        public static Placement SelectedEntity;
 
         /// <summary>
         /// The currently selected tool.

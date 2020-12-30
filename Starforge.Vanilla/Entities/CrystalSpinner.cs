@@ -31,5 +31,29 @@ namespace Starforge.Vanilla.Entities {
         public override void Render() {
             Texture.DrawCentered(Position);
         }
+
+        public static PlacementList Placements = new PlacementList()
+        {
+            new Placement("Crystal Spinner (Blue)")
+            {
+                ["color"] = "blue"
+            },
+            new Placement("Crystal Spinner (Purple)")
+            {
+                ["color"] = "purple"
+            },
+            new Placement("Crystal Spinner (Rainbow)")
+            {
+                ["color"] = "rainbow"
+            },
+            new Placement("Crystal Spinner (Red)")
+            {
+                ["color"] = "red"
+            },
+            new Placement("Dust Sprite")
+            {
+                ["dust"] = true
+            }
+        };
     }
 }
