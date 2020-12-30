@@ -4,7 +4,6 @@ using Starforge.Core;
 using System;
 
 namespace Starforge.Editor.UI {
-
     public class WindowRoomList : Window {
         private int VisibleRoomCount = 0;
         public string[] RoomNames;
@@ -31,10 +30,16 @@ namespace Starforge.Editor.UI {
             ImGui.PopStyleVar(3);
 
             ImGui.SetNextItemWidth(235f);
-            ImGui.ListBoxHeader("", RoomNames.Length, VisibleRoomCount);
+            ImGui.ListBoxHeader("     ", RoomNames.Length, VisibleRoomCount);
             for (int i = 0; i < RoomNames.Length; i++) {
-                if (ImGui.Selectable(RoomNames[i], RoomNames[i] == MapEditor.Instance.State.SelectedRoom.Name)) {
-                    MapEditor.Instance.SelectRoom(i, true);
+                if (ImGui.Selectable(RoomNames[i], RoomNames[i] == MapEditor.Instance.State.SelectedRoom.Name)) MapEditor.Instance.SelectRoom(i, true);
+                if (ImGui.BeginPopupContextItem(RoomNames[i], ImGuiPopupFlags.MouseButtonRight)) {
+                    ImGui.Text(RoomNames[i]);
+                    ImGui.Separator();
+                    if (ImGui.MenuItem("Configure Room")) { }
+                    if (ImGui.MenuItem("Delete Room")) { }
+
+                    ImGui.EndPopup();
                 }
             }
             ImGui.ListBoxFooter();
@@ -43,7 +48,7 @@ namespace Starforge.Editor.UI {
 
             if (Settings.DebugMode) {
                 string keys = "";
-                foreach(Keys key in Input.Keyboard.GetPressedKeys()) {
+                foreach (Keys key in Input.Keyboard.GetPressedKeys()) {
                     keys += key.ToString() + " ";
                 }
 

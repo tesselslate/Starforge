@@ -12,11 +12,9 @@ namespace Starforge.Editor.Actions {
         protected TileGrid Grid;
         protected TextureMap Textures;
 
-        protected DrawableRoom DrawableRoom;
         protected List<(Point, short)> PreviousTiles;
 
         public TileAction(Room r, ToolLayer l, int t) : base(r) {
-            DrawableRoom = MapEditor.Instance.Renderer.GetRoom(r);
             PreviousTiles = new List<(Point, short)>();
 
             Layer = l;

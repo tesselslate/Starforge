@@ -1,4 +1,5 @@
-﻿using Starforge.Map;
+﻿using Starforge.Editor.Render;
+using Starforge.Map;
 
 namespace Starforge.Editor.Actions {
     public abstract class EditorAction {
@@ -7,8 +8,14 @@ namespace Starforge.Editor.Actions {
         /// </summary>
         protected Room Room;
 
+        /// <summary>
+        /// The drawable room the action was applied to.
+        /// </summary>
+        protected DrawableRoom DrawableRoom;
+
         public EditorAction(Room room) {
             Room = room;
+            DrawableRoom = MapEditor.Instance.Renderer.GetRoom(room);
         }
 
         /// <summary>

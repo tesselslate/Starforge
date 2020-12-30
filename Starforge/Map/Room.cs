@@ -70,7 +70,7 @@ namespace Starforge.Map {
                     break;
                 case "triggers":
                     foreach (MapElement trigger in child.Children) {
-                        r.Triggers.Add(new Entity(new EntityData(trigger), r));
+                        r.Triggers.Add(new UnknownEntity(new EntityData(trigger), r));
                     }
 
                     break;

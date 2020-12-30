@@ -12,6 +12,7 @@
 
     public enum ToolType {
         TileBrush,
-        TileRectangle
+        TileRectangle,
+        Entity
     }
 }

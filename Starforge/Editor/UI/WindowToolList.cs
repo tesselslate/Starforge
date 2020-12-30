@@ -9,6 +9,7 @@ namespace Starforge.Editor.UI {
     public class WindowToolList : Window {
         public List<string> BGTilesets;
         public List<string> FGTilesets;
+
         public List<string> Tools;
 
         public ToolType SelectedTool;
@@ -55,7 +56,7 @@ namespace Starforge.Editor.UI {
             // Tool list
             ImGui.Text("Tool");
             ImGui.SetNextItemWidth(130f);
-            ImGui.ListBoxHeader(" ", Tools.Count, Tools.Count);
+            ImGui.ListBoxHeader("ToolsList", Tools.Count, Tools.Count);
             for (int i = 0; i < Tools.Count; i++) {
                 string tool = Tools[i];
                 if (ImGui.Selectable(tool, SelectedTool.ToString() == ((ToolType)i).ToString())) {
@@ -72,31 +73,39 @@ namespace Starforge.Editor.UI {
                 ImGui.NewLine();
                 ImGui.Text("Layer");
                 ImGui.SetNextItemWidth(130f);
-                ImGui.ListBoxHeader("  ", 2, 2);
+                ImGui.ListBoxHeader("LayersList", 2, 2);
                 if (ImGui.Selectable("Background", ToolManager.SelectedLayer == ToolLayer.Background)) ToolManager.SelectedLayer = ToolLayer.Background;
                 if (ImGui.Selectable("Foreground", ToolManager.SelectedLayer == ToolLayer.Foreground)) ToolManager.SelectedLayer = ToolLayer.Foreground;
                 ImGui.ListBoxFooter();
             }
 
             ImGui.NextColumn();
+
             // Tile/entity/etc list
-            if (SelectedTool == ToolType.TileBrush || SelectedTool == ToolType.TileRectangle) {
+            switch (SelectedTool) {
+            case ToolType.TileBrush: case ToolType.TileRectangle:
                 ImGui.Text("Tilesets");
                 ImGui.SetNextItemWidth(235f);
 
                 if (ToolManager.SelectedLayer == ToolLayer.Background) {
-                    ImGui.ListBoxHeader("    ", BGTilesets.Count, VisibleItemsCount);
+                    ImGui.ListBoxHeader("TilesetsList", BGTilesets.Count, VisibleItemsCount);
                     for (int i = 0; i < BGTilesets.Count; i++) {
                         if (ImGui.Selectable(BGTilesets[i], ToolManager.BGTileset == i)) ToolManager.BGTileset = i;
                     }
                     ImGui.ListBoxFooter();
                 } else {
-                    ImGui.ListBoxHeader("    ", FGTilesets.Count, VisibleItemsCount);
+                    ImGui.ListBoxHeader("TilesetsList", FGTilesets.Count, VisibleItemsCount);
                     for (int i = 0; i < FGTilesets.Count; i++) {
                         if (ImGui.Selectable(FGTilesets[i], ToolManager.FGTileset == i)) ToolManager.FGTileset = i;
                     }
                     ImGui.ListBoxFooter();
                 }
+
+                break;
+            case ToolType.Entity:
+                ImGui.Text("Entities");
+
+                break;
             }
 
             ImGui.NextColumn();

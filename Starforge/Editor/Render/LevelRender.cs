@@ -105,6 +105,7 @@ namespace Starforge.Editor.Render {
 
             Engine.Instance.GraphicsDevice.SetRenderTarget(null);
             Engine.Instance.GraphicsDevice.Clear(Settings.BackgroundColor);
+
             Engine.Batch.Begin(
                 SpriteSortMode.Deferred,
                 BlendState.AlphaBlend,
@@ -220,10 +221,10 @@ namespace Starforge.Editor.Render {
             }
 
             SelectedRoom = GetRoom(room);
-            RenderRoom(SelectedRoom);
-            if (old != null) RenderRoom(old);
+            SelectedRoom.Dirty = true;
+            if (old != null) old.Dirty = true;
 
-            Overlay = new RenderTarget2D(Engine.Instance.GraphicsDevice, room.Width, room.Height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents);
+            Overlay = new RenderTarget2D(Engine.Instance.GraphicsDevice, room.Width, room.Height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
         }
 
         /// <summary>

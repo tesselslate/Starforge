@@ -1,15 +1,19 @@
 ﻿using Microsoft.Xna.Framework;
 using Starforge.Mod.API;
+using System;
 using System.Collections.Generic;
 
 namespace Starforge.Map {
-    public class Entity : AttributeHolder, IPackable {
+    public abstract class Entity : AttributeHolder, IPackable {
         public int ID;
         public readonly string Name;
         public List<Vector2> Nodes;
         public Vector2 Position;
 
         public Room Parent;
+
+        public virtual bool StretchableX => false;
+        public virtual bool StretchableY => false;
 
         public Entity(EntityData data, Room room) {
             Attributes = new Dictionary<string, object>(data.Attributes);
@@ -42,6 +46,6 @@ namespace Starforge.Map {
             return el;
         }
 
-        public virtual void Render() { }
+        public abstract void Render();
     }
 }

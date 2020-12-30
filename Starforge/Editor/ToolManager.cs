@@ -1,4 +1,5 @@
 ﻿using Starforge.Editor.Tools;
+using Starforge.Map;
 using System.Collections.Generic;
 
 namespace Starforge.Editor {
@@ -7,6 +8,11 @@ namespace Starforge.Editor {
         /// A dictionary containing all available tools.
         /// </summary>
         public static Dictionary<ToolType, Tool> Tools;
+
+        /// <summary>
+        /// The currently selected entity.
+        /// </summary>
+        public static Entity SelectedEntity;
 
         /// <summary>
         /// The currently selected tool.
@@ -32,7 +38,8 @@ namespace Starforge.Editor {
             Tools = new Dictionary<ToolType, Tool>()
             {
                 [ToolType.TileBrush] = new TileBrushTool(),
-                [ToolType.TileRectangle] = new TileRectangleTool()
+                [ToolType.TileRectangle] = new TileRectangleTool(),
+                [ToolType.Entity] = new EntityTool()
             };
 
             SelectedTool = Tools[ToolType.TileBrush];

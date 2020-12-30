@@ -191,6 +191,8 @@ namespace Starforge.Core {
         protected override void Update(GameTime gt) {
             base.Update(gt);
 
+            if (!IsActive) SuppressDraw();
+
             Input.Update();
             Scene.Update(gt);
             Input.UpdatePrevious();

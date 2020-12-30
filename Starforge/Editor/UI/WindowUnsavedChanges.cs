@@ -28,6 +28,7 @@ namespace Starforge.Editor.UI {
                 ImGui.SameLine();
                 if (ImGui.Button("Don't Save", new System.Numerics.Vector2(80f, 25f))) {
                     Activate = true;
+                    MapEditor.Instance.State.Unsaved = false;
                     Visible = false;
                 }
 

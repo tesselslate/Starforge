@@ -28,6 +28,8 @@ namespace Starforge.Mod {
                         }
                     }
                 }
+
+                PluginAssemblies.Add(asm);
             } catch (Exception e) {
                 Logger.Log(LogLevel.Error, $"Failed to load plugin assembly {asm.GetName()}");
                 if (e is ReflectionTypeLoadException) {
