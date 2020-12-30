@@ -232,7 +232,7 @@ namespace Starforge.Editor {
                 for (int x = 0; x < rect.Width; x++) {
                     if (x + rect.X < 0 || x + rect.X > grid.Width - 1 || y + rect.Y < 0 || y + rect.Y > grid.Height - 1) continue;
 
-                    map.Textures[x + yInc] = GenerateTileTexture(grid, x, y, true, yInc);
+                    map.Textures[x + rect.X + yInc] = GenerateTileTexture(grid, x + rect.X, y + rect.Y, true, yInc);
                 }
             }
         }

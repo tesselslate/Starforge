@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Starforge.Util;
 using System.Collections.Generic;
 using System.IO;

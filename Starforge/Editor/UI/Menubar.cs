@@ -3,9 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
 using Starforge.Core.Interop;
 using Starforge.Editor.Render;
-using Starforge.Map;
 using System;
-using System.IO;
 
 namespace Starforge.Editor.UI {
     /// <summary>
@@ -33,7 +31,7 @@ namespace Starforge.Editor.UI {
             if (ImGui.BeginMenu("File")) {
                 if (ImGui.MenuItem("New")) New();
                 if (ImGui.MenuItem("Open", "CTRL+O")) Open();
-                if (ImGui.MenuItem("Save", "CTRL+S", false, Engine.MapLoaded)) Save();
+                if (ImGui.MenuItem("Save", "CTRL+S", false, Engine.MapLoaded && MapEditor.Instance.State.Unsaved)) Save();
                 if (ImGui.MenuItem("Save As", "", false, Engine.MapLoaded)) SaveAs();
 
                 ImGui.EndMenu();
@@ -63,6 +61,7 @@ namespace Starforge.Editor.UI {
                 if (Settings.DebugMode) {
                     ImGui.Separator();
                     if (ImGui.MenuItem("Force GC")) GC.Collect(2, GCCollectionMode.Forced, true, true);
+                    if (ImGui.MenuItem("Clear Render Cache")) ChangeView();
                 }
 
                 ImGui.EndMenu();
@@ -95,8 +94,6 @@ namespace Starforge.Editor.UI {
                 editor.LoadLevel(mapPath);
                 Engine.SetScene(editor);
             }
-
-            Input.Reset();
         }
 
         public static bool Save() {
@@ -107,7 +104,6 @@ namespace Starforge.Editor.UI {
                     }
                 }
 
-                Input.Reset();
                 if (string.IsNullOrEmpty(MapEditor.Instance.State.LoadedPath)) return false;
 
                 MapEditor.Instance.State.Save();

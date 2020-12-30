@@ -1,6 +1,4 @@
-﻿using Starforge.Mod.Content;
-
-namespace Starforge.Editor.Render {
+﻿namespace Starforge.Editor.Render {
     /// <summary>
     /// Contains a map of textures which can be rendered in quick succession or modified.
     /// </summary>

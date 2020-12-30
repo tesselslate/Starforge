@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
 using System;
 
@@ -8,9 +9,8 @@ namespace Starforge.Editor.UI {
         private int VisibleRoomCount = 0;
         public string[] RoomNames;
 
-        public void UpdateListHeight(int height = 0) {
-            if (height == 0) height = Engine.Instance.GraphicsDevice.Viewport.Height;
-            VisibleRoomCount = (int)((height - ImGui.GetTextLineHeightWithSpacing() * 10) / ImGui.GetTextLineHeightWithSpacing());
+        public void UpdateListHeight() {
+            VisibleRoomCount = (int)((Engine.Instance.GraphicsDevice.Viewport.Height - ImGui.GetTextLineHeightWithSpacing() * 10) / ImGui.GetTextLineHeightWithSpacing());
         }
 
         public override void Render() {
@@ -42,12 +42,17 @@ namespace Starforge.Editor.UI {
             ImGui.Text($"Rooms: {RoomNames.Length}");
 
             if (Settings.DebugMode) {
+                string keys = "";
+                foreach(Keys key in Input.Keyboard.GetPressedKeys()) {
+                    keys += key.ToString() + " ";
+                }
+
                 ImGui.SetCursorPosY(Engine.Instance.GraphicsDevice.Viewport.Height - ImGui.GetTextLineHeightWithSpacing() * 5 - Menubar.MenubarHeight - 10);
                 ImGui.Text($"{Math.Round(1000f / ImGui.GetIO().Framerate, 2)} ms/frame ({Math.Round(ImGui.GetIO().Framerate)} FPS)");
-                ImGui.NewLine();
                 ImGui.Text($"Pointer: {MapEditor.Instance.State.TilePointer}");
                 ImGui.Text($"Cursor: {MapEditor.Instance.Camera.ScreenToReal(Input.Mouse.GetVectorPos())}");
                 ImGui.Text($"Camera: {MapEditor.Instance.Camera.Position}");
+                ImGui.Text($"Keys: {keys}");
             }
         }
     }

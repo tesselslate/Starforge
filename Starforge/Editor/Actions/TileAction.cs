@@ -30,14 +30,6 @@ namespace Starforge.Editor.Actions {
 
         public abstract ToolType GetToolType();
 
-        protected void Redraw() {
-            if (Room == MapEditor.Instance.State.SelectedRoom) {
-                MapEditor.Instance.Rerender |= Layer == ToolLayer.Background ? RenderFlags.BGTiles : RenderFlags.FGTiles;
-            } else {
-                MapEditor.Instance.Renderer.RenderRoom(DrawableRoom);
-            }
-        }
-
         public override bool Undo() {
             bool changed = false;
 
@@ -45,7 +37,7 @@ namespace Starforge.Editor.Actions {
                 if (SetPoint(p, t)) changed = true;
             }
 
-            if (changed) Redraw();
+            if (changed) DrawableRoom.Dirty = true;
 
             return changed;
         }
@@ -58,7 +50,11 @@ namespace Starforge.Editor.Actions {
             bool res = Grid[p.X, p.Y] != t;
             Grid[p.X, p.Y] = t;
 
-            if (res) Tiler.Update(DrawableRoom, Layer == ToolLayer.Foreground, p);
+            if (res) {
+                Tiler.Update(DrawableRoom, Layer == ToolLayer.Foreground, p);
+                DrawableRoom.Dirty = true;
+            }
+
             return res;
         }
     }

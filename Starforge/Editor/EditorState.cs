@@ -45,39 +45,52 @@ namespace Starforge.Editor {
         public Stack<EditorAction> FutureActions;
 
         /// <returns>Whether or not there are changes that can be redone.</returns>
-        public bool CanRedo() => true;
+        public bool CanRedo() => FutureActions.Count > 0;
 
         /// <returns>Whether or not there are changes that can be undone.</returns>
-        public bool CanUndo() => true;
+        public bool CanUndo() => PastActions.Count > 0;
 
         /// <summary>
         /// Applies a new action to the level.
         /// </summary>
         /// <param name="action">The action to apply.</param>
         public void Apply(EditorAction action) {
-            PastActions.Push(action);
+            Unsaved = true;
+
             action.Apply();
+            PastActions.Push(action);
+            FutureActions.Clear();
         }
 
         /// <summary>
         /// Undoes the last action, if one is available.
         /// </summary>
         public void Undo() {
+            if (PastActions.Count > 0) {
+                EditorAction action = PastActions.Pop();
+                Unsaved = true;
 
+                FutureActions.Push(action);
+            }
         }
 
         /// <summary>
         /// Applies the previously undone action, if one is available.
         /// </summary>
         public void Redo() {
+            if (FutureActions.Count > 0) {
+                EditorAction action = FutureActions.Pop();
+                Unsaved = true;
 
+                PastActions.Push(action);
+            }
         }
 
         /// <summary>
         /// Saves the currently loaded map.
         /// </summary>
         public void Save() {
-            using (FileStream stream = File.OpenWrite(LoadedPath)) {
+            using (FileStream stream = new FileStream(LoadedPath, FileMode.Truncate)) {
                 using (BinaryWriter writer = new BinaryWriter(stream)) {
                     MapPacker.WriteMapBinary(writer, LoadedLevel.Encode());
                     Unsaved = false;

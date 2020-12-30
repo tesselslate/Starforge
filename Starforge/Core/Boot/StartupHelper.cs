@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Starforge.Editor;
+﻿using Starforge.Editor;
 using Starforge.Mod.Content;
 using System;
 using System.Collections.Generic;

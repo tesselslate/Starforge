@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Starforge.Editor.Tools {
+﻿namespace Starforge.Editor.Tools {
     public abstract class Tool {
         public abstract string GetName();
         public abstract void Update();
@@ -18,10 +12,6 @@ namespace Starforge.Editor.Tools {
 
     public enum ToolType {
         TileBrush,
-        TileRectangle,
-        ObjectTile,
-        Decal,
-        Entity,
-        Trigger
+        TileRectangle
     }
 }

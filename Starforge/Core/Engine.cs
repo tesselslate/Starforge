@@ -224,9 +224,6 @@ namespace Starforge.Core {
         public static bool SetScene(Scene scene) {
             if (Scene != null) {
                 if (Scene.End()) {
-                    // Reset input state
-                    Input.Reset();
-
                     Scene = scene;
                     Scene.Begin();
                     return true;

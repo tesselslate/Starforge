@@ -225,26 +225,25 @@ namespace Starforge.Map {
                         writer.Write(el.GetString("innerText"));
                     }
                 } else {
-                    if(pair.Value is bool) {
+                    string val = pair.Value.ToString();
+                    if(bool.TryParse(val, out bool o1)) {
                         writer.Write((byte)ValueType.Boolean);
-                        writer.Write((bool)pair.Value);
-                    } else if(pair.Value is int) {
-                        if((int)pair.Value < byte.MaxValue) {
-                            writer.Write((byte)ValueType.Byte);
-                            writer.Write((byte)pair.Value);
-                        } else if((int)pair.Value < short.MaxValue) {
-                            writer.Write((byte)ValueType.Short);
-                            writer.Write((short)pair.Value);
-                        } else {
-                            writer.Write((byte)ValueType.Int);
-                            writer.Write((int)pair.Value);
-                        }
-                    } else if(pair.Value is float) {
+                        writer.Write(o1);
+                    } else if(byte.TryParse(val, out byte o2)) {
+                        writer.Write((byte)ValueType.Byte);
+                        writer.Write(o2);
+                    } else if(short.TryParse(val, out short o3)) {
+                        writer.Write((byte)ValueType.Short);
+                        writer.Write(o3);
+                    } else if(int.TryParse(val, out int o4)) {
+                        writer.Write((byte)ValueType.Int);
+                        writer.Write(o4);
+                    } else if(float.TryParse(val, out float o5)) {
                         writer.Write((byte)ValueType.Float);
-                        writer.Write((float)pair.Value);
-                    } else if(pair.Value is string) {
+                        writer.Write(o5);
+                    } else {
                         writer.Write((byte)ValueType.Lookup);
-                        writer.Write(LookupKeys[pair.Value.ToString()]);
+                        writer.Write(LookupKeys[val]);
                     }
                 }
             }

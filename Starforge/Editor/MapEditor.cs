@@ -21,7 +21,6 @@ namespace Starforge.Editor {
 
         // Level rendering
         public LevelRender Renderer { get; private set; }
-        public RenderFlags Rerender = RenderFlags.None;
 
         // Windows and UI elements
         private WindowRoomList RoomListWindow;
@@ -46,7 +45,10 @@ namespace Starforge.Editor {
             Engine.CreateWindow(RoomListWindow);
             Engine.CreateWindow(ToolListWindow);
 
-            // TODO: Initialize tool window
+            Engine.Instance.GraphicsDevice.SetRenderTarget(null);
+            Engine.OnViewportUpdate += UpdateViewport;
+            RoomListWindow.UpdateListHeight();
+            ToolListWindow.UpdateListHeight();
 
             // Initialize shortcuts
             Shortcuts = new ShortcutManager();
@@ -54,6 +56,8 @@ namespace Starforge.Editor {
             Shortcuts.RegisterShortcut(new Shortcut(Menubar.Open, Keys.LeftControl, Keys.O));
             Shortcuts.RegisterShortcut(new Shortcut(new Action(() => { Menubar.Save(); }), Keys.LeftControl, Keys.S));
             Shortcuts.RegisterShortcut(new Shortcut(Menubar.SaveAs, Keys.LeftControl, Keys.LeftShift, Keys.S));
+            Shortcuts.RegisterShortcut(new Shortcut(State.Undo, Keys.LeftControl, Keys.Z));
+            Shortcuts.RegisterShortcut(new Shortcut(State.Redo, Keys.LeftControl, Keys.LeftShift, Keys.Z));
         }
 
         public override bool End() {
@@ -63,6 +67,7 @@ namespace Starforge.Editor {
 
             Engine.MapLoaded = false;
             Engine.OnViewportUpdate -= Camera.UpdateViewport;
+            Engine.OnViewportUpdate -= UpdateViewport;
             Renderer.Dispose();
 
             // Remove windows
@@ -73,11 +78,9 @@ namespace Starforge.Editor {
         }
 
         public override void Render(GameTime gt) {
-            RoomListWindow.UpdateListHeight();
-            ToolListWindow.UpdateListHeight();
-
             if (State.SelectedRoom != null) {
                 Engine.Instance.GraphicsDevice.SetRenderTarget(Renderer.Overlay);
+                Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
                 Engine.Batch.Begin(
                     SpriteSortMode.Deferred,
                     BlendState.AlphaBlend,
@@ -88,12 +91,9 @@ namespace Starforge.Editor {
                 );
                 ToolManager.Render();
                 Engine.Batch.End();
-
-                Renderer.RenderSelectedRoom(Rerender);
             }
 
             Renderer.Render();
-            Rerender = RenderFlags.None;
         }
 
         public override void Update(GameTime gt) {
@@ -130,7 +130,7 @@ namespace Starforge.Editor {
                 Point realPoint = new Point((int)rm.X, (int)rm.Y);
 
                 // Check to see if selected room should change
-                if (!State.SelectedRoom.Meta.Bounds.Contains(realPoint)) {
+                if (State.SelectedRoom != null && !State.SelectedRoom.Meta.Bounds.Contains(realPoint)) {
                     foreach (DrawableRoom room in Renderer.VisibleRooms) {
                         if (room.Room.Meta.Bounds.Contains(realPoint)) {
                             SelectRoom(room);
@@ -149,6 +149,11 @@ namespace Starforge.Editor {
                 Vector2 rm = Camera.ScreenToReal(Input.Mouse.GetVectorPos());
                 State.TilePointer = new Point((int)Math.Floor((rm.X - State.SelectedRoom.X) / 8), (int)Math.Floor((rm.Y - State.SelectedRoom.Y) / 8));
             }
+        }
+
+        public void UpdateViewport() {
+            RoomListWindow.UpdateListHeight();
+            ToolListWindow.UpdateListHeight();
         }
 
         #endregion
@@ -208,11 +213,10 @@ namespace Starforge.Editor {
         /// <param name="moveCamera"></param>
         public void SelectRoom(int index, bool moveCamera = false) {
             // Rerender previously selected room
-            if (State.SelectedRoom != null) Renderer.RenderRoom(Renderer.Rooms[index], Menubar.RerenderFlags);
+            if (State.SelectedRoom != null) Renderer.SelectedRoom.Dirty = true;
             State.SelectedRoom = State.LoadedLevel.Rooms[index];
 
             Renderer.SetSelected(State.LoadedLevel.Rooms[index]);
-            Renderer.RenderSelectedRoom(RenderFlags.All);
 
             if (!moveCamera) return;
             Camera.Zoom = 1f;

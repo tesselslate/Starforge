@@ -29,10 +29,10 @@ namespace Starforge.Editor.Tools {
 
             switch (ToolManager.SelectedLayer) {
             case ToolLayer.Background:
-                Action = new TileBrushAction(r, ToolLayer.Background, ToolManager.FGTileset, MapEditor.Instance.State.TilePointer);
+                Action = new TileBrushAction(r, ToolLayer.Background, ToolManager.BGTileset, MapEditor.Instance.State.TilePointer);
                 break;
             case ToolLayer.Foreground:
-                Action = new TileBrushAction(r, ToolLayer.Foreground, ToolManager.BGTileset, MapEditor.Instance.State.TilePointer);
+                Action = new TileBrushAction(r, ToolLayer.Foreground, ToolManager.FGTileset, MapEditor.Instance.State.TilePointer);
                 break;
             }
 

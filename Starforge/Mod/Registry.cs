@@ -68,9 +68,9 @@ namespace Starforge.Mod {
                     TriggerDefinitionAttribute tattr = type.GetCustomAttribute<TriggerDefinitionAttribute>();
                     if (tattr != null) {
                         TryRegister(TriggerCreators, type, tattr);
+                    } else {
+                        Logger.Log(LogLevel.Error, $"Entity {type} does not have a definition attribute");
                     }
-
-                    Logger.Log(LogLevel.Error, $"Entity {type} does not have a definition attribute");
                 }
             } catch (Exception e) {
                 Logger.Log(LogLevel.Error, $"Encountered an error while attempting to register entity {type}");

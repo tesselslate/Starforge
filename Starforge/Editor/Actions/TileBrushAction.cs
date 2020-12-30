@@ -14,7 +14,7 @@ namespace Starforge.Editor.Actions {
 
         public void AddPoint(Point p) {
             if (Points.Contains(p)) return;
-            if (p.X < 0 || p.Y < 0 || p.X < Grid.Width - 1 || p.Y < Grid.Height - 1) return;
+            if (p.X < 0 || p.Y < 0 || p.X > Grid.Width - 1 || p.Y > Grid.Height - 1) return;
 
             PreviousTiles.Add((p, Grid[p.X, p.Y]));
             Points.Add(p);
@@ -27,7 +27,7 @@ namespace Starforge.Editor.Actions {
                 if (SetPoint(p)) changed = true;
             }
 
-            if (changed) Redraw();
+            if (changed) DrawableRoom.Dirty = true;
             return changed;
         }
 

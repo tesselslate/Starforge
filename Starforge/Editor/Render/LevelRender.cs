@@ -38,13 +38,6 @@ namespace Starforge.Editor.Render {
 
         // Selected room
         public DrawableRoom SelectedRoom { get; private set; }
-
-        private RenderTarget2D BGTiles;
-        private RenderTarget2D BGDecals;
-        private RenderTarget2D FGTiles;
-        private RenderTarget2D FGDecals;
-        private RenderTarget2D Entities;
-        private RenderTarget2D Triggers;
         public RenderTarget2D Overlay { get; private set; }
 
         /// <summary>
@@ -64,7 +57,7 @@ namespace Starforge.Editor.Render {
             }
 
             if (prerenderAll) {
-                foreach (DrawableRoom room in Rooms) RenderRoom(room);
+                foreach (DrawableRoom room in Rooms) RenderRoom(room, Menubar.RerenderFlags);
             }
 
             Editor.Camera.OnPositionChange += () => {
@@ -106,6 +99,10 @@ namespace Starforge.Editor.Render {
                 }
             }
 
+            foreach (DrawableRoom room in VisibleRooms) {
+                if (room.Dirty) RenderRoom(room, Menubar.RerenderFlags);
+            }
+
             Engine.Instance.GraphicsDevice.SetRenderTarget(null);
             Engine.Instance.GraphicsDevice.Clear(Settings.BackgroundColor);
             Engine.Batch.Begin(
@@ -120,18 +117,11 @@ namespace Starforge.Editor.Render {
 
             // Render rooms
             foreach (DrawableRoom room in VisibleRooms) {
-                if (room != SelectedRoom) Engine.Batch.Draw(room.Target, new Vector2(room.Room.X, room.Room.Y), Color.White);
+                Engine.Batch.Draw(room.Target, new Vector2(room.Room.X, room.Room.Y), Color.White);
             }
 
             // Render selected room
             if (SelectedRoom != null) {
-                GFX.Draw.Rectangle(SelectedRoom.Room.Meta.Bounds, Settings.SelectedRoomColor);
-                if (Menubar.View_BGTiles) Engine.Batch.Draw(BGTiles, new Vector2(SelectedRoom.Room.X, SelectedRoom.Room.Y), Color.White);
-                if (Menubar.View_BGDecals) Engine.Batch.Draw(BGDecals, new Vector2(SelectedRoom.Room.X, SelectedRoom.Room.Y), Color.White);
-                if (Menubar.View_Entities) Engine.Batch.Draw(Entities, new Vector2(SelectedRoom.Room.X, SelectedRoom.Room.Y), Color.White);
-                if (Menubar.View_FGTiles) Engine.Batch.Draw(FGTiles, new Vector2(SelectedRoom.Room.X, SelectedRoom.Room.Y), Color.White);
-                if (Menubar.View_FGDecals) Engine.Batch.Draw(FGDecals, new Vector2(SelectedRoom.Room.X, SelectedRoom.Room.Y), Color.White);
-                if (Menubar.View_Triggers) Engine.Batch.Draw(Triggers, new Vector2(SelectedRoom.Room.X, SelectedRoom.Room.Y), Color.White);
                 Engine.Batch.Draw(Overlay, new Vector2(SelectedRoom.Room.X, SelectedRoom.Room.Y), Color.White * 0.75f);
             }
 
@@ -154,8 +144,12 @@ namespace Starforge.Editor.Render {
             room.FGDecals = CreateDecalTextureList(room.Room.ForegroundDecals);
 
             // Generate tiles
-            room.BGTiles = Editor.BGAutotiler.GenerateTextureMap(room.Room.BackgroundTiles, true);
-            room.FGTiles = Editor.FGAutotiler.GenerateTextureMap(room.Room.ForegroundTiles, true);
+            if (room.TilesDirty) {
+                room.BGTiles = Editor.BGAutotiler.GenerateTextureMap(room.Room.BackgroundTiles, true);
+                room.FGTiles = Editor.FGAutotiler.GenerateTextureMap(room.Room.ForegroundTiles, true);
+
+                room.TilesDirty = false;
+            }
 
             // Generate object tiles
             for (int i = 0; i < room.Room.ObjectTiles.Map.Length; i++) {
@@ -170,7 +164,9 @@ namespace Starforge.Editor.Render {
             }
 
             Engine.Instance.GraphicsDevice.SetRenderTarget(room.Target);
-            Engine.Instance.GraphicsDevice.Clear(Settings.RoomColor);
+            if (SelectedRoom == room) Engine.Instance.GraphicsDevice.Clear(Settings.SelectedRoomColor);
+            else Engine.Instance.GraphicsDevice.Clear(Settings.RoomColor);
+
             Engine.Batch.Begin(
                 SpriteSortMode.Deferred,
                 BlendState.AlphaBlend,
@@ -208,91 +204,26 @@ namespace Starforge.Editor.Render {
             }
 
             Engine.Batch.End();
+
+            room.Dirty = false;
         }
-
-        /// <summary>
-        /// Renders the currently selected room.
-        /// </summary>
-        /// <param name="render">The layers to rerender.</param>
-        public void RenderSelectedRoom(RenderFlags render) {
-            if (SelectedRoom == null) return;
-
-            if (render.HasFlag(RenderFlags.BGDecals)) {
-                SetSubtarget(BGDecals);
-                SelectedRoom.BGDecals = CreateDecalTextureList(SelectedRoom.Room.BackgroundDecals);
-                foreach (StaticTexture t in SelectedRoom.BGDecals) t.DrawCentered();
-                Engine.Batch.End();
-            }
-
-            if (render.HasFlag(RenderFlags.BGTiles)) {
-                SetSubtarget(BGTiles);
-                SelectedRoom.BGTiles.Draw();
-                Engine.Batch.End();
-            }
-
-            if (render.HasFlag(RenderFlags.FGDecals)) {
-                SetSubtarget(FGDecals);
-                SelectedRoom.FGDecals = CreateDecalTextureList(SelectedRoom.Room.ForegroundDecals);
-                foreach (StaticTexture t in SelectedRoom.FGDecals) t.DrawCentered();
-                Engine.Batch.End();
-            }
-
-            if (render.HasFlag(RenderFlags.FGTiles)) {
-                SetSubtarget(FGTiles);
-                SelectedRoom.FGTiles.Draw();
-                foreach (StaticTexture t in SelectedRoom.OBTiles) t.Draw();
-                Engine.Batch.End();
-            }
-
-            if (render.HasFlag(RenderFlags.Entities)) {
-                SetSubtarget(Entities);
-                foreach (Entity e in SelectedRoom.Room.Entities) e.Render();
-                Engine.Batch.End();
-            }
-
-            if (render.HasFlag(RenderFlags.Triggers)) {
-                SetSubtarget(Triggers);
-                foreach (Entity t in SelectedRoom.Room.Triggers) {
-                    Rectangle tr = new Rectangle((int)t.Position.X, (int)t.Position.Y, (int)t.Attributes["width"], (int)t.Attributes["height"]);
-                    GFX.Draw.BorderedRectangle(tr, Settings.TriggerColor * 0.4f, Settings.TriggerColor);
-                    GFX.Draw.TextCentered(MiscHelper.CleanCamelCase(t.Name), tr, Color.White);
-                }
-                Engine.Batch.End();
-            }
-
-            Engine.Instance.GraphicsDevice.SetRenderTarget(Overlay);
-            Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
-        }
+        
 
         /// <summary>
         /// Sets the currently selected room.
         /// </summary>
         public void SetSelected(Room room) {
-            foreach (DrawableRoom drawable in Rooms) {
-                if (drawable.Room == room) {
-                    // Dispose of old render targets
-                    if (BGTiles != null) {
-                        BGTiles.Dispose();
-                        BGDecals.Dispose();
-                        FGTiles.Dispose();
-                        FGDecals.Dispose();
-                        Entities.Dispose();
-                        Triggers.Dispose();
-                        Overlay.Dispose();
-                    }
-
-                    // Select room
-                    SelectedRoom = drawable;
-
-                    BGTiles = new RenderTarget2D(Engine.Instance.GraphicsDevice, room.Width, room.Height, false, SurfaceFormat.Color, DepthFormat.None, 0, TargetUsage);
-                    BGDecals = new RenderTarget2D(Engine.Instance.GraphicsDevice, room.Width, room.Height, false, SurfaceFormat.Color, DepthFormat.None, 0, TargetUsage);
-                    FGTiles = new RenderTarget2D(Engine.Instance.GraphicsDevice, room.Width, room.Height, false, SurfaceFormat.Color, DepthFormat.None, 0, TargetUsage);
-                    FGDecals = new RenderTarget2D(Engine.Instance.GraphicsDevice, room.Width, room.Height, false, SurfaceFormat.Color, DepthFormat.None, 0, TargetUsage);
-                    Entities = new RenderTarget2D(Engine.Instance.GraphicsDevice, room.Width, room.Height, false, SurfaceFormat.Color, DepthFormat.None, 0, TargetUsage);
-                    Triggers = new RenderTarget2D(Engine.Instance.GraphicsDevice, room.Width, room.Height, false, SurfaceFormat.Color, DepthFormat.None, 0, TargetUsage);
-                    Overlay = new RenderTarget2D(Engine.Instance.GraphicsDevice, room.Width, room.Height, false, SurfaceFormat.Color, DepthFormat.None, 0, TargetUsage);
-                }
+            DrawableRoom old = null;
+            if (SelectedRoom != null) {
+                Overlay.Dispose();
+                old = SelectedRoom;
             }
+
+            SelectedRoom = GetRoom(room);
+            RenderRoom(SelectedRoom);
+            if (old != null) RenderRoom(old);
+
+            Overlay = new RenderTarget2D(Engine.Instance.GraphicsDevice, room.Width, room.Height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents);
         }
 
         /// <summary>
@@ -307,19 +238,6 @@ namespace Starforge.Editor.Render {
             }
 
             return list;
-        }
-
-        private void SetSubtarget(RenderTarget2D target) {
-            Engine.Instance.GraphicsDevice.SetRenderTarget(target);
-            Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
-            Engine.Batch.Begin(
-                SpriteSortMode.Deferred,
-                BlendState.AlphaBlend,
-                SamplerState.PointClamp,
-                DepthStencilState.None,
-                RasterizerState.CullNone,
-                null
-            );
         }
     }
 
@@ -336,6 +254,9 @@ namespace Starforge.Editor.Render {
         public TextureMap BGTiles;
         public TextureMap FGTiles;
         public List<StaticTexture> OBTiles;
+
+        public bool Dirty = true;
+        public bool TilesDirty = true;
 
         public DrawableRoom(Room room, RenderTargetUsage targetUsage) {
             Room = room;

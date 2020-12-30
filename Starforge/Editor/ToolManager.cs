@@ -1,9 +1,5 @@
 ﻿using Starforge.Editor.Tools;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Starforge.Editor {
     public static class ToolManager {
@@ -35,7 +31,8 @@ namespace Starforge.Editor {
         static ToolManager() {
             Tools = new Dictionary<ToolType, Tool>()
             {
-                [ToolType.TileBrush] = new TileBrushTool()
+                [ToolType.TileBrush] = new TileBrushTool(),
+                [ToolType.TileRectangle] = new TileRectangleTool()
             };
 
             SelectedTool = Tools[ToolType.TileBrush];

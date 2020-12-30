@@ -5,6 +5,7 @@ using System;
 namespace Starforge.Editor.UI {
     public class WindowUnsavedChanges : Window {
         private Action Callback;
+        private bool Activate = false;
 
         /// <summary>
         /// Opens a window notifying the user they have unsaved changes, and activates the callback once the user is OK with doing so.
@@ -26,20 +27,24 @@ namespace Starforge.Editor.UI {
 
                 ImGui.SameLine();
                 if (ImGui.Button("Don't Save", new System.Numerics.Vector2(80f, 25f))) {
-                    if (Callback != null) Callback.Invoke();
+                    Activate = true;
                     Visible = false;
                 }
 
                 ImGui.SameLine();
                 if (ImGui.Button("Save", new System.Numerics.Vector2(40f, 25f))) {
                     if (Menubar.Save()) {
-                        if (Callback != null) Callback.Invoke();
+                        Activate = true;
                         Visible = false;
                     }
                 }
             }
 
             ImGui.EndPopup();
+        }
+
+        public override void End() {
+            if (Activate && Callback != null) Callback.Invoke();
         }
     }
 }

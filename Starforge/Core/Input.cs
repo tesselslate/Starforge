@@ -13,16 +13,6 @@ namespace Starforge.Core {
         public static KeyboardInput  Keyboard;
 
         /// <summary>
-        /// Resets all internal input states.
-        /// </summary>
-        public static void Reset() {
-            PreviousMouse = default;
-            PreviousKeyboard = default;
-            Mouse = default;
-            Keyboard = default;
-        }
-
-        /// <summary>
         /// Updates the current mouse/keyboard states.
         /// </summary>
         public static void Update() {

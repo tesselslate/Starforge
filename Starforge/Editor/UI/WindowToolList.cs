@@ -24,7 +24,7 @@ namespace Starforge.Editor.UI {
             foreach (Tileset t in fg.GetTilesetList()) FGTilesets.Add(MiscHelper.CleanCamelCase(t.Path));
 
             Tools = new List<string>();
-            //foreach (ToolType type in Enum.GetValues(typeof(ToolType))) Tools.Add(ToolManager.Tools[type].GetName());
+            foreach (ToolType type in Enum.GetValues(typeof(ToolType))) Tools.Add(ToolManager.Tools[type].GetName());
         }
 
         public void UpdateListHeight() {
@@ -68,7 +68,7 @@ namespace Starforge.Editor.UI {
             ImGui.ListBoxFooter();
 
             // Layer list (tile/decal only)
-            if (SelectedTool == ToolType.TileBrush || SelectedTool == ToolType.TileRectangle || SelectedTool == ToolType.Decal) {
+            if (SelectedTool == ToolType.TileBrush || SelectedTool == ToolType.TileRectangle /*|| SelectedTool == ToolType.Decal*/) {
                 ImGui.NewLine();
                 ImGui.Text("Layer");
                 ImGui.SetNextItemWidth(130f);
