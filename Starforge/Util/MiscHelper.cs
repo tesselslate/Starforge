@@ -8,6 +8,15 @@ namespace Starforge.Util {
     /// Contains various miscellaneous functions.
     /// </summary>
     public static class MiscHelper {
+        public static Random Rand;
+        public static byte[] RandBytes;
+        static MiscHelper() {
+            Rand = new Random();
+
+            RandBytes = new byte[65536];
+            Rand.NextBytes(RandBytes);
+        }
+
         public static float Angle(Vector2 from, Vector2 to) {
             return (float)Math.Atan2(to.Y - from.Y, to.X - from.X);
         }
@@ -73,6 +82,10 @@ namespace Starforge.Util {
             res.G = (byte)(hex >> 8);
             res.B = (byte)hex;
             return res;
+        }
+
+        public static int RandInt(int seed, int max) {
+            return RandBytes[seed] % max;
         }
 
         public static System.Numerics.Vector3 ColorToVect3(Color c) {

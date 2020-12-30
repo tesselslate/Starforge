@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Starforge.Core;
 using Starforge.Editor.Render;
+using Starforge.Editor.UI;
 using Starforge.Map;
 using Starforge.Mod.Content;
 using Starforge.Util;
@@ -122,6 +123,26 @@ namespace Starforge.Editor {
             if (x < 0 || x > grid.Width - 1 || y < 0 || y > grid.Height - 1) return edgesExtend;
 
             return grid[x, y] != '0' && !(t.ID != grid[x, y] && (t.Ignores.Contains((char)grid[x, y]) || t.Ignores.Contains('*')));
+        }
+        
+        public TextureMap GenerateFakeTileMap(Room room, Vector2 offset, int width, int height, short tileset, bool edgesExtend = false) {
+            TileGrid grid = new TileGrid(width, height) { DefaultValue = tileset };
+            grid.Fill(tileset);
+
+            TextureMap map = GenerateTextureMap(grid, edgesExtend);
+            DrawableRoom dr = MapEditor.Instance.Renderer.GetRoom(room);
+
+            if (!Menubar.View_OBTiles) return map;
+
+            // Object tiles
+            Rectangle mapBounds = new Rectangle((int)offset.X / 8, (int)offset.Y / 8, width, height);
+            foreach(StaticTexture t in dr.OBTiles) {
+                if(mapBounds.Contains(new Point((int)t.Position.X / 8, (int)t.Position.Y / 8))) {
+                    map.Textures[(int)t.Position.X / 8 - (int)offset.X / 8 + (width * ((int)t.Position.Y / 8 - (int)offset.Y / 8))].Visible = false;
+                }
+            }
+
+            return map;
         }
 
         public TextureMap GenerateTextureMap(TileGrid grid, bool edgesExtend = true) {

@@ -44,8 +44,7 @@ namespace Starforge.Editor.Render {
         /// Creates a new LevelRender instance for rendering the level.
         /// </summary>
         /// <param name="level">The level to render.</param>
-        /// <param name="prerenderAll">Whether or not all rooms should be rendered before displaying the map.</param>
-        public LevelRender(MapEditor editor, Level level, bool prerenderAll = false) {
+        public LevelRender(MapEditor editor, Level level) {
             // Create room render targets
             TargetUsage = Settings.AlwaysRerender ? RenderTargetUsage.DiscardContents : RenderTargetUsage.PreserveContents;
             Rooms = new List<DrawableRoom>();
@@ -54,10 +53,6 @@ namespace Starforge.Editor.Render {
 
             foreach (Room room in Level.Rooms) {
                 Rooms.Add(new DrawableRoom(room, TargetUsage));
-            }
-
-            if (prerenderAll) {
-                foreach (DrawableRoom room in Rooms) RenderRoom(room, Menubar.RerenderFlags);
             }
 
             Editor.Camera.OnPositionChange += () => {
@@ -149,19 +144,18 @@ namespace Starforge.Editor.Render {
                 room.BGTiles = Editor.BGAutotiler.GenerateTextureMap(room.Room.BackgroundTiles, true);
                 room.FGTiles = Editor.FGAutotiler.GenerateTextureMap(room.Room.ForegroundTiles, true);
 
-                room.TilesDirty = false;
-            }
-
-            // Generate object tiles
-            for (int i = 0; i < room.Room.ObjectTiles.Map.Length; i++) {
-                if (room.Room.ObjectTiles.Map[i] != TileGrid.OBJ_AIR) {
-                    room.OBTiles.Add(
-                        new StaticTexture(GFX.Scenery[room.Room.ObjectTiles.Map[i]])
-                        {
-                            Position = new Vector2(i % room.Room.ObjectTiles.Width * 8, i / room.Room.ObjectTiles.Width * 8)
-                        }
-                    );
+                for (int i = 0; i < room.Room.ObjectTiles.Map.Length; i++) {
+                    if (room.Room.ObjectTiles.Map[i] != TileGrid.OBJ_AIR) {
+                        room.OBTiles.Add(
+                            new StaticTexture(GFX.Scenery[room.Room.ObjectTiles.Map[i]])
+                            {
+                                Position = new Vector2(i % room.Room.ObjectTiles.Width * 8, i / room.Room.ObjectTiles.Width * 8)
+                            }
+                        );
+                    }
                 }
+
+                room.TilesDirty = false;
             }
 
             Engine.Instance.GraphicsDevice.SetRenderTarget(room.Target);
@@ -183,14 +177,14 @@ namespace Starforge.Editor.Render {
             // Background decals
             if (flags.HasFlag(RenderFlags.BGDecals)) foreach (StaticTexture t in room.BGDecals) t.DrawCentered();
 
+            // Object tiles
+            if (flags.HasFlag(RenderFlags.OBTiles)) foreach (StaticTexture t in room.OBTiles) t.Draw();
+
             // Entities
             if (flags.HasFlag(RenderFlags.Entities)) foreach (Entity e in room.Room.Entities) e.Render();
 
             // Foreground tiles
             if (flags.HasFlag(RenderFlags.FGTiles)) room.FGTiles.Draw();
-
-            // Object tiles
-            if (flags.HasFlag(RenderFlags.FGTiles)) foreach (StaticTexture t in room.OBTiles) t.Draw();
 
             // Foreground decals
             if (flags.HasFlag(RenderFlags.FGDecals)) foreach (StaticTexture t in room.FGDecals) t.DrawCentered();
@@ -277,6 +271,7 @@ namespace Starforge.Editor.Render {
         FGTiles = 8,
         Entities = 16,
         Triggers = 32,
-        All = 63
+        OBTiles = 64,
+        All = 127
     }
 }

@@ -22,7 +22,7 @@ namespace Starforge.Editor.Tools {
             Room r = MapEditor.Instance.State.SelectedRoom;
 
             if (HeldEntity != null) {
-                HeldEntity.Parent = r;
+                HeldEntity.Room = r;
 
                 if (Input.Mouse.LeftClick) HandleClick();
                 else if (Input.Mouse.LeftHold) HandleDrag();

@@ -10,10 +10,20 @@ namespace Starforge.Map {
         public List<Vector2> Nodes;
         public Vector2 Position;
 
-        public Room Parent;
+        public int Width {
+            get => GetInt("width");
+            set => Attributes["width"] = value;
+        }
+
+        public int Height {
+            get => GetInt("height");
+            set => Attributes["height"] = value;
+        }
 
         public virtual bool StretchableX => false;
         public virtual bool StretchableY => false;
+
+        public Room Room;
 
         public Entity(EntityData data, Room room) {
             Attributes = new Dictionary<string, object>(data.Attributes);
@@ -22,7 +32,7 @@ namespace Starforge.Map {
             Nodes = new List<Vector2>(data.Nodes);
 
             Position = new Vector2((int)GetFloat("x"), (int)GetFloat("y"));
-            Parent = room;
+            Room = room;
         }
 
         public MapElement Encode() {

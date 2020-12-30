@@ -28,6 +28,16 @@ namespace Starforge.Map {
         }
 
         /// <summary>
+        /// Gets a character attribute from the MapElement.
+        /// </summary>
+        /// <param name="name">The name of the attribute.</param>
+        /// <param name="defaultValue">The value to return if the attribute doesn't exist.</param>
+        /// <returns>The character value of the attribute if it exists, otherwise the defaultValue provided.</returns>
+        public char GetChar(string name, char defaultValue = '0') {
+            return GetString(name, $"{defaultValue}")[0];
+        }
+
+        /// <summary>
         /// Gets a float attribute from the MapElement.
         /// </summary>
         /// <param name="name">The name of the attribute.</param>

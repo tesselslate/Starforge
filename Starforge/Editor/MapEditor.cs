@@ -30,7 +30,6 @@ namespace Starforge.Editor {
         #region Scene
 
         public override void Begin() {
-            Instance = this;
             Engine.MapLoaded = true;
             Logger.Log("Beginning map editor.");
 
@@ -173,6 +172,8 @@ namespace Starforge.Editor {
         }
 
         public void LoadLevel(Level level, string path) {
+            Instance = this;
+
             if (State != null && State.LoadedLevel != null) {
                 Logger.Log(LogLevel.Warning, $"MapEditor: Attempted to load {level.Package} while {State.LoadedLevel.Package} was already loaded.");
                 return;
@@ -194,7 +195,9 @@ namespace Starforge.Editor {
 
             // Initialize camera and level renderer
             Camera = new Camera();
-            Renderer = new LevelRender(this, State.LoadedLevel, true);
+            Renderer = new LevelRender(this, State.LoadedLevel);
+            foreach (DrawableRoom room in Renderer.Rooms) Renderer.RenderRoom(room);
+
             Camera.Update();
 
             if (State.LoadedLevel.Rooms.Count > 0) {

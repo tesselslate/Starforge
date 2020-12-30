@@ -28,7 +28,7 @@ namespace Starforge.Editor {
         /// The currently selected room.
         /// </summary>
         public Room SelectedRoom;
-        
+
         /// <summary>
         /// The position of the cursor, in tiles, in the selected room.
         /// </summary>
@@ -90,6 +90,12 @@ namespace Starforge.Editor {
         /// Saves the currently loaded map.
         /// </summary>
         public void Save() {
+            if (!File.Exists(LoadedPath)) {
+                using (FileStream stream = File.Create(LoadedPath)) {
+                    stream.Close();
+                }
+            }
+
             using (FileStream stream = new FileStream(LoadedPath, FileMode.Truncate)) {
                 using (BinaryWriter writer = new BinaryWriter(stream)) {
                     MapPacker.WriteMapBinary(writer, LoadedLevel.Encode());

@@ -17,6 +17,7 @@ namespace Starforge.Editor.UI {
         public static bool View_BGTiles = true;
         public static bool View_FGDecals = true;
         public static bool View_FGTiles = true;
+        public static bool View_OBTiles = true;
         public static bool View_Entities = true;
         public static bool View_Triggers = true;
 
@@ -49,6 +50,7 @@ namespace Starforge.Editor.UI {
                 if (ImGui.MenuItem("Background Tiles", "", ref View_BGTiles, Engine.MapLoaded)) ChangeView();
                 if (ImGui.MenuItem("Foreground Decals", "", ref View_FGDecals, Engine.MapLoaded)) ChangeView();
                 if (ImGui.MenuItem("Foreground Tiles", "", ref View_FGTiles, Engine.MapLoaded)) ChangeView();
+                if (ImGui.MenuItem("Object Tiles", "", ref View_OBTiles, Engine.MapLoaded)) ChangeView();
                 if (ImGui.MenuItem("Entities", "", ref View_Entities, Engine.MapLoaded)) ChangeView();
                 if (ImGui.MenuItem("Triggers", "", ref View_Triggers, Engine.MapLoaded)) ChangeView();
 
@@ -114,7 +116,12 @@ namespace Starforge.Editor.UI {
         }
 
         public static void SaveAs() {
-
+            if (Engine.MapLoaded) {
+                if (NfdResult.OKAY == NFD.SaveDialog("bin", Settings.CelesteDirectory, out string mapPath)) {
+                    MapEditor.Instance.State.LoadedPath = mapPath + ".bin";
+                    MapEditor.Instance.State.Save();
+                }
+            }
         }
 
         #endregion
@@ -135,6 +142,7 @@ namespace Starforge.Editor.UI {
             if (View_BGTiles) RerenderFlags |= RenderFlags.BGTiles;
             if (View_FGDecals) RerenderFlags |= RenderFlags.FGDecals;
             if (View_FGTiles) RerenderFlags |= RenderFlags.FGTiles;
+            if (View_OBTiles) RerenderFlags |= RenderFlags.OBTiles;
             if (View_Entities) RerenderFlags |= RenderFlags.Entities;
             if (View_Triggers) RerenderFlags |= RenderFlags.Triggers;
 
