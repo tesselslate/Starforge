@@ -80,10 +80,13 @@ namespace Starforge.Editor {
         }
 
         public override void Render(GameTime gt) {
+            ImGuiIOPtr io = ImGui.GetIO();
+
             if (State.SelectedRoom != null) {
                 Engine.Instance.GraphicsDevice.SetRenderTarget(Renderer.Overlay);
                 Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
-                Engine.Batch.Begin(
+                if(!io.WantCaptureMouse) {
+                    Engine.Batch.Begin(
                     SpriteSortMode.Deferred,
                     BlendState.AlphaBlend,
                     SamplerState.PointClamp,
@@ -91,8 +94,9 @@ namespace Starforge.Editor {
                     RasterizerState.CullNone,
                     null
                 );
-                ToolManager.Render();
-                Engine.Batch.End();
+                    ToolManager.Render();
+                    Engine.Batch.End();
+                }
             }
 
             Renderer.Render();
