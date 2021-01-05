@@ -184,6 +184,31 @@ namespace Starforge.Map {
             WindPattern = el.GetString("windPattern", "None");
         }
 
+        public RoomMeta(string name) {
+            Name = name;
+            Bounds = new Rectangle(0, 0, 320, 184);
+
+            Ambience = "";
+            AltMusic = "";
+            Music = "";
+
+            DelayAltMusicFade = false;
+            AmbienceProgress = -1;
+            MusicProgress = -1;
+            MusicLayer1 = true;
+            MusicLayer2 = true;
+            MusicLayer3 = true;
+            MusicLayer4 = true;
+            Whisper = false;
+            Color = 0;
+            CameraOffset = new Vector2(0, 0);
+            Dark = false;
+            DisableDownTransition = false;
+            Space = false;
+            Underwater = false;
+            WindPattern = "None";
+        }
+
         public void Encode(MapElement el) {
             el.SetAttribute("name", Name);
             el.SetAttribute("x", Bounds.X);

@@ -44,7 +44,7 @@ namespace Starforge.Editor.UI {
 
                 ImGui.InputText("Celeste Path", ref Settings.CelesteDirectory, 4096);
 
-                ImGui.SetCursorPos(new System.Numerics.Vector2(500f, 370f));
+                ImGui.SetCursorPos(new Vector2(500f, 370f));
                 ImGui.Checkbox("Debug Mode", ref Settings.DebugMode);
 
                 ImGui.NextColumn();

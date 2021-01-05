@@ -6,7 +6,7 @@ using Starforge.Mod.Content;
 
 namespace Starforge.Editor.Tools {
     public class TileRectangleTool : Tool {
-        private Rectangle Hint = new Rectangle(0, 0, 8, 8);
+        private Rectangle Hint = new Rectangle(-8, -8, 8, 8);
         private Rectangle Hold = new Rectangle(-1, -1, 0, 0);
         private Point Start;
 
@@ -14,12 +14,11 @@ namespace Starforge.Editor.Tools {
 
         public override void Render() {
             GFX.Draw.BorderedRectangle(Hint, Settings.ToolColor * 0.5f, Settings.ToolColor);
+            Hint.X = MapEditor.Instance.State.TilePointer.X * 8;
+            Hint.Y = MapEditor.Instance.State.TilePointer.Y * 8;
         }
 
         public override void Update() {
-            Hint.X = MapEditor.Instance.State.TilePointer.X * 8;
-            Hint.Y = MapEditor.Instance.State.TilePointer.Y * 8;
-
             if (Input.Mouse.LeftClick) HandleClick();
             else if (Input.Mouse.LeftHold) HandleDrag();
             else if (Input.Mouse.LeftUnclick) HandleUnclick();

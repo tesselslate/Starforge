@@ -51,13 +51,62 @@ namespace Starforge.Editor {
         public bool CanUndo() => PastActions.Count > 0;
 
         /// <summary>
+        /// Adds a room to the level.
+        /// </summary>
+        /// <param name="room">The room to add.</param>
+        public void AddRoom(Room room) {
+            if (LoadedLevel.Rooms.Contains(room)) return;
+
+            LoadedLevel.Rooms.Add(room);
+            MapEditor.Instance.Renderer.AddRoom(room);
+            MapEditor.Instance.RoomListWindow.RoomNames = GetRoomNameList();
+
+            MapEditor.Instance.SelectRoom(MapEditor.Instance.Renderer.GetRoom(room), true);
+        }
+
+        /// <summary>
+        /// Updates a room in the level.
+        /// </summary>
+        /// <param name="room">The room to update.</param>
+        public void UpdateRoom(Room room) {
+            MapEditor.Instance.Renderer.UpdateRoom(room);
+            MapEditor.Instance.RoomListWindow.RoomNames = GetRoomNameList();
+
+            if (room == SelectedRoom) MapEditor.Instance.SelectRoom(MapEditor.Instance.Renderer.GetRoom(room));
+        }
+
+        /// <summary>
+        /// Removes a room from the level.
+        /// </summary>
+        /// <param name="room">The room to remove.</param>
+        public void RemoveRoom(Room room) {
+            if (!LoadedLevel.Rooms.Contains(room)) return;
+
+            MapEditor.Instance.Renderer.RemoveRoom(room);
+            LoadedLevel.Rooms.Remove(room);
+            MapEditor.Instance.RoomListWindow.RoomNames = GetRoomNameList();
+
+            if (SelectedRoom == room) {
+                SelectedRoom = null;
+                MapEditor.Instance.Renderer.Overlay.Dispose();
+            }
+        }
+
+        /// <returns>An array of all the room names.</returns>
+        public string[] GetRoomNameList() {
+            List<string> roomNames = new List<string>();
+            foreach (Room room in LoadedLevel.Rooms) roomNames.Add(room.Name);
+            return roomNames.ToArray();
+        }
+
+        /// <summary>
         /// Applies a new action to the level.
         /// </summary>
         /// <param name="action">The action to apply.</param>
         public void Apply(EditorAction action) {
             Unsaved = true;
-
             action.Apply();
+
             PastActions.Push(action);
             FutureActions.Clear();
         }
@@ -70,6 +119,7 @@ namespace Starforge.Editor {
                 EditorAction action = PastActions.Pop();
                 Unsaved = true;
 
+                action.Undo();
                 FutureActions.Push(action);
             }
         }
@@ -80,6 +130,7 @@ namespace Starforge.Editor {
         public void Redo() {
             if (FutureActions.Count > 0) {
                 EditorAction action = FutureActions.Pop();
+                action.Apply();
                 Unsaved = true;
 
                 PastActions.Push(action);

@@ -115,7 +115,7 @@ namespace Starforge.Core.Boot {
                 ImGui.SetNextWindowPos(new System.Numerics.Vector2(Engine.Instance.GraphicsDevice.Viewport.Width / 2, Engine.Instance.GraphicsDevice.Viewport.Height / 2 - ImGui.GetTextLineHeightWithSpacing()));
                 ImGui.SetNextWindowSize(new System.Numerics.Vector2(256f, 64f));
 
-                ImGui.Begin("", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize);
+                ImGui.Begin("Boot", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize);
 
                 if (StartupHelper.FinishedFirstStage) {
                     ImGui.Text("Loading textures...");
@@ -168,6 +168,7 @@ namespace Starforge.Core.Boot {
                 if (Alpha > 0.01) {
                     Alpha = Alpha /= 1.3f;
                 } else {
+                    SDL2.SDL.SDL_MaximizeWindow(Engine.Instance.Window.Handle);
                     Engine.SetScene(new BlankScene());
                 }
             }

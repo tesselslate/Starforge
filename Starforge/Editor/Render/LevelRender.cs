@@ -65,6 +65,29 @@ namespace Starforge.Editor.Render {
             };
         }
 
+        public void AddRoom(Room room) {
+            Rooms.Add(new DrawableRoom(room, TargetUsage));
+            Editor.Camera.Update();
+        }
+
+        public void UpdateRoom(Room room) {
+            DrawableRoom dr = GetRoom(room);
+            int index = Rooms.IndexOf(dr);
+
+            dr.Target.Dispose();
+            Rooms[index] = new DrawableRoom(room, TargetUsage);
+            Editor.Camera.Update();
+        }
+
+        public void RemoveRoom(Room room) {
+            DrawableRoom dr;
+            if ((dr = GetRoom(room)) != null) {
+                Rooms.Remove(dr);
+                dr.Target.Dispose();
+            }
+            Editor.Camera.Update();
+        }
+
         /// <summary>
         /// Disposes of the LevelRender.
         /// </summary>
@@ -113,11 +136,11 @@ namespace Starforge.Editor.Render {
 
             // Render rooms
             foreach (DrawableRoom room in VisibleRooms) {
-                Engine.Batch.Draw(room.Target, new Vector2(room.Room.X, room.Room.Y), Color.White);
+                if (!room.Target.IsDisposed) Engine.Batch.Draw(room.Target, new Vector2(room.Room.X, room.Room.Y), Color.White);
             }
 
             // Render selected room
-            if (SelectedRoom != null) {
+            if (SelectedRoom != null && !Overlay.IsDisposed) {
                 Engine.Batch.Draw(Overlay, new Vector2(SelectedRoom.Room.X, SelectedRoom.Room.Y), Color.White * 0.75f);
             }
 

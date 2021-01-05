@@ -4,6 +4,7 @@ using Starforge.Core;
 using Starforge.Core.Interop;
 using Starforge.Editor.Render;
 using System;
+using System.IO;
 
 namespace Starforge.Editor.UI {
     /// <summary>
@@ -21,11 +22,17 @@ namespace Starforge.Editor.UI {
         public static bool View_Entities = true;
         public static bool View_Triggers = true;
 
+        public static bool DemoWindow = false;
+        public static bool MetricsWindow = false;
+
         /// <summary>
         /// Renders the window menubar.
         /// </summary>
         /// <param name="hasEditor">Whether or not the map editor is currently loaded.</param>
-        public static void Render(bool hasEditor = false) {
+        public static void Render() {
+            if (DemoWindow) ImGui.ShowDemoWindow();
+            if (MetricsWindow) ImGui.ShowMetricsWindow();
+
             if (!ImGui.BeginMainMenuBar()) return;
             MenubarHeight = ImGui.GetWindowHeight();
 
@@ -41,6 +48,8 @@ namespace Starforge.Editor.UI {
             if (ImGui.BeginMenu("Edit")) {
                 if (ImGui.MenuItem("Undo", "CTRL+Z", false, Engine.MapLoaded && MapEditor.Instance.State.CanUndo())) MapEditor.Instance.State.Undo();
                 if (ImGui.MenuItem("Redo", "CTRL+SHIFT+Z", false, Engine.MapLoaded && MapEditor.Instance.State.CanRedo())) MapEditor.Instance.State.Redo();
+                ImGui.Separator();
+                if (ImGui.MenuItem("Add Room", "", false, Engine.MapLoaded)) Engine.CreateWindow(new WindowRoomConfig());
 
                 ImGui.EndMenu();
             }
@@ -59,11 +68,19 @@ namespace Starforge.Editor.UI {
 
             if (ImGui.BeginMenu("Tools")) {
                 if (ImGui.MenuItem("Settings")) Engine.CreateWindow(new WindowSettings());
+                if (ImGui.MenuItem("Save Room As Image", Engine.MapLoaded && MapEditor.Instance.State.SelectedRoom != null)) SaveRoomImage();
 
                 if (Settings.DebugMode) {
                     ImGui.Separator();
-                    if (ImGui.MenuItem("Force GC")) GC.Collect(2, GCCollectionMode.Forced, true, true);
-                    if (ImGui.MenuItem("Clear Render Cache")) ChangeView();
+                    if (ImGui.BeginMenu("Debug Options")) {
+                        if (ImGui.MenuItem("Force GC")) GC.Collect(2, GCCollectionMode.Forced, true, true);
+                        if (ImGui.MenuItem("Clear Render Cache")) ChangeView();
+                        if (ImGui.MenuItem("Reset Input")) Input.Reset();
+                        ImGui.MenuItem("Show Demo Window", "", ref DemoWindow);
+                        ImGui.MenuItem("Show Metrics Window", "", ref MetricsWindow);
+
+                        ImGui.EndMenu();
+                    }
                 }
 
                 ImGui.EndMenu();
@@ -93,17 +110,19 @@ namespace Starforge.Editor.UI {
                 return;
             } else if (NfdResult.OKAY == NFD.OpenDialog("bin", Settings.CelesteDirectory, out string mapPath)) {
                 MapEditor editor = new MapEditor();
-                editor.LoadLevel(mapPath);
+                editor.LoadLevel(mapPath + (mapPath.EndsWith(".bin") ? "" : ".bin"));
                 Engine.SetScene(editor);
             }
+            Input.Reset();
         }
 
         public static bool Save() {
             if (Engine.MapLoaded && MapEditor.Instance.State.Unsaved) {
                 if (string.IsNullOrEmpty(MapEditor.Instance.State.LoadedPath)) {
                     if (NfdResult.OKAY == NFD.SaveDialog("bin", Settings.CelesteDirectory, out string mapPath)) {
-                        MapEditor.Instance.State.LoadedPath = mapPath;
+                        MapEditor.Instance.State.LoadedPath = mapPath + (mapPath.EndsWith(".bin") ? "" : ".bin");
                     }
+                    Input.Reset();
                 }
 
                 if (string.IsNullOrEmpty(MapEditor.Instance.State.LoadedPath)) return false;
@@ -118,9 +137,10 @@ namespace Starforge.Editor.UI {
         public static void SaveAs() {
             if (Engine.MapLoaded) {
                 if (NfdResult.OKAY == NFD.SaveDialog("bin", Settings.CelesteDirectory, out string mapPath)) {
-                    MapEditor.Instance.State.LoadedPath = mapPath + ".bin";
+                    MapEditor.Instance.State.LoadedPath = mapPath + (mapPath.EndsWith(".bin") ? "" : ".bin");
                     MapEditor.Instance.State.Save();
                 }
+                Input.Reset();
             }
         }
 
@@ -153,9 +173,27 @@ namespace Starforge.Editor.UI {
 
         #region Tools
 
+        public static void SaveRoomImage() {
+            if (!Engine.MapLoaded || MapEditor.Instance == null) return;
+
+            if (NfdResult.OKAY == NFD.SaveDialog("png", Settings.CelesteDirectory, out string pngPath)) {
+                if (!File.Exists(pngPath)) {
+                    using (FileStream stream = File.Create(pngPath + ".png")) {
+                        stream.Close();
+                    }
+                }
+
+                using (FileStream stream = File.Open(pngPath, FileMode.Truncate)) {
+                    DrawableRoom dr = MapEditor.Instance.Renderer.SelectedRoom;
+
+                    dr.Target.SaveAsPng(stream, dr.Room.Width, dr.Room.Height);
+                }
+            }
+        }
+
         public static void LogInputState() {
             string res = "Keyboard Current:";
-            foreach(Keys key in Input.Keyboard.GetPressedKeys()) {
+            foreach (Keys key in Input.Keyboard.GetPressedKeys()) {
                 res += $" {key.ToString()}";
             }
             Logger.Log(res);

@@ -105,6 +105,22 @@ namespace Starforge.Map {
             for (int i = 0; i < Map.Length; i++) Map[i] = value;
         }
 
+        public void Resize(int width, int height) {
+            short[] newMap = new short[width * height];
+            for (int i = 0; i < newMap.Length; i++) newMap[i] = DefaultValue;
+            
+            for(int y = 0; y < height; y++) {
+                int yInc = width * y;
+                for(int x = 0; x < width; x++) {
+                    newMap[x + yInc] = this[x, y];
+                }
+            }
+
+            Map = newMap;
+            Width = width;
+            Height = height;
+        }
+
         /// <summary>
         /// Generates a CSV of the tile grid, where each element is separated by commas and each row is separated by newlines.
         /// </summary>

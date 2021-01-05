@@ -6,19 +6,18 @@ using Starforge.Mod.Content;
 
 namespace Starforge.Editor.Tools {
     public class TileBrushTool : Tool {
-        private Rectangle Hint = new Rectangle(0, 0, 8, 8);
+        private Rectangle Hint = new Rectangle(-8, -8, 8, 8);
         private TileBrushAction Action = null;
 
         public override string GetName() => "Tiles (Brush)";
 
         public override void Render() {
             GFX.Draw.BorderedRectangle(Hint, Settings.ToolColor * 0.5f, Settings.ToolColor);
+            Hint.X = MapEditor.Instance.State.TilePointer.X * 8;
+            Hint.Y = MapEditor.Instance.State.TilePointer.Y * 8;
         }
 
         public override void Update() {
-            Hint.X = MapEditor.Instance.State.TilePointer.X * 8;
-            Hint.Y = MapEditor.Instance.State.TilePointer.Y * 8;
-
             if (Input.Mouse.LeftClick) HandleClick();
             if (Input.Mouse.LeftHold) HandleDrag();
             if (Input.Mouse.LeftUnclick) HandleUnclick();

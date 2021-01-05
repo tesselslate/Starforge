@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SDL2;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -9,6 +10,13 @@ using System.Runtime.InteropServices;
 // This code is largely from https://github.com/mellinoe/ImGui.NET/tree/master/src/ImGui.NET.SampleProgram.XNA
 
 namespace Starforge.Core.Interop {
+    public unsafe class ClipboardDelegates {
+        public delegate string Get();
+        public static Get SDL_Get = () => SDL.SDL_GetClipboardText();
+
+        // I've been unable to get a clipboard setter working. Who needs that in a map editor anyway? (:
+    }
+
     public class ImGuiRenderer {
         private RasterizerState RasterizerState;
         private Engine Engine;
@@ -30,7 +38,23 @@ namespace Starforge.Core.Interop {
         private int ScrollWheelValue;
         private List<int> ImGUIKeys = new List<int>();
 
+        public Dictionary<ImGuiMouseCursor, SDL.SDL_SystemCursor> Cursors;
+
         public ImGuiRenderer(Engine engine) {
+            Cursors = new Dictionary<ImGuiMouseCursor, SDL.SDL_SystemCursor>()
+            {
+                [ImGuiMouseCursor.Arrow] = SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_ARROW,
+                [ImGuiMouseCursor.Hand] = SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_HAND,
+                [ImGuiMouseCursor.None] = SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_HAND,
+                [ImGuiMouseCursor.NotAllowed] = SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_NO,
+                [ImGuiMouseCursor.ResizeAll] = SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZEALL,
+                [ImGuiMouseCursor.ResizeEW] = SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZEWE,
+                [ImGuiMouseCursor.ResizeNESW] = SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZENESW,
+                [ImGuiMouseCursor.ResizeNS] = SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZENS,
+                [ImGuiMouseCursor.ResizeNWSE] = SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZENWSE,
+                [ImGuiMouseCursor.TextInput] = SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_IBEAM
+            };
+
             IntPtr ctx = ImGui.CreateContext();
             ImGui.SetCurrentContext(ctx);
 
@@ -100,7 +124,7 @@ namespace Starforge.Core.Interop {
         }
 
         protected void SetupInput() {
-            var io = ImGui.GetIO();
+            ImGuiIOPtr io = ImGui.GetIO();
 
             // Bind XNA keys to ImGUI keys
             ImGUIKeys.Add(io.KeyMap[(int)ImGuiKey.Tab] = (int)Keys.Tab);
@@ -117,13 +141,23 @@ namespace Starforge.Core.Interop {
             ImGUIKeys.Add(io.KeyMap[(int)ImGuiKey.Enter] = (int)Keys.Enter);
             ImGUIKeys.Add(io.KeyMap[(int)ImGuiKey.Escape] = (int)Keys.Escape);
             ImGUIKeys.Add(io.KeyMap[(int)ImGuiKey.Space] = (int)Keys.Space);
+            ImGUIKeys.Add(io.KeyMap[(int)ImGuiKey.A] = (int)Keys.A);
+            ImGUIKeys.Add(io.KeyMap[(int)ImGuiKey.C] = (int)Keys.C);
+            ImGUIKeys.Add(io.KeyMap[(int)ImGuiKey.V] = (int)Keys.V);
+            ImGUIKeys.Add(io.KeyMap[(int)ImGuiKey.X] = (int)Keys.X);
+            ImGUIKeys.Add(io.KeyMap[(int)ImGuiKey.Y] = (int)Keys.Y);
+            ImGUIKeys.Add(io.KeyMap[(int)ImGuiKey.Z] = (int)Keys.Z);
 
             TextInputEXT.TextInput += c => {
                 if (c == '\t') return;
-                ImGui.GetIO().AddInputCharacter(c);
+                io.AddInputCharacter(c);
             };
 
-            ImGui.GetIO().Fonts.AddFontDefault();
+            unsafe {
+                io.GetClipboardTextFn = Marshal.GetFunctionPointerForDelegate(ClipboardDelegates.SDL_Get);
+            }
+
+            io.Fonts.AddFontDefault();
         }
 
         protected Effect UpdateEffect(Texture2D texture) {

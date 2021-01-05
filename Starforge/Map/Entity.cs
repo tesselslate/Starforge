@@ -39,7 +39,7 @@ namespace Starforge.Map {
             MapElement el = new MapElement()
             {
                 Name = Name,
-                Attributes = Attributes
+                Attributes = new Dictionary<string, object>(Attributes)
             };
 
             el.SetAttribute("x", Position.X);

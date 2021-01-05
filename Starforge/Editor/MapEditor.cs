@@ -7,6 +7,7 @@ using Starforge.Editor.Actions;
 using Starforge.Editor.Render;
 using Starforge.Editor.UI;
 using Starforge.Map;
+using Starforge.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,9 +24,11 @@ namespace Starforge.Editor {
         public LevelRender Renderer { get; private set; }
 
         // Windows and UI elements
-        private WindowRoomList RoomListWindow;
-        private WindowToolList ToolListWindow;
+        internal WindowRoomList RoomListWindow;
+        internal WindowToolList ToolListWindow;
         private ShortcutManager Shortcuts;
+
+        public bool AcceptToolInput { get; private set; } = false;
 
         #region Scene
 
@@ -55,8 +58,8 @@ namespace Starforge.Editor {
             Shortcuts.RegisterShortcut(new Shortcut(Menubar.Open, Keys.LeftControl, Keys.O));
             Shortcuts.RegisterShortcut(new Shortcut(new Action(() => { Menubar.Save(); }), Keys.LeftControl, Keys.S));
             Shortcuts.RegisterShortcut(new Shortcut(Menubar.SaveAs, Keys.LeftControl, Keys.LeftShift, Keys.S));
-            Shortcuts.RegisterShortcut(new Shortcut(State.Undo, Keys.LeftControl, Keys.Z));
             Shortcuts.RegisterShortcut(new Shortcut(State.Redo, Keys.LeftControl, Keys.LeftShift, Keys.Z));
+            Shortcuts.RegisterShortcut(new Shortcut(State.Undo, Keys.LeftControl, Keys.Z));
         }
 
         public override bool End() {
@@ -99,9 +102,16 @@ namespace Starforge.Editor {
             UpdateState();
 
             // Ignore user input in certain cases
-            ImGuiIOPtr io = ImGui.GetIO();
-            if (io.WantCaptureMouse || io.WantCaptureKeyboard || !Engine.Instance.IsActive) return;
+            if (!Engine.Instance.IsActive) return;
             if (Shortcuts.Update()) return;
+
+            ImGuiIOPtr io = ImGui.GetIO();
+            if (io.WantCaptureMouse || io.WantCaptureKeyboard) {
+                UIHelper.SetCursor(Engine.GUIRenderer.Cursors[ImGui.GetMouseCursor()]);
+                return;
+            } else {
+                UIHelper.SetCursor();
+            }
 
             //////////////////////
             // Handle user inputs
@@ -129,7 +139,7 @@ namespace Starforge.Editor {
                 Point realPoint = new Point((int)rm.X, (int)rm.Y);
 
                 // Check to see if selected room should change
-                if (State.SelectedRoom != null && !State.SelectedRoom.Meta.Bounds.Contains(realPoint)) {
+                if(!(State.SelectedRoom != null && State.SelectedRoom.Meta.Bounds.Contains(realPoint))) {
                     foreach (DrawableRoom room in Renderer.VisibleRooms) {
                         if (room.Room.Meta.Bounds.Contains(realPoint)) {
                             SelectRoom(room);
@@ -139,7 +149,8 @@ namespace Starforge.Editor {
                 }
             }
 
-            if (State.SelectedRoom != null) ToolManager.Update();
+            if (State.SelectedRoom != null && AcceptToolInput) ToolManager.Update();
+            if (!AcceptToolInput && Input.Mouse.LeftUnclick) AcceptToolInput = true;
         }
 
         public void UpdateState() {
@@ -215,6 +226,8 @@ namespace Starforge.Editor {
         /// <param name="index">The index of the room to select.</param>
         /// <param name="moveCamera"></param>
         public void SelectRoom(int index, bool moveCamera = false) {
+            AcceptToolInput = false;
+
             // Rerender previously selected room
             if (State.SelectedRoom != null) Renderer.SelectedRoom.Dirty = true;
             State.SelectedRoom = State.LoadedLevel.Rooms[index];

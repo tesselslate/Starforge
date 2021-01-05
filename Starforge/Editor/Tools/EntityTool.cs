@@ -10,7 +10,7 @@ namespace Starforge.Editor.Tools {
         public Entity HeldEntity;
 
         private Point Start;
-        private Rectangle Hold;
+        private Rectangle Hold = new Rectangle(-64, -64, 0, 0);
 
         public override string GetName() => "Entities";
 
@@ -36,6 +36,7 @@ namespace Starforge.Editor.Tools {
 
         public void UpdateHeldEntity() {
             HeldEntity = ToolManager.SelectedEntity.Create(MapEditor.Instance.State.SelectedRoom);
+            HeldEntity.SetArea(Hold);
         }
 
         private void HandleClick() {

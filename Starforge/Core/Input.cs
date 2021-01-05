@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using SDL2;
 
 namespace Starforge.Core {
     /// <summary>
@@ -11,6 +12,11 @@ namespace Starforge.Core {
 
         public static MouseInput     Mouse;
         public static KeyboardInput  Keyboard;
+
+        public static void Reset() {
+            SDL.SDL_HideWindow(Engine.Instance.Window.Handle);
+            SDL.SDL_ShowWindow(Engine.Instance.Window.Handle);
+        }
 
         /// <summary>
         /// Updates the current mouse/keyboard states.

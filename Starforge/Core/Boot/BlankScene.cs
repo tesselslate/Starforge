@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Starforge.Editor.UI;
+using Starforge.Util;
 using System;
 
 namespace Starforge.Core.Boot {
@@ -24,6 +25,7 @@ namespace Starforge.Core.Boot {
 
         public override void Update(GameTime gt) {
             Shortcuts.Update();
+            UIHelper.SetCursor(Engine.GUIRenderer.Cursors[ImGui.GetMouseCursor()]);
         }
     }
 }

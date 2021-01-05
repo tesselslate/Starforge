@@ -1,6 +1,7 @@
 ﻿using ImGuiNET;
 using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
+using Starforge.Editor.Actions;
 using System;
 
 namespace Starforge.Editor.UI {
@@ -14,7 +15,7 @@ namespace Starforge.Editor.UI {
 
         public override void Render() {
             ImGui.SetNextWindowPos(new System.Numerics.Vector2(0f, Menubar.MenubarHeight));
-            ImGui.SetNextWindowSize(new System.Numerics.Vector2(250f, Engine.Instance.GraphicsDevice.Viewport.Height - Menubar.MenubarHeight));
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(200f, Engine.Instance.GraphicsDevice.Viewport.Height - Menubar.MenubarHeight));
             ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0f);
             ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 0f);
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0f);
@@ -29,15 +30,16 @@ namespace Starforge.Editor.UI {
 
             ImGui.PopStyleVar(3);
 
-            ImGui.SetNextItemWidth(235f);
+            ImGui.SetNextItemWidth(185f);
             ImGui.ListBoxHeader("     ", RoomNames.Length, VisibleRoomCount);
             for (int i = 0; i < RoomNames.Length; i++) {
-                if (ImGui.Selectable(RoomNames[i], RoomNames[i] == MapEditor.Instance.State.SelectedRoom.Name)) MapEditor.Instance.SelectRoom(i, true);
+                if (ImGui.Selectable(RoomNames[i], MapEditor.Instance.State.SelectedRoom != null && RoomNames[i] == MapEditor.Instance.State.SelectedRoom.Name)) MapEditor.Instance.SelectRoom(i, true);
                 if (ImGui.BeginPopupContextItem(RoomNames[i], ImGuiPopupFlags.MouseButtonRight)) {
                     ImGui.Text(RoomNames[i]);
                     ImGui.Separator();
-                    if (ImGui.MenuItem("Configure Room")) { }
-                    if (ImGui.MenuItem("Delete Room")) { }
+
+                    if (ImGui.MenuItem("Configure Room")) Engine.CreateWindow(new WindowRoomConfig(MapEditor.Instance.State.LoadedLevel.Rooms[i]));
+                    if (ImGui.MenuItem("Remove Room")) MapEditor.Instance.State.Apply(new RoomRemovalAction(MapEditor.Instance.State.LoadedLevel.Rooms[i]));
 
                     ImGui.EndPopup();
                 }
@@ -52,12 +54,13 @@ namespace Starforge.Editor.UI {
                     keys += key.ToString() + " ";
                 }
 
-                ImGui.SetCursorPosY(Engine.Instance.GraphicsDevice.Viewport.Height - ImGui.GetTextLineHeightWithSpacing() * 5 - Menubar.MenubarHeight - 10);
+                ImGui.SetCursorPosY(Engine.Instance.GraphicsDevice.Viewport.Height - ImGui.GetTextLineHeightWithSpacing() * 6 - Menubar.MenubarHeight - 10);
                 ImGui.Text($"{Math.Round(1000f / ImGui.GetIO().Framerate, 2)} ms/frame ({Math.Round(ImGui.GetIO().Framerate)} FPS)");
                 ImGui.Text($"Pointer: {MapEditor.Instance.State.TilePointer}");
                 ImGui.Text($"Cursor: {MapEditor.Instance.Camera.ScreenToReal(Input.Mouse.GetVectorPos())}");
                 ImGui.Text($"Camera: {MapEditor.Instance.Camera.Position}");
                 ImGui.Text($"Keys: {keys}");
+                ImGui.Text($"Tool Input: {MapEditor.Instance.AcceptToolInput}");
             }
         }
     }

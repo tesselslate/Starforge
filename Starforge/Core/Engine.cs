@@ -166,23 +166,17 @@ namespace Starforge.Core {
         protected override void Draw(GameTime gt) {
             base.Draw(gt);
             GUIRenderer.BeforeLayout(gt);
-
             Scene.Render(gt);
 
             List<Window> toRemove = new List<Window>();
 
             // Set render target back to the window so we don't accidentally render UI content on top of a room.
-            foreach (Window win in Windows) {
-                if (win.Visible) win.Render();
-                else toRemove.Add(win);
+            for(int i = 0; i < Windows.Count; i++) {
+                if (Windows[i].Visible) Windows[i].Render();
+                else DeleteWindow(Windows[i]);
             }
 
-            foreach (Window win in toRemove) {
-                win.End();
-                Windows.Remove(win);
-            }
-
-            Menubar.Render(MapLoaded);
+            Menubar.Render();
 
             GraphicsDevice.SetRenderTarget(null);
             GUIRenderer.AfterLayout();
@@ -253,6 +247,7 @@ namespace Starforge.Core {
         /// <param name="win">The window to remove.</param>
         public static void DeleteWindow(Window win) {
             Windows.Remove(win);
+            win.End();
         }
     }
 }
