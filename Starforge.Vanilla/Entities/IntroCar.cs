@@ -7,8 +7,8 @@ using System;
 namespace Starforge.Vanilla.Entities {
     [EntityDefinition("introCar")]
     public class IntroCar : Entity {
-        private static Lazy<DrawableTexture> bodySprite = new Lazy<DrawableTexture>(() => GFX.Gameplay["scenery/car/body"];
-        private static Lazy<DrawableTexture> wheelsSprite = new Lazy<DrawableTexture>(() => GFX.Gameplay["scenery/car/wheels"];
+        private static Lazy<DrawableTexture> bodySprite = new Lazy<DrawableTexture>(() => GFX.Gameplay["scenery/car/body"]);
+        private static Lazy<DrawableTexture> wheelsSprite = new Lazy<DrawableTexture>(() => GFX.Gameplay["scenery/car/wheels"]);
 
         public IntroCar(EntityData data, Room room) : base(data, room) { }
 

@@ -15,7 +15,7 @@ namespace Starforge.Core {
         /// </summary>
         /// <param name="msg">The message to write.</param>
         public static void Log(string msg) {
-            if (Active &&Level >= LogLevel.Info) {
+            if (Active && Level >= LogLevel.Info) {
                 Writer.WriteLine($"[{DateTime.Now.ToString()}] | [Info] {msg}");
                 Writer.Flush();
             }

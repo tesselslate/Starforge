@@ -27,7 +27,7 @@ namespace Starforge.Editor.Tools {
                 if (Input.Mouse.LeftClick) HandleClick();
                 else if (Input.Mouse.LeftHold) HandleDrag();
                 else if (Input.Mouse.LeftUnclick) HandleUnclick();
-                else if (Input.Mouse.Moved) HandleMove();
+                else HandleMove();
             } else {
                 HeldEntity = ToolManager.SelectedEntity.Create(r);
                 HeldEntity.SetArea(Hold);

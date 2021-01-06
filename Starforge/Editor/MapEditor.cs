@@ -87,13 +87,13 @@ namespace Starforge.Editor {
                 Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
                 if(!io.WantCaptureMouse) {
                     Engine.Batch.Begin(
-                    SpriteSortMode.Deferred,
-                    BlendState.AlphaBlend,
-                    SamplerState.PointClamp,
-                    DepthStencilState.None,
-                    RasterizerState.CullNone,
-                    null
-                );
+                        SpriteSortMode.Deferred,
+                        BlendState.AlphaBlend,
+                        SamplerState.PointClamp,
+                        DepthStencilState.None,
+                        RasterizerState.CullNone,
+                        null
+                    );
                     ToolManager.Render();
                     Engine.Batch.End();
                 }
@@ -154,7 +154,7 @@ namespace Starforge.Editor {
             }
 
             if (State.SelectedRoom != null && AcceptToolInput) ToolManager.Update();
-            if (!AcceptToolInput && Input.Mouse.LeftUnclick) AcceptToolInput = true;
+            if (!AcceptToolInput && (Input.Mouse.LeftUnclick || Input.Mouse.Moved)) AcceptToolInput = true;
         }
 
         public void UpdateState() {

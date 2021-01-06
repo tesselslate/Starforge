@@ -3,8 +3,7 @@
 		<OutputType>Library</OutputType>
 		<TargetFramework>net472</TargetFramework>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-		<RootNamespace>Starforge</RootNamespace>
-		<ApplicationIcon>../assets/logo_128.ico</ApplicationIcon>
+		<RootNamespace>Starforge.Vanilla</RootNamespace>
 		<StartupObject />
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Platforms>x86</Platforms>
