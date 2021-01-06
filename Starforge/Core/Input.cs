@@ -80,7 +80,6 @@ namespace Starforge.Core {
         /// <summary>
         /// Determines if any mouse button states have changed.
         /// </summary>
-        /// <returns></returns>
         public bool HasAny() => 
             LeftClick   || LeftHold   || LeftUnclick   || 
             MiddleClick || MiddleHold || MiddleUnclick || 
@@ -105,7 +104,6 @@ namespace Starforge.Core {
         /// <summary>
         /// Returns an array of all currently pressed keys.
         /// </summary>
-        /// <returns></returns>
         public Keys[] GetPressedKeys() => current.GetPressedKeys();
         public bool IsKeyDown(Keys key) => current.IsKeyDown(key);
         public bool IsKeyUp(Keys key) => current.IsKeyUp(key);

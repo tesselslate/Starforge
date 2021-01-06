@@ -61,7 +61,7 @@ namespace Starforge.Core.Boot {
         /// Checks if the given folder appears to be a valid Celeste install.
         /// </summary>
         /// <param name="location">The path to check.</param>
-        /// <returns></returns>
+        /// <returns>Whether or not the given location contains a valid Celeste installation.</returns>
         public static bool IsCelesteInstall(string location) {
             if (Directory.Exists(location)) {
                 if (

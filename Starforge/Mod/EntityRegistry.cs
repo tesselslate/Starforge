@@ -76,7 +76,7 @@ namespace Starforge.Mod {
             return new List<string>(EntityCreators.Keys);
         }
 
-        /// <returns>A list of all registered entity placements.</retrurns>
+        /// <returns>A list of all registered entity placements.</returns>
         public static Dictionary<string, Placement> GetRegisteredPlacements() {
             Dictionary<string, Placement> res = new Dictionary<string, Placement>();
 
