@@ -60,6 +60,7 @@ namespace Starforge.Editor {
         /// <summary>
         /// Moves the camera the specified amount.
         /// </summary>
+        /// <remarks>While camera coordinates are usually the inverse of the map coordinates. However, in this case, the amount parameter is subtracted from the camera position, so normal map coordinates work.</remarks>
         /// <param name="amount">The amount to move the camera.</param>
         public void Move(Vector2 amount) {
             Position -= amount;
@@ -127,7 +128,6 @@ namespace Starforge.Editor {
             Update();
 
             GotoCentered(ScreenToReal(pos));
-            Update();
         }
 
         /// <summary>
@@ -141,7 +141,6 @@ namespace Starforge.Editor {
             Update();
 
             GotoCentered(ScreenToReal(pos));
-            Update();
         }
 
         /// <summary>

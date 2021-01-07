@@ -86,6 +86,11 @@ namespace Starforge.Map {
                 }
             }
 
+            if (r.ObjectTiles == null) {
+                r.ObjectTiles = new TileGrid(r.Width / 8, r.Height / 8) { DefaultValue = TileGrid.OBJ_AIR };
+                r.ObjectTiles.Fill(TileGrid.OBJ_AIR);
+            }
+
             // It should be noted that there are two additional child elements - bgtiles and fgtiles.
             // These appear to follow the same format as the objtiles element and likely have a similar function.
             // However, they aren't parsed here simply because they are so rarely needed and object tiles work fine.

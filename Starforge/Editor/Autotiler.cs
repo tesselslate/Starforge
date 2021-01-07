@@ -31,7 +31,7 @@ namespace Starforge.Editor {
         /// <param name="xmlPath">The path to the file containing the tileset definitions.</param>
         public Autotiler(string xmlPath) {
             // Create tile randomization array
-            TileRand = new byte[1048576];
+            TileRand = new byte[TILE_RAND_SIZE];
             new Random().NextBytes(TileRand);
 
             // Register tilesets
@@ -192,9 +192,9 @@ namespace Starforge.Editor {
                     || !CheckTile(grid, t, x + 2, y, edgesExtend)
                     || !CheckTile(grid, t, x, y - 2, edgesExtend)
                     || !CheckTile(grid, t, x, y + 2, edgesExtend)) {
-                    tex.Texture = t.Padding[TileRand[x + yInc] % t.Padding.Count];
+                    tex.Texture = t.Padding[TileRand[(x + yInc) % TILE_RAND_SIZE] % t.Padding.Count];
                 } else {
-                    tex.Texture = t.Center[TileRand[x + yInc] % t.Center.Count];
+                    tex.Texture = t.Center[TileRand[(x + yInc) % TILE_RAND_SIZE] % t.Center.Count];
                 }
             } else {
                 tex.Texture = GFX.Empty; // Set to arbitrary texture incase there isn't a valid mask.
@@ -209,7 +209,7 @@ namespace Starforge.Editor {
                     }
 
                     if (found) {
-                        tex.Texture = m.Textures[TileRand[x + yInc] % m.Textures.Count];
+                        tex.Texture = m.Textures[TileRand[(x + yInc) % TILE_RAND_SIZE] % m.Textures.Count];
                         tex.Visible = true;
                         break;
                     }
@@ -257,5 +257,7 @@ namespace Starforge.Editor {
                 }
             }
         }
+
+        private const int TILE_RAND_SIZE = 1024;
     }
 }

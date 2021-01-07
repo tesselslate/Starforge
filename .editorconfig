@@ -1,0 +1,5 @@
+# To learn more about .editorconfig see https://aka.ms/editorconfigdocs
+
+# All files
+[*]
+insert_final_newline=true

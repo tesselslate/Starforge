@@ -10,6 +10,7 @@ namespace Starforge.Util {
     public static class MiscHelper {
         public static Random Rand;
         public static byte[] RandBytes;
+
         static MiscHelper() {
             Rand = new Random();
 
@@ -85,7 +86,7 @@ namespace Starforge.Util {
         }
 
         public static int RandInt(int seed, int max) {
-            return RandBytes[seed] % max;
+            return RandBytes[seed] % (max % ushort.MaxValue);
         }
 
         public static System.Numerics.Vector3 ColorToVect3(Color c) {

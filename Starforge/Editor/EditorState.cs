@@ -115,7 +115,7 @@ namespace Starforge.Editor {
         /// Undoes the last action, if one is available.
         /// </summary>
         public void Undo() {
-            if (PastActions.Count > 0) {
+            if (CanUndo()) {
                 EditorAction action = PastActions.Pop();
                 Unsaved = true;
 
@@ -128,7 +128,7 @@ namespace Starforge.Editor {
         /// Applies the previously undone action, if one is available.
         /// </summary>
         public void Redo() {
-            if (FutureActions.Count > 0) {
+            if (CanRedo()) {
                 EditorAction action = FutureActions.Pop();
                 action.Apply();
                 Unsaved = true;

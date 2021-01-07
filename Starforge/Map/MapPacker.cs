@@ -8,250 +8,239 @@ namespace Starforge.Map {
     /// Used to parse binary maps and encode maps into the binary format.
     /// </summary>
     public static class MapPacker {
-        public static Dictionary<string, short> LookupKeys;
-        public static short LookupCounter;
-        public static string[] Lookup;
+        // Used for RLE
+        private static StringBuilder Builder = new StringBuilder();
+        private static byte[] RLEBytes = new byte[32768];
 
-        static MapPacker() {
-            LookupKeys = new Dictionary<string, short>();
-            LookupCounter = 0;
-        }
+        // You may be wondering what the point of using a Dictionary rather than a List here is.
+        // After all, we are just storing the strings and their indices, right?
+        // Somehow, using a Dictionary is 5x faster. So we will use a Dictionary (:
+        private static string[] ReadLookup;
+        private static Dictionary<string, short> WriteLookup;
+        private static short WriteLookupCounter = 0;
 
-        /// <summary>
-        /// Adds a string to the lookup table.
-        /// </summary>
-        /// <param name="value">The string to add to the lookup table.</param>
-        public static void AddLookupValue(string value) {
-            if (value != null && !LookupKeys.ContainsKey(value)) {
-                LookupKeys.Add(value, LookupCounter++);
-            }
-        }
+        private static BinaryWriter Writer;
+        private static BinaryReader Reader;
 
         /// <summary>
-        /// Creates a string lookup table for all the values in the specified MapElement.
+        /// Decodes a run-length-encoded string from the map file.
         /// </summary>
-        /// <param name="el">The MapElement to add looukp values for.</param>
-        public static void CreateLookupTable(MapElement el) {
-            AddLookupValue(el.Name);
-            foreach (KeyValuePair<string, object> pair in el.Attributes) {
-                AddLookupValue(pair.Key);
-
-                // If the key/value pair is for tile information - don't create lookup values for the inner text.
-                if ((el.Name == "solids" || el.Name == "bg" || el.Name == "objtiles") && pair.Key == "innerText") {
-                    break;
-                }
-
-                // Add value to lookup if it's a string.
-                if (pair.Value is string) {
-                    AddLookupValue(pair.Value.ToString());
-                }
-            }
-
-            // Add children elements' values to the lookup.
-            foreach (MapElement child in el.Children) {
-                CreateLookupTable(child);
-            }
-        }
-
-        /// <summary>
-        /// Decodes a run-length encoded string from the binary map format.
-        /// </summary>
-        /// <param name="value">A byte array containing the run-length encoded string.</param>
+        /// <param name="rle">The RLE string to decode.</param>
         /// <returns>The decoded string.</returns>
-        public static string DecodeRLE(byte[] value) {
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < value.Length; i += 2) {
-                builder.Append((char)value[i + 1], value[i]);
-            }
+        public static string DecodeRLE(byte[] rle) {
+            Builder.Clear();
+            for (int i = 0; i < rle.Length; i += 2) Builder.Append((char)rle[i + 1], rle[i]);
 
-            return builder.ToString();
+            return Builder.ToString();
         }
 
         /// <summary>
-        /// Encodes a string to the run-length format for map packing.
+        /// Encodes a string to a run-length-encoded format for the binary format.
         /// </summary>
-        /// <param name="value">The string to encode.</param>
-        /// <returns>An array of bytes containing the length-encoded string.</returns>
-        public static byte[] EncodeRLE(string value) {
-            List<byte> list = new List<byte>();
-            for (int i = 0; i < value.Length; i++) {
-                byte b = 1;
-                char c = value[i];
-                while (i + 1 < value.Length && value[i + 1] == c && b < 255) {
-                    b += 1;
-                    i++;
+        /// <param name="input">The input string to encode.</param>
+        /// <returns>The RLE-encoded input string.</returns>
+        public static unsafe byte[] EncodeRLE(string rle) {
+            int pos = 0;
+            byte[] arr = RLEBytes;
+
+            fixed (byte* ptr = &arr[0]) {
+                for (int i = 0; i < rle.Length; i++) {
+                    byte cv = (byte)rle[i];
+                    byte c = 1;
+
+                    while (i + 1 < rle.Length && c < byte.MaxValue && rle[i + 1] == cv) {
+                        c++;
+                        i++;
+                    }
+
+                    ptr[pos++] = c;
+                    ptr[pos++] = cv;
                 }
 
-                list.Add(b);
-                list.Add((byte)c);
-            }
+                byte[] res = new byte[pos];
+                fixed (byte* resptr = &res[0]) {
+                    for (int i = 0; i < pos; i++) resptr[i] = ptr[i];
+                }
 
-            return list.ToArray();
+                return res;
+            }
         }
 
+        /// <summary>
+        /// Reads a map from a map binary file.
+        /// </summary>
+        /// <param name="reader">The BinaryReader reading from the map binary file.</param>
+        /// <returns>The parsed map.</returns>
         public static MapElement ReadMapBinary(BinaryReader reader) {
-            if (reader.ReadString() != "CELESTE MAP") {
-                throw new InvalidDataException("Invalid map header.");
-            }
-
-            // Read metadata - map package and amount of lookup keys
+            if (reader.ReadString() != "CELESTE MAP") throw new InvalidDataException("Map does not start with CELESTE MAP header");
             string package = reader.ReadString();
-            short keysCounter = reader.ReadInt16();
 
-            Lookup = new string[keysCounter];
-            for (int i = 0; i < keysCounter; i++) {
-                Lookup[i] = reader.ReadString();
-            }
+            ReadLookup = new string[reader.ReadInt16()];
+            for (int i = 0; i < ReadLookup.Length; i++) ReadLookup[i] = reader.ReadString();
 
-            MapElement el = ReadMapElement(reader);
+            Reader = reader;
+
+            MapElement el = ReadMapElement();
             el.Package = package;
-
             return el;
         }
 
         /// <summary>
-        /// Parses a map element from the binary format.
+        /// Reads a map element from the binary map file.
         /// </summary>
-        /// <param name="reader">The BinaryReader to read the map data from.</param>
-        /// <returns>The parsed map element.</returns>
-        public static MapElement ReadMapElement(BinaryReader reader) {
+        /// <returns>The parsed MapElement.</returns>
+        public static MapElement ReadMapElement() {
             MapElement el = new MapElement();
-            el.Name = Lookup[reader.ReadInt16()];
+            el.Name = ReadLookup[Reader.ReadInt16()];
+            byte attrCount = Reader.ReadByte();
 
-            byte attrCount = reader.ReadByte();
             for (int i = 0; i < attrCount; i++) {
-                short loc = reader.ReadInt16();
-                string key = Lookup[loc];
-                ValueType type = (ValueType)reader.ReadByte();
-                object value = null;
+                string attrName = ReadLookup[Reader.ReadInt16()];
+                object attrVal = null;
+
+                ValueType type = (ValueType)Reader.ReadByte();
 
                 switch (type) {
                 case ValueType.Boolean:
-                    value = reader.ReadBoolean();
+                    attrVal = Reader.ReadBoolean();
                     break;
                 case ValueType.Byte:
-                    value = Convert.ToInt32(reader.ReadByte());
+                    attrVal = (int)Reader.ReadByte();
                     break;
                 case ValueType.Short:
-                    value = Convert.ToInt32(reader.ReadInt16());
+                    attrVal = (int)Reader.ReadInt16();
                     break;
-                case ValueType.Int:
-                    value = reader.ReadInt32();
+                case ValueType.Integer:
+                    attrVal = Reader.ReadInt32();
                     break;
                 case ValueType.Float:
-                    value = reader.ReadSingle();
+                    attrVal = Reader.ReadSingle();
                     break;
                 case ValueType.Lookup:
-                    value = Lookup[reader.ReadInt16()];
+                    attrVal = ReadLookup[Reader.ReadInt16()];
                     break;
                 case ValueType.String:
-                    value = reader.ReadString();
+                    attrVal = Reader.ReadString();
                     break;
                 case ValueType.RLE:
-                    // RLE strings start with a short (int16) containing the length.
-                    value = DecodeRLE(reader.ReadBytes(reader.ReadInt16()));
+                    attrVal = DecodeRLE(Reader.ReadBytes(Reader.ReadInt16()));
                     break;
                 }
 
-                el.Attributes.Add(key, value);
+                el.Attributes.Add(attrName, attrVal);
             }
 
-            short childCount = reader.ReadInt16();
-            for (int i = 0; i < childCount; i++) {
-                el.Children.Add(ReadMapElement(reader));
-            }
+            short childCount = Reader.ReadInt16();
+            for (int i = 0; i < childCount; i++) el.Children.Add(ReadMapElement());
 
             return el;
+        }
+
+        /// <summary>
+        /// Writes a map to a binary file.
+        /// </summary>
+        /// <param name="writer">The BinaryWriter used to write the result to.</param>
+        /// <param name="el">The map to write.</param>
+        public static void WriteMapBinary(BinaryWriter writer, MapElement el) {
+            // Create string lookup table
+            WriteLookup = new Dictionary<string, short>();
+            WriteLookupCounter = 0;
+            CreateLookupTable(el);
+
+            Writer = writer;
+            writer.Write("CELESTE MAP");
+            writer.Write(el.Package);
+            writer.Write((short)WriteLookup.Count);
+            foreach (string str in WriteLookup.Keys) writer.Write(str);
+
+            WriteMapElement(el);
+            writer.Flush();
         }
 
         /// <summary>
         /// Writes a map element to a binary file.
         /// </summary>
-        /// <param name="writer">The BinaryWriter used to write the result to.</param>
         /// <param name="el">The MapElement to write.</param>
-        public static void WriteMapBinary(BinaryWriter writer, MapElement el) {
-            LookupKeys.Clear();
-            LookupCounter = 0;
+        public static void WriteMapElement(MapElement el) {
+            byte attrCount = (byte)el.Attributes.Count;
+            short childCount = (short)el.Children.Count;
 
-            CreateLookupTable(el);
-
-            writer.Write("CELESTE MAP");
-            writer.Write(el.Package);
-            writer.Write((short)LookupKeys.Count);
-            foreach (string val in LookupKeys.Keys) {
-                writer.Write(val);
-            }
-
-            WriteMapElement(writer, el);
-            writer.Flush();
-        }
-
-        /// <summary>
-        /// Converts a map element to its binary representation.
-        /// </summary>
-        /// <param name="writer">The BinaryWriter used to write the result to.</param>
-        /// <param name="el">The MapElement to convert.</param>
-        public static void WriteMapElement(BinaryWriter writer, MapElement el) {
-            int children = el.Children.Count;
-            int attributes = el.Attributes.Keys.Count;
-
-            if (el.Children.Count > short.MaxValue || el.Attributes.Count > byte.MaxValue) {
-                throw new InvalidDataException($"Potential corruption in writing element {el.Name}: too many elements/attributes");
-            }
-
-            writer.Write(LookupKeys[el.Name]);
-            writer.Write((byte)attributes);
+            WriteLookupValue(el.Name, false);
+            Writer.Write(attrCount);
 
             foreach (KeyValuePair<string, object> pair in el.Attributes) {
-                writer.Write(LookupKeys[pair.Key]);
+                WriteLookupValue(pair.Key, false);
+
                 if (pair.Key == "innerText") {
                     if (el.Name == "solids" || el.Name == "bg") {
-                        byte[] array = EncodeRLE(el.GetString("innerText"));
+                        byte[] res = EncodeRLE(pair.Value.ToString());
 
-                        // RLE strings are preceded by a short containing their length.
-                        // If this exceeds the max value of a short, the map will corrupt.
-                        // Writing a normal string instead will result in a size increase,
-                        // but will (hopefully) prevent the map data from getting corrupted.
-                        if (array.Length > short.MaxValue) {
-                            writer.Write((byte)ValueType.String);
-                            writer.Write(el.GetString("innerText"));
-                        } else {
-                            writer.Write((byte)ValueType.RLE);
-                            writer.Write((short)array.Length);
-                            writer.Write(array);
-                        }
+                        Writer.Write((byte)ValueType.RLE);
+                        Writer.Write((short)res.Length);
+                        Writer.Write(res);
                     } else {
-                        writer.Write((byte)ValueType.String);
-                        writer.Write(el.GetString("innerText"));
+                        Writer.Write((byte)ValueType.String);
+                        Writer.Write(pair.Value.ToString());
                     }
                 } else {
-                    string val = pair.Value.ToString();
-                    if(bool.TryParse(val, out bool o1)) {
-                        writer.Write((byte)ValueType.Boolean);
-                        writer.Write(o1);
-                    } else if(byte.TryParse(val, out byte o2)) {
-                        writer.Write((byte)ValueType.Byte);
-                        writer.Write(o2);
-                    } else if(short.TryParse(val, out short o3)) {
-                        writer.Write((byte)ValueType.Short);
-                        writer.Write(o3);
-                    } else if(int.TryParse(val, out int o4)) {
-                        writer.Write((byte)ValueType.Int);
-                        writer.Write(o4);
-                    } else if(float.TryParse(val, out float o5)) {
-                        writer.Write((byte)ValueType.Float);
-                        writer.Write(o5);
+                    if (pair.Value is bool) {
+                        Writer.Write((byte)ValueType.Boolean);
+                        Writer.Write((bool)pair.Value);
+                    } else if (pair.Value is int) {
+                        CompressNumber((int)pair.Value);
+                    } else if (pair.Value is float) {
+                        float val = (float)pair.Value;
+
+                        // Compress to a byte/short/int if whole
+                        if (val % 1 == 0) {
+                            CompressNumber((int)val);
+                        } else {
+                            Writer.Write((byte)ValueType.Float);
+                            Writer.Write((float)pair.Value);
+                        }
                     } else {
-                        writer.Write((byte)ValueType.Lookup);
-                        writer.Write(LookupKeys[val]);
+                        WriteLookupValue(pair.Value.ToString(), true);
                     }
                 }
             }
 
-            writer.Write((short)children);
-            foreach (MapElement child in el.Children) {
-                WriteMapElement(writer, child);
+            Writer.Write(childCount);
+            foreach (MapElement child in el.Children) WriteMapElement(child);
+        }
+
+        public static void CreateLookupTable(MapElement el) {
+            if (!WriteLookup.ContainsKey(el.Name)) WriteLookup.Add(el.Name, WriteLookupCounter++);
+
+            foreach (KeyValuePair<string, object> pair in el.Attributes) {
+                // Add attribute keys
+                if (!WriteLookup.ContainsKey(pair.Key) && pair.Key != null) WriteLookup.Add(pair.Key, WriteLookupCounter++);
+
+                // Add attribute values
+                if (pair.Value is string && pair.Key != "innerText" && !WriteLookup.ContainsKey(pair.Value.ToString()) && pair.Key != null) WriteLookup.Add(pair.Value.ToString(), WriteLookupCounter++);
             }
+
+            foreach (MapElement child in el.Children) CreateLookupTable(child);
+        }
+
+        public static void CompressNumber(int num) {
+            if (num >= 0 && num <= byte.MaxValue) {
+                Writer.Write((byte)ValueType.Byte);
+                Writer.Write((byte)num);
+            } else if (num >= short.MinValue && num <= short.MaxValue) {
+                Writer.Write((byte)ValueType.Short);
+                Writer.Write((short)num);
+            } else {
+                Writer.Write((byte)ValueType.Integer);
+                Writer.Write(num);
+            }
+        }
+
+        public static void WriteLookupValue(string value, bool writeType) {
+            if (writeType) Writer.Write((byte)ValueType.Lookup);
+            short lval = WriteLookup[value];
+
+            if (lval < 0) throw new KeyNotFoundException($"Could not find lookup value {value}");
+            Writer.Write(lval);
         }
     }
 
@@ -262,7 +251,7 @@ namespace Starforge.Map {
         Boolean = 0,
         Byte = 1,
         Short = 2,
-        Int = 3,
+        Integer = 3,
         Float = 4,
         Lookup = 5,
         String = 6,

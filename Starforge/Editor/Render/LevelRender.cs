@@ -288,13 +288,13 @@ namespace Starforge.Editor.Render {
 
     public enum RenderFlags {
         None = 0,
-        BGDecals = 1,
-        BGTiles = 2,
-        FGDecals = 4,
-        FGTiles = 8,
-        Entities = 16,
-        Triggers = 32,
-        OBTiles = 64,
-        All = 127
+        BGDecals = 1 << 0,
+        BGTiles = 1 << 1,
+        FGDecals = 1 << 2,
+        FGTiles = 1 << 3,
+        Entities = 1 << 4,
+        Triggers = 1 << 5,
+        OBTiles = 1 << 6,
+        All = BGDecals | BGTiles | FGDecals | FGTiles | Entities | Triggers | OBTiles
     }
 }

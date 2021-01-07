@@ -167,16 +167,16 @@ namespace Starforge.Core {
             base.Draw(gt);
             GUIRenderer.BeforeLayout(gt);
             Scene.Render(gt);
-            
+
             // Set render target back to the window so we don't accidentally render UI content on top of a room.
-            for(int i = 0; i < Windows.Count; i++) {
+            GraphicsDevice.SetRenderTarget(null);
+            for (int i = 0; i < Windows.Count; i++) {
                 if (Windows[i].Visible) Windows[i].Render();
                 else DeleteWindow(Windows[i]);
             }
 
             Menubar.Render();
 
-            GraphicsDevice.SetRenderTarget(null);
             GUIRenderer.AfterLayout();
         }
 

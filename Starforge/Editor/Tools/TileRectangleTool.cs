@@ -6,7 +6,9 @@ using Starforge.Mod.Content;
 
 namespace Starforge.Editor.Tools {
     public class TileRectangleTool : Tool {
+        /// <remarks>The hint is set out of bounds (beyond upleft corner) so the hint does not appear when first selecting the tool.</remarks>
         private Rectangle Hint = new Rectangle(-8, -8, 8, 8);
+
         private Rectangle Hold = new Rectangle(-1, -1, 0, 0);
         private Point Start;
 

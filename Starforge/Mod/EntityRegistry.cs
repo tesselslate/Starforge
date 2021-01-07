@@ -9,12 +9,10 @@ namespace Starforge.Mod {
     public static class EntityRegistry {
         private static List<Placement> EntityPlacements;
         private static Dictionary<string, EntityCreator> EntityCreators;
-        private static Dictionary<Type, PropertyInfo[]> EntityCache;
 
         static EntityRegistry() {
             EntityPlacements = new List<Placement>();
             EntityCreators = new Dictionary<string, EntityCreator>();
-            EntityCache = new Dictionary<Type, PropertyInfo[]>();
         }
 
         public static Entity CreateEntity(MapElement el, Room room) {
@@ -32,39 +30,39 @@ namespace Starforge.Mod {
                 if (!type.IsSubclassOf(typeof(Entity))) return;
 
                 EntityDefinitionAttribute attr = type.GetCustomAttribute<EntityDefinitionAttribute>();
-                if (attr != null) {
-                    string id = attr.ID;
-                    ConstructorInfo ctor = type.GetConstructor(new Type[]
-                    {
+                if (attr == null) {
+                    Logger.Log(LogLevel.Error, $"Entity {type} does not have a definition attribute");
+                    return;
+                }
+
+                string id = attr.ID;
+                ConstructorInfo ctor = type.GetConstructor(new Type[]
+                {
                         typeof(EntityData),
                         typeof(Room)
-                    });
+                });
 
-                    if (ctor != null) {
-                        EntityCache.Add(type, type.GetProperties());
+                if (ctor == null) {
+                    Logger.Log(LogLevel.Error, $"Entity of type {type} with ID {id} does not have a valid ctor");
+                    return;
+                }
 
-                        FieldInfo placementsField = null;
-                        if ((placementsField = type.GetField("Placements", BindingFlags.Public | BindingFlags.Static)) != null) {
-                            if (placementsField.FieldType == typeof(PlacementList)) {
-                                PlacementList placements = (PlacementList)placementsField.GetValue(null);
+                FieldInfo placementsField = null;
+                if ((placementsField = type.GetField("Placements", BindingFlags.Public | BindingFlags.Static)) != null) {
+                    if (placementsField.FieldType == typeof(PlacementList)) {
+                        PlacementList placements = (PlacementList)placementsField.GetValue(null);
 
-                                foreach (Placement p in placements) {
-                                    p.Parent = type;
-                                    EntityPlacements.Add(p);
-                                }
-
-                                Logger.Log($"Registered {placements.Count} placements for {attr.ID}");
-                            }
+                        foreach (Placement p in placements) {
+                            p.Parent = type;
+                            EntityPlacements.Add(p);
                         }
 
-                        EntityCreators.Add(id, (EntityData d, Room r) => (Entity)ctor.Invoke(new object[] { d, r }));
-                        Logger.Log($"Registered entity {id} of type {type}");
-                    } else {
-                        Logger.Log(LogLevel.Error, $"Entity of type {type} with ID {id} does not have a valid ctor");
+                        Logger.Log($"Registered {placements.Count} placements for {attr.ID}");
                     }
-                } else {
-                    Logger.Log(LogLevel.Error, $"Entity {type} does not have a definition attribute");
                 }
+
+                EntityCreators.Add(id, (EntityData d, Room r) => (Entity)ctor.Invoke(new object[] { d, r }));
+                Logger.Log($"Registered entity {id} of type {type}");
             } catch (Exception e) {
                 Logger.Log(LogLevel.Error, $"Encountered an error while attempting to register entity {type}");
                 Logger.LogException(e);

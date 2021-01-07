@@ -10,6 +10,8 @@ namespace Starforge.Editor.Tools {
         public Entity HeldEntity;
 
         private Point Start;
+
+        /// <remarks>The hold is set out of bounds (beyond upleft corner) so the entity does not appear when first selecting the tool.</remarks>
         private Rectangle Hold = new Rectangle(-64, -64, 0, 0);
 
         public override string GetName() => "Entities";

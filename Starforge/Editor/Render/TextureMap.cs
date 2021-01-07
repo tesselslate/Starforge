@@ -16,7 +16,7 @@
         /// <returns>The texture at the given position.</returns>
         public StaticTexture this[int x, int y] {
             get {
-                if (x < 0 || x > Width - 1 || y < 0 || y > Height - 1) return default;
+                if (x < 0 || x >= Width || y < 0 || y >= Height) return default;
                 else return Textures[x + y * Width];
             }
         }
