@@ -86,7 +86,7 @@ namespace Starforge.Util {
         }
 
         public static int RandInt(int seed, int max) {
-            return RandBytes[seed] % (max % ushort.MaxValue);
+            return RandBytes[seed % ushort.MaxValue] % max;
         }
 
         public static System.Numerics.Vector3 ColorToVect3(Color c) {
