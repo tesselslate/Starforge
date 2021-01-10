@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SDL2;
 using Starforge.Core.Boot;
 using Starforge.Core.Interop;
 using Starforge.Editor.UI;
@@ -9,6 +8,7 @@ using Starforge.Platform;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Starforge.Core {
@@ -99,18 +99,10 @@ namespace Starforge.Core {
 
         private static void Main(string[] args) {
             // Set up platform helper
-            switch (SDL.SDL_GetPlatform()) {
-            case "Windows":
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
                 Platform = new PlatformWindows();
-                break;
-            case "Linux":
-                Logger.CreateErrorLog($"Linux is currently unsupported.");
-                break;
-            default:
-                // There are currently no plans to support Mac, however there may be in the future.
-                // SDL/FNA support iOS. Please do not attempt to run this on iOS. (:
-                Logger.CreateErrorLog($"{SDL.SDL_GetPlatform()} is unsupported.");
-                break;
+            } else {
+                Logger.CreateErrorLog($"Unsupported platform detected.");
             }
 
             Thread.CurrentThread.Name = "Starforge";
@@ -176,7 +168,6 @@ namespace Starforge.Core {
             }
 
             Menubar.Render();
-
             GUIRenderer.AfterLayout();
         }
 

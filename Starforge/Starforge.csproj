@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net472</TargetFramework>
+		<TargetFramework>net5.0</TargetFramework>
 		<ApplicationIcon>../assets/logo_128.ico</ApplicationIcon>
 		<StartupObject />
 		
@@ -9,25 +9,40 @@
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<RootNamespace>Starforge</RootNamespace>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<Platforms>x86</Platforms>
+		<Platforms>x64</Platforms>
 	</PropertyGroup>
 
+	
+	
+	<!-- Packages -->
 	<ItemGroup>
 		<PackageReference Include="ImGui.NET" Version="1.78.0" />
+		<PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
 		<PackageReference Include="System.Buffers" Version="4.4.0" />
 		<PackageReference Include="System.Numerics.Vectors" Version="4.4.0" />
 		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.4.0" />
 	</ItemGroup>
 
+	
+	
+	<!-- Embedded Resources -->
 	<ItemGroup>
-		<Reference Include="FNA" HintPath="..\lib\FNA\bin\Release\FNA.dll" />
-		<Reference Include="System" />
-		<Reference Include="System.Numerics" />
-		<Reference Include="System.Xml" />
 		<EmbeddedResource Include="../assets/logo_256.png" />
 	</ItemGroup>
 
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	  <Exec Command="copy $(SolutionDir)\lib\nfd_d.dll $(OutDir)\nfd_d.dll" />
+	
+	
+	<!-- Dependencies -->
+	<ItemGroup>
+		<Reference Include="../lib/FNA/bin/x64/Release/netstandard2.0/FNA.dll" />
+	</ItemGroup>
+
+	
+	
+	<!-- Native Dependencies -->
+	<Target Condition="$([MSBuild]::IsOSPlatform(Windows))" Name="CopyNative-Windows" AfterTargets="AfterBuild">
+		<Copy SourceFiles="$(SolutionDir)/lib/prebuilt/win-x64/FNA3D.dll" DestinationFolder="$(OutDir)"/>
+		<Copy SourceFiles="$(SolutionDir)/lib/prebuilt/win-x64/SDL2.dll" DestinationFolder="$(OutDir)"/>
+		<Copy SourceFiles="$(SolutionDir)/lib/prebuilt/win-x64/nfd_d.dll" DestinationFolder="$(OutDir)"/>
 	</Target>
 </Project>

@@ -1,11 +1,13 @@
-﻿using Microsoft.Win32;
+﻿#pragma warning disable CA1416
+
+using Microsoft.Win32;
 using Starforge.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
 namespace Starforge.Platform {
-    public class PlatformWindows : PlatformBase {
+    internal class PlatformWindows : PlatformBase {
         public override string GetAppDataFolder() {
             return Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),

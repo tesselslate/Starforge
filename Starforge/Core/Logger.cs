@@ -16,7 +16,7 @@ namespace Starforge.Core {
         /// <param name="msg">The message to write.</param>
         public static void Log(string msg) {
             if (Active && Level >= LogLevel.Info) {
-                Writer.WriteLine($"[{DateTime.Now.ToString()}] | [Info] {msg}");
+                Writer.WriteLine($"[{DateTime.Now}] | [Info] {msg}");
                 Writer.Flush();
             }
         }
@@ -28,7 +28,7 @@ namespace Starforge.Core {
         /// <param name="msg">The message to write.</param>
         public static void Log(LogLevel level, string msg) {
             if (Active && level >= Level) {
-                Writer.WriteLine($"[{DateTime.Now.ToString()}] | [{level.ToString()}] {msg}");
+                Writer.WriteLine($"[{DateTime.Now}] | [{level}] {msg}");
                 Writer.Flush();
             }
         }
@@ -72,7 +72,11 @@ namespace Starforge.Core {
                 }
 
                 // Open the crash/error log.
-                Process.Start(errLogPath);
+                new Process{ 
+                    StartInfo = new ProcessStartInfo(errLogPath) {
+                        UseShellExecute = true
+                    } 
+                }.Start();
             } catch (Exception e) {
                 LogException(e);
             }
