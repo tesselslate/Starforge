@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
-using Starforge.Core;
-using Starforge.MapStructure;
-using Starforge.Mod;
+using Starforge.Map;
+using Starforge.Mod.API;
+using Starforge.Mod.Content;
 using Starforge.Util;
 
 namespace Starforge.Vanilla.Entities {
@@ -10,10 +10,10 @@ namespace Starforge.Vanilla.Entities {
         private static readonly Color BgColor = MiscHelper.HexToColor("fcf579") * 0.2f;
         private static readonly Color OutlineColor = MiscHelper.HexToColor("fcf579");
 
-        public Lightning(Level level, EntityData data) : base(level, data) {
-            StretchableX = true;
-            StretchableY = true;
-        }
+        public override bool StretchableX => true;
+        public override bool StretchableY => true;
+
+        public Lightning(EntityData data, Room room) : base(data, room) { }
 
         public override void Render() {
             Rectangle renderPos = new Rectangle((int)Position.X, (int)Position.Y, GetInt("width", 8), GetInt("height", 8));
@@ -21,5 +21,10 @@ namespace Starforge.Vanilla.Entities {
             GFX.Pixel.Draw(renderPos, BgColor);
             GFX.Draw.HollowRectangle(renderPos, OutlineColor);
         }
+
+        public static PlacementList Placements = new PlacementList()
+        {
+            new Placement("Lightning")
+        };
     }
 }

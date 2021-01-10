@@ -3,8 +3,7 @@
 		<OutputType>Library</OutputType>
 		<TargetFramework>net472</TargetFramework>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-		<RootNamespace>Starforge</RootNamespace>
-		<ApplicationIcon>../assets/logo_128.ico</ApplicationIcon>
+		<RootNamespace>Starforge.Vanilla</RootNamespace>
 		<StartupObject />
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Platforms>x86</Platforms>
@@ -25,9 +24,7 @@
 
 	<ItemGroup>
 		<Reference Include="FNA" HintPath="..\lib\FNA\bin\Release\FNA.dll" />
-		<Reference Include="Starforge">
-		  <HintPath>..\Starforge\bin\x86\Debug\net472\Starforge.exe</HintPath>
-		</Reference>
+		<Reference Include="Starforge" HintPath="..\Starforge\bin\x86\Debug\net472\Starforge.exe" />
 		<Reference Include="System" />
 	</ItemGroup>
 </Project>

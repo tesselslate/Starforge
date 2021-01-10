@@ -1,92 +1,77 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using Starforge.Core;
-using Starforge.Core.Input;
 using Starforge.Editor.Actions;
-using Starforge.Editor.UI;
-using Starforge.MapStructure;
+using Starforge.Map;
+using Starforge.Mod.Content;
 
 namespace Starforge.Editor.Tools {
-
     public class TileRectangleTool : Tool {
+        /// <remarks>The hint is set out of bounds (beyond upleft corner) so the hint does not appear when first selecting the tool.</remarks>
+        private Rectangle Hint = new Rectangle(-8, -8, 8, 8);
 
-        private Rectangle ToolHint = new Rectangle(0, 0, 8, 8);
-        private static Rectangle Hold;
-        private static Point HoldStart;
+        private Rectangle Hold = new Rectangle(-1, -1, 0, 0);
+        private Point Start;
 
-        public override void ManageInput(MouseEvent m) {
-            Level l = Engine.Scene.SelectedLevel;
-
-            ToolHint.X = l.TilePointer.X * 8;
-            ToolHint.Y = l.TilePointer.Y * 8;
-
-            if (m.LeftButtonClick) {
-                OnLeftClick();
-            }
-            else if (m.LeftButtonDrag) {
-                OnLeftDrag();
-            }
-            else if (m.LeftButtonUnclick) {
-                OnLeftUnclick();
-            }
-            else if (m.MouseMoved) {
-                OnMouseMove();
-            }
-
-            ToolHint = new Rectangle(Hold.X * 8, Hold.Y * 8, Hold.Width * 8, Hold.Height * 8);
-        }
-
-        private void OnMouseMove() {
-            Level l = Engine.Scene.SelectedLevel;
-            Hold = new Rectangle(l.TilePointer.X, l.TilePointer.Y, 1, 1);
-        }
-
-        private void OnLeftClick() {
-            Level l = Engine.Scene.SelectedLevel;
-            HoldStart = new Point(l.TilePointer.X, l.TilePointer.Y);
-        }
-
-        private void OnLeftDrag() {
-            Level l = Engine.Scene.SelectedLevel;
-            Point topLeftCorner = new Point(
-                (int)MathHelper.Min(HoldStart.X, l.TilePointer.X),
-                (int)MathHelper.Min(HoldStart.Y, l.TilePointer.Y)
-            );
-            Point botRightCorner = new Point(
-                (int)MathHelper.Max(HoldStart.X, l.TilePointer.X),
-                (int)MathHelper.Max(HoldStart.Y, l.TilePointer.Y)
-            );
-            Hold = new Rectangle(
-                topLeftCorner.X,
-                topLeftCorner.Y,
-                botRightCorner.X - topLeftCorner.X + 1,
-                botRightCorner.Y - topLeftCorner.Y + 1
-            );
-        }
-
-        private void OnLeftUnclick() {
-            Level l = Engine.Scene.SelectedLevel;
-            switch (ToolWindow.CurrentTileType) {
-            case TileType.Foreground:
-                l.ApplyNewAction(new RectangleTilePlacement(l, ToolWindow.CurrentTileType, ToolWindow.CurrentFGTileset, Hold));
-                break;
-            case TileType.Background:
-                l.ApplyNewAction(new RectangleTilePlacement(l, ToolWindow.CurrentTileType, ToolWindow.CurrentBGTileset, Hold));
-                break;
-            }
-            Hold = new Rectangle(l.TilePointer.X, l.TilePointer.Y, 1, 1);
-            ToolHint.Width = 8;
-            ToolHint.Height = 8;
-        }
+        public override string GetName() => "Tiles (Rectangle)";
 
         public override void Render() {
-            GFX.Pixel.Draw(ToolHint, Engine.Config.ToolAccentColor, 0.25f);
-            GFX.Draw.HollowRectangle(ToolHint, Color.Goldenrod);
+            GFX.Draw.BorderedRectangle(Hint, Settings.ToolColor * 0.5f, Settings.ToolColor);
+            Hint.X = MapEditor.Instance.State.TilePointer.X * 8;
+            Hint.Y = MapEditor.Instance.State.TilePointer.Y * 8;
         }
 
-        public override string getName() {
-            return "Tile Rectangles";
+        public override void Update() {
+            if (Input.Mouse.LeftClick) HandleClick();
+            else if (Input.Mouse.LeftHold) HandleDrag();
+            else if (Input.Mouse.LeftUnclick) HandleUnclick();
+            else if (Input.Mouse.Moved) HandleMove();
+
+            Hint = new Rectangle(Hold.X * 8, Hold.Y * 8, Hold.Width * 8, Hold.Height * 8);
+        }
+
+        private void HandleMove() {
+            Hold = new Rectangle(MapEditor.Instance.State.TilePointer.X, MapEditor.Instance.State.TilePointer.Y, 1, 1);
+        }
+
+        private void HandleClick() {
+            Start = MapEditor.Instance.State.TilePointer;
+        }
+
+        private void HandleDrag() {
+            Point tp = MapEditor.Instance.State.TilePointer;
+
+            Point tl = new Point(
+                (int)MathHelper.Min(Start.X, tp.X),
+                (int)MathHelper.Min(Start.Y, tp.Y)
+            );
+
+            Point br = new Point(
+                (int)MathHelper.Max(Start.X, tp.X),
+                (int)MathHelper.Max(Start.Y, tp.Y)
+            );
+
+            Hold = new Rectangle(
+                tl.X, tl.Y,
+                br.X - tl.X + 1,
+                br.Y - tl.Y + 1
+            );
+        }
+
+        private void HandleUnclick() {
+            Room r = MapEditor.Instance.State.SelectedRoom;
+
+            switch (ToolManager.SelectedLayer) {
+            case ToolLayer.Background:
+                MapEditor.Instance.State.Apply(new TileRectangleAction(r, ToolManager.SelectedLayer, ToolManager.BGTileset, Hold));
+                break;
+            case ToolLayer.Foreground:
+                MapEditor.Instance.State.Apply(new TileRectangleAction(r, ToolManager.SelectedLayer, ToolManager.FGTileset, Hold));
+                break;
+            }
+
+            Hold = new Rectangle(MapEditor.Instance.State.TilePointer.X, MapEditor.Instance.State.TilePointer.Y, 1, 1);
+            Hint.Width = 8;
+            Hint.Height = 8;
         }
     }
-
 }

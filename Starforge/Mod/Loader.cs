@@ -1,5 +1,6 @@
 ﻿using Starforge.Core;
-using Starforge.MapStructure;
+using Starforge.Map;
+using Starforge.Mod.API;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,40 +8,68 @@ using System.Reflection;
 
 namespace Starforge.Mod {
     public static class Loader {
-        private static List<Assembly> LoadedAssemblies = new List<Assembly>();
+        /// <summary>
+        /// A list of plugin assemblies not contained in mods.
+        /// </summary>
+        private static List<Assembly> PluginAssemblies = new List<Assembly>();
 
-        public static void LoadAssembly(Assembly asm) {
+        /// <summary>
+        /// Attempts to load a plugin assembly.
+        /// </summary>
+        /// <param name="asm">The assembly to load.</param>
+        public static void LoadPluginAssembly(Assembly asm) {
             try {
                 foreach (Type type in asm.GetTypes()) {
-                    if (type.IsSubclassOf(typeof(Entity)) && type.GetCustomAttribute<EntityDefinitionAttribute>() != null) {
-                        EntityRegistry.Register(type);
+                    if (type.IsSubclassOf(typeof(Entity))) {
+                        if (type.GetCustomAttribute<EntityDefinitionAttribute>() != null || type.GetCustomAttribute<TriggerDefinitionAttribute>() != null) {
+                            EntityRegistry.Register(type);
+                        } else {
+                            Logger.Log(LogLevel.Warning, $"Assembly {asm.GetName()} contains {type} without an appropriate definition attribute");
+                        }
                     }
                 }
 
-                LoadedAssemblies.Add(asm);
-            }
-            catch (Exception e) {
-                Logger.Log(LogLevel.Error, $"Failed to load assembly: {asm.GetName()}");
+                PluginAssemblies.Add(asm);
+            } catch (Exception e) {
+                Logger.Log(LogLevel.Error, $"Failed to load plugin assembly {asm.GetName()}");
+                if (e is ReflectionTypeLoadException) {
+                    foreach (Exception e2 in ((ReflectionTypeLoadException)e).LoaderExceptions) {
+                        Logger.Log(LogLevel.Error, $"RTL - {e2}");
+                    }
+                }
+
                 Logger.LogException(e);
             }
         }
 
-        public static void LoadAssembly(string path) {
+        /// <summary>
+        /// Attempts to load a plugin assembly from the given path.
+        /// </summary>
+        /// <param name="path">The path to load the assembly from.</param>
+        public static void LoadPluginAssembly(string path) {
             try {
                 Assembly asm = Assembly.LoadFile(path);
-                LoadAssembly(asm);
-            }
-            catch (Exception e) {
-                Logger.Log(LogLevel.Error, $"Failed to load assembly: ${path}");
+                LoadPluginAssembly(asm);
+            } catch (Exception e) {
+                Logger.Log(LogLevel.Error, $"Failed to load assembly: {path}");
                 Logger.LogException(e);
             }
         }
 
+        /// <summary>
+        /// Loads all plugin assemblies.
+        /// </summary>
         public static void LoadPluginAssemblies() {
-            // TODO: Load plugins from mods folder
+            string pluginDir = Path.Combine(Settings.ConfigDirectory, "Plugins");
+            if (!Directory.Exists(pluginDir)) Directory.CreateDirectory(pluginDir);
 
-            // Hardcoded for development purposes
-            LoadAssembly(Path.GetFullPath(".\\Starforge.Vanilla.dll"));
+            // Load Starforge.Vanilla manually
+            LoadPluginAssembly(Path.GetFullPath("./Starforge.Vanilla.dll"));
+
+            // Load plugins from Plugins folder
+            foreach (string path in Directory.GetFiles(pluginDir)) {
+                LoadPluginAssembly(path);
+            }
         }
     }
 }

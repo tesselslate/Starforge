@@ -1,17 +1,29 @@
 ﻿using Microsoft.Xna.Framework;
+using Starforge.Map;
 using System;
 using System.Collections.Generic;
 
 namespace Starforge.Util {
+    /// <summary>
+    /// Contains various miscellaneous functions.
+    /// </summary>
     public static class MiscHelper {
-        public static Random Rand = new Random();
+        public static Random Rand;
+        public static byte[] RandBytes;
 
-        public static T Choose<T>(List<T> toChoose) {
-            return toChoose[Rand.Next(toChoose.Count)];
+        static MiscHelper() {
+            Rand = new Random();
+
+            RandBytes = new byte[65536];
+            Rand.NextBytes(RandBytes);
         }
 
-        public static T Choose<T>(int x, int y, List<T> toChoose) {
-            return toChoose[(x ^ 2 + y * x) % toChoose.Count];
+        public static float Angle(Vector2 from, Vector2 to) {
+            return (float)Math.Atan2(to.Y - from.Y, to.X - from.X);
+        }
+
+        public static Vector2 AngleToVector(float angleRadians, float length) {
+            return new Vector2((float)Math.Cos(angleRadians) * length, (float)Math.Sin(angleRadians) * length);
         }
 
         public static string CleanCamelCase(string str) {
@@ -22,8 +34,7 @@ namespace Starforge.Util {
                 if (char.IsUpper(c)) {
                     if (!string.IsNullOrEmpty(word)) words.Add(char.ToUpper(word[0]) + word.Substring(1));
                     word = $"{c}";
-                }
-                else {
+                } else {
                     word += c;
                 }
             }
@@ -31,6 +42,10 @@ namespace Starforge.Util {
             words.Add(char.ToUpper(word[0]) + word.Substring(1));
 
             return string.Join(" ", words.ToArray());
+        }
+
+        public static Room CloneRoom(Room room) {
+            return Room.Decode(room.Encode(), room.Parent);
         }
 
         public static string ColorToHex(Color c) {
@@ -51,13 +66,11 @@ namespace Starforge.Util {
                     HexCharToByte(hex[index + 2]) * 16 + HexCharToByte(hex[index + 3]),
                     HexCharToByte(hex[index + 4]) * 16 + HexCharToByte(hex[index + 5])
                 );
-            }
-            else {
+            } else {
                 int hexNum;
                 if (int.TryParse(hex.Substring(index), out hexNum)) {
                     return HexToColor(hexNum);
-                }
-                else {
+                } else {
                     return Color.White;
                 }
             }
@@ -72,35 +85,8 @@ namespace Starforge.Util {
             return res;
         }
 
-        public static int[,] ReadCSV(string csv, int width, int height) {
-            int[,] array = new int[width, height];
-
-            for (int i = 0; i < width; i++) {
-                for (int j = 0; j < height; j++) {
-                    array[i, j] = -1;
-                }
-            }
-
-            string[] array2 = csv.Split(new char[] {
-                '\n'
-            });
-
-            int index = 0;
-            while (index < height && index < array2.Length) {
-                string[] array3 = array2[index].Split(new char[]
-                {
-                    ','
-                }, StringSplitOptions.RemoveEmptyEntries);
-
-                int widthIndex = 0;
-                while (widthIndex < width && widthIndex < array3.Length) {
-                    array[widthIndex, index] = Convert.ToInt32(array3[widthIndex]);
-                    widthIndex++;
-                }
-                index++;
-            }
-
-            return array;
+        public static int RandInt(int seed, int max) {
+            return RandBytes[seed % ushort.MaxValue] % max;
         }
 
         public static System.Numerics.Vector3 ColorToVect3(Color c) {
@@ -109,14 +95,6 @@ namespace Starforge.Util {
 
         public static Color Vect3ToColor(System.Numerics.Vector3 v) {
             return new Color(v.X, v.Y, v.Z);
-        }
-
-        public static float Angle(Vector2 from, Vector2 to) {
-            return (float)Math.Atan2(to.Y - from.Y, to.X - from.X);
-        }
-
-        public static Vector2 AngleToVector(float angleRadians, float length) {
-            return new Vector2((float)Math.Cos(angleRadians) * length, (float)Math.Sin(angleRadians) * length);
         }
     }
 }

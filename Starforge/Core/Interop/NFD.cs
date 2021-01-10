@@ -8,12 +8,6 @@ using System.Text;
 
 namespace Starforge.Core.Interop {
     public static class NFD {
-        public enum NfdResult {
-            NFD_ERROR,
-            NFD_OKAY,
-            NFD_CANCEL
-        }
-
         [DllImport("nfd_d", CallingConvention = CallingConvention.Cdecl)]
         private static extern NfdResult NFD_OpenDialog(
             IntPtr filterList,
@@ -23,6 +17,11 @@ namespace Starforge.Core.Interop {
         [DllImport("nfd_d", CallingConvention = CallingConvention.Cdecl)]
         private static extern NfdResult NFD_SaveDialog(
             IntPtr filterList,
+            IntPtr defaultPath,
+            out IntPtr outPath);
+
+        [DllImport("nfd_d", CallingConvention = CallingConvention.Cdecl)]
+        private static extern NfdResult NFD_PickFolder(
             IntPtr defaultPath,
             out IntPtr outPath);
 
@@ -37,13 +36,13 @@ namespace Starforge.Core.Interop {
             Marshal.FreeHGlobal(filterListPtr);
             Marshal.FreeHGlobal(defaultPathPtr);
 
-            path = res != NfdResult.NFD_OKAY ? null : NFDParser.FromNfdString(outPath);
+            path = res != NfdResult.OKAY ? null : NFDParser.FromNfdString(outPath);
 
             // Here, we *should* free the outPath pointer.
             // However, doing so causes a crash!
             // Does not doing so cause a memory leak? Probably. :)
 
-            if (res == NfdResult.NFD_ERROR) {
+            if (res == NfdResult.ERROR) {
                 Logger.Log(LogLevel.Error, "nativefiledialog error:");
                 Logger.Log(LogLevel.Error, GetError());
             }
@@ -59,11 +58,27 @@ namespace Starforge.Core.Interop {
             Marshal.FreeHGlobal(filterListPtr);
             Marshal.FreeHGlobal(defaultPathPtr);
 
-            path = res != NfdResult.NFD_OKAY ? null : NFDParser.FromNfdString(outPath);
+            path = res != NfdResult.OKAY ? null : NFDParser.FromNfdString(outPath);
 
             // The outPath pointer should also probably be freed here.
 
-            if (res == NfdResult.NFD_ERROR) {
+            if (res == NfdResult.ERROR) {
+                Logger.Log(LogLevel.Error, "nativefiledialog error:");
+                Logger.Log(LogLevel.Error, GetError());
+            }
+
+            return res;
+        }
+
+        public static NfdResult PickFolder(string defaultPath, out string path) {
+            IntPtr defaultPathPtr = NFDParser.ToNfdString(defaultPath);
+
+            NfdResult res = NFD_PickFolder(defaultPathPtr, out IntPtr outPath);
+            Marshal.FreeHGlobal(defaultPathPtr);
+
+            path = res != NfdResult.OKAY ? null : NFDParser.FromNfdString(outPath);
+
+            if (res == NfdResult.ERROR) {
                 Logger.Log(LogLevel.Error, "nativefiledialog error:");
                 Logger.Log(LogLevel.Error, GetError());
             }
@@ -100,7 +115,7 @@ namespace Starforge.Core.Interop {
             int i = 0;
 
             // While string is not null terminated, copy bytes
-            while(i < 4095 && bytes[i++] != 0) {
+            while (i < 4095 && bytes[i++] != 0) {
                 Marshal.Copy(ptr, bytes, 0, i + 1);
             }
 
@@ -112,5 +127,11 @@ namespace Starforge.Core.Interop {
 
             return Encoding.UTF8.GetString(res);
         }
+    }
+
+    public enum NfdResult {
+        ERROR,
+        OKAY,
+        CANCEL
     }
 }

@@ -6,6 +6,13 @@ using System.IO;
 
 namespace Starforge.Platform {
     public class PlatformWindows : PlatformBase {
+        public override string GetAppDataFolder() {
+            return Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Starforge"
+            );
+        }
+
         public override List<string> GetCelesteDirectories() {
             List<string> celesteInstalls = new List<string>();
 
@@ -40,7 +47,6 @@ namespace Starforge.Platform {
 
             return null;
         }
-
 
         private List<string> GetSteamLibraries() {
             List<string> libraries = new List<string>();

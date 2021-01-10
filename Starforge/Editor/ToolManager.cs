@@ -1,36 +1,60 @@
-﻿using Starforge.Editor.UI;
-using Starforge.Editor.Tools;
+﻿using Starforge.Editor.Tools;
+using Starforge.Mod.API;
 using System.Collections.Generic;
-using Starforge.Core.Input;
 
 namespace Starforge.Editor {
     public static class ToolManager {
+        /// <summary>
+        /// A dictionary containing all available tools.
+        /// </summary>
+        public static Dictionary<ToolType, Tool> Tools;
 
-        public static Dictionary<ToolType, Tool> Tools = new Dictionary<ToolType, Tool>() {
-            [ToolType.TileDraw] = new TileDrawTool(),
-            [ToolType.TileRectangle] = new TileRectangleTool(),
-            [ToolType.EntityPlace] = new EntityPlaceTool()
-        };
+        /// <summary>
+        /// The currently selected entity placement.
+        /// </summary>
+        public static Placement SelectedEntity;
 
-        public static void Manage(MouseEvent m) {
-            Tools[ToolWindow.CurrentTool].ManageInput(m);
+        /// <summary>
+        /// The currently selected tool.
+        /// </summary>
+        public static Tool SelectedTool;
+
+        /// <summary>
+        /// The currently selected tool layer (background/foreground).
+        /// </summary>
+        public static ToolLayer SelectedLayer;
+
+        /// <summary>
+        /// The index of the currently selected background tileset.
+        /// </summary>
+        public static int BGTileset;
+
+        /// <summary>
+        /// The index of the currently selected foreground tileset.
+        /// </summary>
+        public static int FGTileset;
+
+        static ToolManager() {
+            Tools = new Dictionary<ToolType, Tool>()
+            {
+                [ToolType.TileBrush] = new TileBrushTool(),
+                [ToolType.TileRectangle] = new TileRectangleTool(),
+                [ToolType.Entity] = new EntityTool()
+            };
+
+            SelectedTool = Tools[ToolType.TileBrush];
+            SelectedLayer = ToolLayer.Foreground;
+
+            BGTileset = 0;
+            FGTileset = 0;
         }
 
-        // Renders the tools overlays/hints on the given target
         public static void Render() {
-            Tools[ToolWindow.CurrentTool].Render();
+            SelectedTool.Render();
         }
 
-    }
-
-    public enum ToolType {
-        TileDraw,
-        TileRectangle,
-        EntityPlace
-    }
-
-    public enum TileType {
-        Foreground,
-        Background
+        public static void Update() {
+            SelectedTool.Update();
+        }
     }
 }

@@ -2,10 +2,12 @@
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net472</TargetFramework>
-		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-		<RootNamespace>Starforge</RootNamespace>
 		<ApplicationIcon>../assets/logo_128.ico</ApplicationIcon>
 		<StartupObject />
+		
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<RootNamespace>Starforge</RootNamespace>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Platforms>x86</Platforms>
 	</PropertyGroup>
@@ -20,9 +22,9 @@
 	<ItemGroup>
 		<Reference Include="FNA" HintPath="..\lib\FNA\bin\Release\FNA.dll" />
 		<Reference Include="System" />
-		<Reference Include="System.Drawing" />
 		<Reference Include="System.Numerics" />
 		<Reference Include="System.Xml" />
+		<EmbeddedResource Include="../assets/logo_256.png" />
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Starforge.Map;
 using System;
 using System.Xml;
 
@@ -14,6 +15,13 @@ namespace Starforge.Util {
 
         public static Vector2 Perpendicular(this Vector2 vector) {
             return new Vector2(-vector.Y, vector.X);
+        }
+
+        public static void SetArea(this Entity entity, Rectangle area) {
+            entity.Position.X = area.X;
+            entity.Position.Y = area.Y;
+            if (area.Width > 0) entity.Width = area.Width;
+            if (area.Height > 0) entity.Height = area.Height;
         }
     }
 }

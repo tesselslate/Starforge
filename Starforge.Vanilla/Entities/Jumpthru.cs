@@ -1,16 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
-using Starforge.Core;
-using Starforge.MapStructure;
-using Starforge.Mod;
-using Starforge.Mod.Assets;
+using Starforge.Map;
+using Starforge.Mod.API;
+using Starforge.Mod.Content;
 using Starforge.Util;
 
 namespace Starforge.Vanilla.Entities {
     [EntityDefinition("jumpThru")]
     public class Jumpthru : Entity {
-        public Jumpthru(Level level, EntityData data) : base(level, data) {
-            StretchableX = true;
-        }
+        public Jumpthru(EntityData data, Room room) : base(data, room) { }
+
+        public override bool StretchableX => true;
 
         public override void Render() {
             string type = GetString("texture", "wood");
@@ -26,21 +25,55 @@ namespace Starforge.Vanilla.Entities {
                 if (i == 0) {
                     // left side
                     xOffset = 0;
-                    yOffset = Level.ForegroundTiles.GetTile(((int)Position.X / 8) - 1, (int)Position.Y / 8) == '0' ? 1 : 0;
-                }
-                else if (i == columns - 1) {
+                    yOffset = Room.ForegroundTiles[((int)Position.X / 8) - 1, (int)Position.Y / 8] == TileGrid.TILE_AIR ? 1 : 0;
+                } else if (i == columns - 1) {
                     // right side
                     xOffset = textureTiles - 1;
-                    yOffset = Level.ForegroundTiles.GetTile(((int)Position.X + width) / 8, (int)Position.Y / 8) == '0' ? 1 : 0;
-                }
-                else {
+                    yOffset = Room.ForegroundTiles[((int)Position.X + width) / 8, (int)Position.Y / 8] == TileGrid.TILE_AIR ? 1 : 0;
+                } else {
                     // middle
-                    xOffset = 1 + MiscHelper.Rand.Next(textureTiles - 2);
-                    yOffset = MiscHelper.Rand.Next(0, 2);
+                    xOffset = 1 + MiscHelper.RandInt(i, textureTiles - 2);
+                    yOffset = MiscHelper.RandInt(i, 2);
                 }
                 // Draw the sprite
                 new DrawableTexture(baseTexture, xOffset * 8, yOffset * 8, 8, 8).Draw(new Vector2(Position.X + (i * 8), Position.Y));
             }
         }
+
+        public static PlacementList Placements = new PlacementList()
+        {
+            new Placement("Jump Through (Cliffside)")
+            {
+                ["texture"] = "cliffside"
+            },
+            new Placement("Jump Through (Core)")
+            {
+                ["texture"] = "core"
+            },
+            new Placement("Jump Through (Dream)")
+            {
+                ["texture"] = "dream"
+            },
+            new Placement("Jump Through (Moon)")
+            {
+                ["texture"] = "moon"
+            },
+            new Placement("Jump Through (Reflection)")
+            {
+                ["texture"] = "reflection"
+            },
+            new Placement("Jump Through (Temple)")
+            {
+                ["texture"] = "temple"
+            },
+            new Placement("Jump Through (Temple B)")
+            {
+                ["texture"] = "templeB"
+            },
+            new Placement("Jump Through (Wood)")
+            {
+                ["texture"] = "wood"
+            }
+        };
     }
 }

@@ -1,29 +1,28 @@
-﻿using Microsoft.Xna.Framework;
-using Starforge.Core;
-using Starforge.Editor;
-using Starforge.MapStructure;
-using Starforge.MapStructure.Tiling;
-using Starforge.Mod;
-using Starforge.Mod.Assets;
-using Starforge.Util;
+﻿using Starforge.Editor;
+using Starforge.Editor.Render;
+using Starforge.Map;
+using Starforge.Mod.API;
 
 namespace Starforge.Vanilla.Entities {
     [EntityDefinition("dashBlock")]
     class DashBlock : Entity {
-        public DashBlock(Level level, EntityData data) : base(level, data) {
-            StretchableX = true;
-            StretchableY = true;
-        }
+        public DashBlock(EntityData data, Room room) : base(data, room) { }
+
+        public override bool StretchableX => true;
+        public override bool StretchableY => true;
 
         public override void Render() {
-            var grid = new TileGrid((int)Width/8, (int)Height/8);
-            grid.Fill(GetChar("tiletype", '3'));
-            var textures = Engine.Scene.FGAutotiler.GenerateTextureMap(grid, 0, 0, false);
-            for (int i = 0; i < textures.Length; i++)
-            {
-                textures[i].Position += Position;
-                textures[i].Draw();
-            }
+            TextureMap map = MapEditor.Instance.FGAutotiler.GenerateFakeTileMap(Room, Position, Width / 8, Height / 8, (short)GetChar("tiletype", '3')); ;
+            for (int i = 0; i < map.Textures.Length; i++) map.Textures[i].Position += Position;
+            map.Draw();
         }
+
+        public static PlacementList Placements = new PlacementList()
+        {
+            new Placement("Dash Block")
+            {
+                ["tiletype"] = "3"
+            }
+        };
     }
 }
