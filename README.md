@@ -8,6 +8,9 @@ Starforge is an experimental map editor for Celeste. **It is still in very early
 
 ---
 # Compiling from Source
+Prerequisites:
+- [.NET 5 SDK](https://dotnet.microsoft.com/download/dotnet/5.0)
+
 First, clone the Git repository and its submodules (you can do the latter with `git submodule update --init --recursive`).
 
 ### Windows Users (`dotnet` CLI / Visual Studio)
