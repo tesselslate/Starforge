@@ -1,11 +1,8 @@
-# Visual Studio Folders
+# Visual Studio Files
 .vs
+*.user
 
 # Binaries
 bin
 obj
 packages
-
-# Celeste Content
-*.bin
-Starforge/Starforge.csproj.user
