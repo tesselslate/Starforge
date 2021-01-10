@@ -12,9 +12,9 @@ namespace Starforge.Map {
         private static StringBuilder Builder = new StringBuilder();
         private static byte[] RLEBytes = new byte[32768];
 
-        // You may be wondering what the point of using a Dictionary rather than a List here is.
-        // After all, we are just storing the strings and their indices, right?
-        // Somehow, using a Dictionary is 5x faster. So we will use a Dictionary (:
+        // Using a Dictionary for string lookup ends up being much faster than a List, as using a List requires us to
+        // iterate through (potentially) the entire list for every operation.
+        // Looking up a value in the Dictionary is closer to O(1) where the List can be upwards of O(n).
         private static string[] ReadLookup;
         private static Dictionary<string, short> WriteLookup;
         private static short WriteLookupCounter = 0;
