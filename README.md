@@ -8,18 +8,17 @@ Starforge is an experimental map editor for Celeste. **It is still in very early
 
 ---
 # Compiling from Source
+Prerequisites:
+- [.NET 5 SDK (x64)](https://dotnet.microsoft.com/download/dotnet/5.0)
+
 First, clone the Git repository and its submodules (you can do the latter with `git submodule update --init --recursive`).
 
-### Visual Studio:
-- Compile FNA from source (make sure you are **creating a release build**) within the included submodule, which is located in the `lib` folder. The Starforge project is set up to automatically pull it from the `bin` folder.
-- Download the FNA [native libraries](http://fna.flibitijibibo.com/archive/fnalibs.tar.bz2) and unpack them. You will need to place **the x86 versions** of `FNA3D.dll` and `SDL2.dll` within the Starforge output directory (where the final `exe` is located.)
+### Windows Users (`dotnet` CLI / Visual Studio)
+- Open `lib/FNA/FNA.Core.csproj`. Build for Release (x64). 
+- Build Starforge. All dependencies should be copied automatically.
 
-### If you are not using Visual Studio:
-- Restore NuGet packages. Starforge requires `ImGui.NET`. Both `ImGui.NET.dll` and `cimgui.dll` should be present in the output directory containing the final executable.
-- Compile the included nativefiledialog fork, and FNA submodule (both located in `lib`). Place the resulting DLLs into the output directory.
-- Acquire the appropriate [native libraries](http://fna.flibitijibibo.com/archive/fnalibs.tar.bz2) for FNA and place them in the output directory.
-
-These steps may differ and libraries may not work depending on the platform you are using. If you have problems attempting to build the project, please open an issue so we can attempt to help and update these instructions to better reflect how to do so.
+### Mac/Linux Users
+Starforge does not *currently* support Mac and Linux.
 
 ---
 # Contributing
