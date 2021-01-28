@@ -84,10 +84,12 @@ namespace Starforge.Platform {
                     // Only include this library folder if it is in the proper format
                     // (libraryfolders.vdf contains a few lines other than library locations)
                     // (key is number, value is path)
+                    // Double backslashes need to be replaced by single ones
 
                     if (int.TryParse(splitLine[1], out int unused)) {
+                        
                         string path = Path.Combine(
-                            splitLine[3],
+                            splitLine[3].Replace("\\\\", "\\"),
                             "steamapps",
                             "common"
                         );
