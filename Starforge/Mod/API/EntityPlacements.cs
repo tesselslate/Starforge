@@ -1,6 +1,7 @@
 ﻿using Starforge.Map;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Starforge.Mod.API {
@@ -26,7 +27,7 @@ namespace Starforge.Mod.API {
                 room
             });
             e.Attributes = new Dictionary<string, object>(Attributes);
-
+            e.ID = room.Entities.Count > 0 ? room.Entities.Max((e) => e.ID) + 1 : 1;
             return e;
         }
     }
