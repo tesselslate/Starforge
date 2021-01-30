@@ -3,6 +3,7 @@ using Starforge.Map;
 using Starforge.Mod.API;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Starforge.Mod {
@@ -17,12 +18,9 @@ namespace Starforge.Mod {
 
         public static Entity CreateEntity(MapElement el, Room room) {
             EntityData data = new EntityData(el);
-
-            if (EntityCreators.ContainsKey(el.Name)) {
-                return EntityCreators[el.Name](data, room);
-            } else {
-                return new UnknownEntity(data, room);
-            }
+            Entity entity = EntityCreators.ContainsKey(el.Name) ? EntityCreators[el.Name](data, room) : new UnknownEntity(data, room);
+            entity.ID = el.GetInt("id", 0);
+            return entity;
         }
 
         public static void Register(Type type) {
