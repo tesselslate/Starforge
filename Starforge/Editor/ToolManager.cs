@@ -1,18 +1,16 @@
-﻿using Starforge.Editor.Tools;
+﻿using Starforge.Core;
+using Starforge.Editor.Tools;
 using Starforge.Mod.API;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Starforge.Editor {
     public static class ToolManager {
         /// <summary>
         /// A dictionary containing all available tools.
         /// </summary>
-        public static Dictionary<ToolType, Tool> Tools;
-
-        /// <summary>
-        /// The currently selected entity placement.
-        /// </summary>
-        public static Placement SelectedEntity;
+        public static Dictionary<string, Tool> Tools;
 
         /// <summary>
         /// The currently selected tool.
@@ -35,14 +33,8 @@ namespace Starforge.Editor {
         public static int FGTileset;
 
         static ToolManager() {
-            Tools = new Dictionary<ToolType, Tool>()
-            {
-                [ToolType.TileBrush] = new TileBrushTool(),
-                [ToolType.TileRectangle] = new TileRectangleTool(),
-                [ToolType.Entity] = new EntityTool()
-            };
+            Tools = new Dictionary<string, Tool>();
 
-            SelectedTool = Tools[ToolType.TileBrush];
             SelectedLayer = ToolLayer.Foreground;
 
             BGTileset = 0;
@@ -50,11 +42,42 @@ namespace Starforge.Editor {
         }
 
         public static void Render() {
+            if (SelectedTool == null)
+                SelectedTool = Tools["TileBrush"];
             SelectedTool.Render();
         }
 
         public static void Update() {
+            if (SelectedTool == null)
+                SelectedTool = Tools["TileBrush"];
             SelectedTool.Update();
+        }
+
+        public static void Register(Type type) {
+            try {
+                if (!type.IsSubclassOf(typeof(Tool))) return;
+
+                ToolDefinitionAttribute attr = type.GetCustomAttribute<ToolDefinitionAttribute>();
+                if (attr == null) {
+                    Logger.Log(LogLevel.Error, $"Tool {type} does not have a definition attribute");
+                    return;
+                }
+
+                string id = attr.ID;
+                ConstructorInfo ctor = type.GetConstructor(Array.Empty<Type>());
+
+                if (ctor == null) {
+                    Logger.Log(LogLevel.Error, $"Tool of type {type} with ID {id} does not have a valid ctor");
+                    return;
+                }
+
+                Tool tool = (Tool)ctor.Invoke(Array.Empty<object>());
+                Tools.Add(id, tool);
+                Logger.Log($"Registered tool {id} of type {type}");
+            } catch (Exception e) {
+                Logger.Log(LogLevel.Error, $"Encountered an error while attempting to register tool {type}");
+                Logger.LogException(e);
+            }
         }
     }
 }

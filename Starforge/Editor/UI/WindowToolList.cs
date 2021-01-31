@@ -4,9 +4,7 @@ using Starforge.Editor.Tools;
 using Starforge.Mod;
 using Starforge.Mod.API;
 using Starforge.Util;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Starforge.Editor.UI {
     public class WindowToolList : Window {
@@ -17,25 +15,22 @@ namespace Starforge.Editor.UI {
 
         public List<string> Tools;
 
-        public ToolType SelectedTool;
-        private int VisibleItemsCount = 0;
+        public string SelectedTool;
+        public int VisibleItemsCount = 0;
 
         public WindowToolList(Autotiler bg, Autotiler fg) {
-            BGTilesets = new List<string>();
-            BGTilesets.Add("Air");
+            BGTilesets = new List<string> { "Air" };
             foreach (Tileset t in bg.GetTilesetList()) BGTilesets.Add(MiscHelper.CleanCamelCase(t.Path.StartsWith("bg") ? t.Path.Substring(2) : t.Path));
 
-            FGTilesets = new List<string>();
-            FGTilesets.Add("Air");
+            FGTilesets = new List<string> { "Air" };
             foreach (Tileset t in fg.GetTilesetList()) FGTilesets.Add(MiscHelper.CleanCamelCase(t.Path));
 
             Placements = new Dictionary<string, Placement>(EntityRegistry.GetRegisteredPlacements());
 
-            Tools = new List<string>();
-            foreach (ToolType type in Enum.GetValues(typeof(ToolType))) Tools.Add(ToolManager.Tools[type].GetName());
+            Tools = new List<string>() { "TileBrush", "TileRectangle", "Entity"}; // Hardcoded tool names to force a specific tool order that's familliar to Ahorn users.
+            foreach (string tool in ToolManager.Tools.Keys) if (!Tools.Contains(tool)) Tools.Add(tool);
 
-            ToolManager.SelectedEntity = EntityRegistry.GetRegisteredPlacements().Values.First();
-            ((EntityTool)ToolManager.Tools[ToolType.Entity]).UpdateHeldEntity();
+            SelectedTool = "TileBrush";
         }
 
         public void UpdateListHeight() {
@@ -69,18 +64,16 @@ namespace Starforge.Editor.UI {
             if (ImGui.ListBoxHeader("ToolsList", Tools.Count, Tools.Count)) {
                 for (int i = 0; i < Tools.Count; i++) {
                     string tool = Tools[i];
-                    if (ImGui.Selectable(tool, SelectedTool.ToString() == ((ToolType)i).ToString())) {
-                        ToolType res = (ToolType)i;
-
-                        SelectedTool = res;
-                        ToolManager.SelectedTool = ToolManager.Tools[res];
+                    if (ImGui.Selectable(ToolManager.Tools[tool].GetName(), SelectedTool == tool)) {
+                        SelectedTool = tool;
+                        ToolManager.SelectedTool = ToolManager.Tools[tool];
                     }
                 }
                 ImGui.ListBoxFooter();
             }
 
-            // Layer list (tile/decal only)
-            if (SelectedTool == ToolType.TileBrush || SelectedTool == ToolType.TileRectangle /*|| SelectedTool == ToolType.Decal*/) {
+            // Layer list
+            if (ToolManager.SelectedTool.CanSelectLayer()) {
                 ImGui.NewLine();
                 ImGui.Text("Layer");
                 ImGui.SetNextItemWidth(130f);
@@ -94,43 +87,7 @@ namespace Starforge.Editor.UI {
             ImGui.NextColumn();
 
             // Tile/entity/etc list
-            switch (SelectedTool) {
-            case ToolType.TileBrush: case ToolType.TileRectangle:
-                ImGui.Text("Tilesets");
-                ImGui.SetNextItemWidth(235f);
-
-                if (ToolManager.SelectedLayer == ToolLayer.Background) {
-                    if (ImGui.ListBoxHeader("TilesetsList", BGTilesets.Count, VisibleItemsCount)) {
-                        for (int i = 0; i < BGTilesets.Count; i++) {
-                            if (ImGui.Selectable(BGTilesets[i], ToolManager.BGTileset == i)) ToolManager.BGTileset = i;
-                        }
-                        ImGui.ListBoxFooter();
-                    }
-                } else {
-                    if (ImGui.ListBoxHeader("TilesetsList", FGTilesets.Count, VisibleItemsCount)) {
-                        for (int i = 0; i < FGTilesets.Count; i++) {
-                            if (ImGui.Selectable(FGTilesets[i], ToolManager.FGTileset == i)) ToolManager.FGTileset = i;
-                        }
-                        ImGui.ListBoxFooter();
-                    }
-                }
-
-                break;
-            case ToolType.Entity:
-                ImGui.Text("Entities");
-                ImGui.SetNextItemWidth(235f);
-
-                if (ImGui.ListBoxHeader("EntitiesList", Placements.Count, VisibleItemsCount)) {
-                    foreach (KeyValuePair<string, Placement> pair in Placements) {
-                        if (ImGui.Selectable(pair.Key, pair.Value == ToolManager.SelectedEntity)) {
-                            ToolManager.SelectedEntity = pair.Value;
-                            ((EntityTool)ToolManager.Tools[ToolType.Entity]).UpdateHeldEntity();
-                        }
-                    }
-                }
-
-                break;
-            }
+            ToolManager.SelectedTool.RenderGUI();
 
             ImGui.NextColumn();
         }

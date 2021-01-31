@@ -32,4 +32,16 @@ namespace Starforge.Mod.API {
     public class TriggerDefinitionAttribute : EntityDefinitionAttribute {
         public TriggerDefinitionAttribute(string name) : base(name) { }
     }
+
+    /// <summary>
+    /// Used to identify a tool.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    public class ToolDefinitionAttribute : Attribute {
+        public ToolDefinitionAttribute(string name) {
+            ID = name;
+        }
+
+        public readonly string ID;
+    }
 }

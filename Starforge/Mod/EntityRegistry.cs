@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace Starforge.Mod {
     public static class EntityRegistry {
-        private static List<Placement> EntityPlacements;
+        public static List<Placement> EntityPlacements;
         private static Dictionary<string, EntityCreator> EntityCreators;
 
         static EntityRegistry() {

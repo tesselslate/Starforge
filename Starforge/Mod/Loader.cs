@@ -1,4 +1,6 @@
 ﻿using Starforge.Core;
+using Starforge.Editor;
+using Starforge.Editor.Tools;
 using Starforge.Map;
 using Starforge.Mod.API;
 using System;
@@ -24,6 +26,14 @@ namespace Starforge.Mod {
                         if (type.GetCustomAttribute<EntityDefinitionAttribute>() != null || type.GetCustomAttribute<TriggerDefinitionAttribute>() != null) {
                             EntityRegistry.Register(type);
                         } else {
+                            Logger.Log(LogLevel.Warning, $"Assembly {asm.GetName()} contains {type} without an appropriate definition attribute");
+                        }
+                    }
+                    if (type.IsSubclassOf(typeof(Tool))) {
+                        if (type.GetCustomAttribute<ToolDefinitionAttribute>() != null) {
+                            ToolManager.Register(type);
+                        }
+                        else {
                             Logger.Log(LogLevel.Warning, $"Assembly {asm.GetName()} contains {type} without an appropriate definition attribute");
                         }
                     }
