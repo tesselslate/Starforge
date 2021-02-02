@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using Starforge.Core;
+using Starforge.Editor;
 using Starforge.Map;
 using System;
 using System.Collections.Generic;
@@ -117,6 +119,17 @@ namespace Starforge.Util {
                 ret.Add(entry.Key, entry.Value);
             }
             return ret;
+        }
+
+        // Returns Mouse TilePointer * 8 or if Ctrl is pressed returns PixelPointer
+        public static Point GetMousePosition() {
+            if (Input.Keyboard.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftControl) || Input.Keyboard.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.RightControl)) {
+                return MapEditor.Instance.State.PixelPointer;
+            }
+            Point Result;
+            Result.X = MapEditor.Instance.State.TilePointer.X * 8;
+            Result.Y = MapEditor.Instance.State.TilePointer.Y * 8;
+            return Result;
         }
     }
 }

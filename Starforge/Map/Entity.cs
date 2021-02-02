@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
+using Starforge.Editor.Tools;
 using Starforge.Mod.API;
+using System;
 using System.Collections.Generic;
 
 namespace Starforge.Map {
@@ -7,7 +9,6 @@ namespace Starforge.Map {
         public int ID;
         public readonly string Name;
         public List<Vector2> Nodes;
-        public Vector2 Position;
 
         public virtual PropertyList Properties => new PropertyList();
 
@@ -17,6 +18,14 @@ namespace Starforge.Map {
             Width == 0 ? 4 : Width, 
             Height == 0 ? 4 : Height
         );
+
+        public Vector2 Position {
+            get => new Vector2(GetFloat("x"), GetFloat("y"));
+            set {
+                Attributes["x"] = value.X;
+                Attributes["y"] = value.Y;
+            }
+        }
 
         public int Width {
             get => GetInt("width");
@@ -49,8 +58,6 @@ namespace Starforge.Map {
                 Attributes = new Dictionary<string, object>(Attributes)
             };
 
-            el.SetAttribute("x", Position.X);
-            el.SetAttribute("y", Position.Y);
             el.SetAttribute("id", ID);
 
             foreach (Vector2 node in Nodes) {
@@ -65,6 +72,45 @@ namespace Starforge.Map {
 
         public bool ContainsPosition(Point pos) {
             return Hitbox.Contains(pos);
+        }
+
+        // Returns the Region of the entity the point is in
+        public EntityRegion GetEntityRegion(Point pos) {
+            if (!ContainsPosition(pos)) {
+                return EntityRegion.Outside;
+            }
+            EntityRegion Horizontal = EntityRegion.Middle;
+            EntityRegion Vertical = EntityRegion.Middle;
+
+            int SelectionWidth = (int)Math.Min(Hitbox.Width / 3f, 8f);
+            int SelectionHeight = (int)Math.Min(Hitbox.Height / 3f, 8f);
+
+            if (StretchableX) {
+                // figure out if left, right or middle horizontally
+                if (pos.X < Hitbox.X + SelectionWidth) {
+                    Horizontal = EntityRegion.Left;
+                }
+                else if (pos.X < Hitbox.X + Hitbox.Width - SelectionWidth) {
+                    Horizontal = EntityRegion.Middle;
+                }
+                else {
+                    Horizontal = EntityRegion.Right;
+                }
+            }
+            if (StretchableY) {
+                // figure out if top, bottom or middle vertically
+                if (pos.Y < Hitbox.Y + SelectionHeight) {
+                    Vertical = EntityRegion.Top;
+                }
+                else if (pos.Y < Hitbox.Y + Hitbox.Height - SelectionHeight) {
+                    Vertical = EntityRegion.Middle;
+                }
+                else {
+                    Vertical = EntityRegion.Bottom;
+                }
+            }
+
+            return Vertical | Horizontal;
         }
 
         public abstract void Render();

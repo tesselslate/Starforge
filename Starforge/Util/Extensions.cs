@@ -18,8 +18,8 @@ namespace Starforge.Util {
         }
 
         public static void SetArea(this Entity entity, Rectangle area) {
-            entity.Position.X = area.X;
-            entity.Position.Y = area.Y;
+            Vector2 vec = new Vector2(area.X, area.Y);
+            entity.Position = vec;
             if (area.Width > 0) entity.Width = area.Width;
             if (area.Height > 0) entity.Height = area.Height;
         }
