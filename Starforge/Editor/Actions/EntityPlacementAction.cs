@@ -11,14 +11,12 @@ namespace Starforge.Editor.Actions {
         public override bool Apply() {
             Room.Entities.Add(Entity);
             DrawableRoom.Dirty = true;
-
             return true;
         }
 
         public override bool Undo() {
             Room.Entities.Remove(Entity);
             DrawableRoom.Dirty = true;
-
             return true;
         }
     }

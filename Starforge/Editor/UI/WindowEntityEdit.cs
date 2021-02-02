@@ -1,17 +1,24 @@
 ﻿using ImGuiNET;
+using Starforge.Editor.Actions;
 using Starforge.Map;
 using Starforge.Mod.API;
 using Starforge.Util;
-using System.Numerics;
+using System.Collections.Generic;
 
 namespace Starforge.Editor.UI {
+
+    using Attributes = Dictionary<string, object>;
+
     public class WindowEntityEdit : Window {
         public string MapName = "";
         private bool Done = false;
         private Entity SelectedEntity;
 
+        private Attributes InitialAttributes;
+
         public WindowEntityEdit(Entity Entity) {
             SelectedEntity = Entity;
+            InitialAttributes = MiscHelper.CloneDictionary(Entity.Attributes);
         }
 
         public override void Render() {
@@ -43,6 +50,12 @@ namespace Starforge.Editor.UI {
         }
 
         public override void End() {
+            MapEditor.Instance.State.Apply(new EntityEditAction(
+                MapEditor.Instance.State.SelectedRoom,
+                SelectedEntity,
+                InitialAttributes,
+                MiscHelper.CloneDictionary(SelectedEntity.Attributes)
+            ));
             if (!Done) return;
         }
 
@@ -80,6 +93,7 @@ namespace Starforge.Editor.UI {
 
             return changed;
         }
+
         public bool AddEntryFloat(Entity entity, Property property) {
             if (!entity.Attributes.ContainsKey(property.Name)) {
                 entity.Attributes[property.Name] = 0;

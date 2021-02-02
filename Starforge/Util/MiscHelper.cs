@@ -110,5 +110,13 @@ namespace Starforge.Util {
             return RectangleCentered(pos.X, pos.Y, w, h);
         }
 
+        // Copies a Dictionary, copying every element
+        public static Dictionary<TKey, object> CloneDictionary<TKey>(Dictionary<TKey, object> original) {
+            Dictionary<TKey, object> ret = new Dictionary<TKey, object>(original.Count, original.Comparer);
+            foreach (KeyValuePair<TKey, object> entry in original) {
+                ret.Add(entry.Key, entry.Value);
+            }
+            return ret;
+        }
     }
 }
