@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Starforge.Mod.API;
-using System;
 using System.Collections.Generic;
 
 namespace Starforge.Map {
@@ -9,6 +8,15 @@ namespace Starforge.Map {
         public readonly string Name;
         public List<Vector2> Nodes;
         public Vector2 Position;
+
+        public virtual PropertyList Properties => new PropertyList();
+
+        public virtual Rectangle Hitbox => new Rectangle(
+            (int)Position.X, 
+            (int)Position.Y, 
+            Width == 0 ? 4 : Width, 
+            Height == 0 ? 4 : Height
+        );
 
         public int Width {
             get => GetInt("width");
@@ -36,8 +44,7 @@ namespace Starforge.Map {
         }
 
         public MapElement Encode() {
-            MapElement el = new MapElement()
-            {
+            MapElement el = new MapElement() {
                 Name = Name,
                 Attributes = new Dictionary<string, object>(Attributes)
             };
@@ -46,7 +53,7 @@ namespace Starforge.Map {
             el.SetAttribute("y", Position.Y);
             el.SetAttribute("id", ID);
 
-            foreach(Vector2 node in Nodes) {
+            foreach (Vector2 node in Nodes) {
                 MapElement nodeEl = new MapElement() { Name = "node" };
                 nodeEl.SetAttribute("x", node.X);
                 nodeEl.SetAttribute("y", node.Y);
@@ -54,6 +61,10 @@ namespace Starforge.Map {
             }
 
             return el;
+        }
+
+        public bool ContainsPosition(Point pos) {
+            return Hitbox.Contains(pos);
         }
 
         public abstract void Render();

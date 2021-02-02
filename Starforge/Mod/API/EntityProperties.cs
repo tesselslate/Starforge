@@ -1,20 +1,25 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 
 namespace Starforge.Mod.API {
 
     public class Property {
         public string Name;
-        public Type Type;
+        public PropertyType Type;
         public string Description;
 
-        Property(string Name, Type Type, string Description) {
+        public Property(string Name, PropertyType Type, string Description) {
             this.Name = Name;
             this.Type = Type;
             this.Description = Description;
         }
+    }
 
+    public enum PropertyType {
+        String,
+        Integer,
+        Float,
+        Bool
     }
 
     public class PropertyList : ICollection<Property> {

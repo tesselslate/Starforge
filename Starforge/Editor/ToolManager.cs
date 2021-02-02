@@ -39,7 +39,8 @@ namespace Starforge.Editor {
             {
                 [ToolType.TileBrush] = new TileBrushTool(),
                 [ToolType.TileRectangle] = new TileRectangleTool(),
-                [ToolType.Entity] = new EntityTool()
+                [ToolType.Entity] = new EntityTool(),
+                [ToolType.EntitySelection] = new EntitySelectionTool()
             };
 
             SelectedTool = Tools[ToolType.TileBrush];

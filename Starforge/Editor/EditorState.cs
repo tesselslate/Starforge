@@ -35,6 +35,11 @@ namespace Starforge.Editor {
         public Point TilePointer;
 
         /// <summary>
+        /// The position of the cursor, in pixels, in the selected room.
+        /// </summary>
+        public Point PixelPointer;
+
+        /// <summary>
         /// A list of previously applied actions which can be undone.
         /// </summary>
         public Stack<EditorAction> PastActions;

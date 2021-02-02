@@ -1,36 +1,46 @@
-﻿using Starforge.Map;
+﻿using Microsoft.Xna.Framework;
+using Starforge.Map;
 using Starforge.Mod.API;
 using Starforge.Mod.Content;
+using Starforge.Util;
+using System;
 
 namespace Starforge.Vanilla.Entities {
     [EntityDefinition("spinner")]
     public class CrystalSpinner : Entity {
-        private DrawableTexture Texture;
+        private static Lazy<DrawableTexture> DustSprite = new Lazy<DrawableTexture>(() => GFX.Gameplay["danger/dustcreature/base00"]);
+        private static Lazy<DrawableTexture> RedSprite = new Lazy<DrawableTexture>(() => GFX.Gameplay["danger/crystal/fg_red03"]);
+        private static Lazy<DrawableTexture> PurpleSprite = new Lazy<DrawableTexture>(() => GFX.Gameplay["danger/crystal/fg_purple03"]);
+        private static Lazy<DrawableTexture> RainbowSprite = new Lazy<DrawableTexture>(() => GFX.Gameplay["danger/crystal/fg_white03"]);
+        private static Lazy<DrawableTexture> BlueSprite = new Lazy<DrawableTexture>(() => GFX.Gameplay["danger/crystal/fg_blue03"]);
 
-        public CrystalSpinner(EntityData data, Room room) : base(data, room) {
+        public CrystalSpinner(EntityData data, Room room) : base(data, room) { }
+
+        public override void Render() {
+            DrawableTexture Texture;
             if (GetBool("dust")) {
-                Texture = GFX.Gameplay["danger/dustcreature/base00"];
-            } else {
+                Texture = DustSprite.Value;
+            }
+            else {
                 switch (GetString("color").ToLower()) {
                 case "red":
-                    Texture = GFX.Gameplay["danger/crystal/fg_red03"];
+                    Texture = RedSprite.Value;
                     break;
                 case "purple":
-                    Texture = GFX.Gameplay["danger/crystal/fg_purple03"];
+                    Texture = PurpleSprite.Value;
                     break;
                 case "rainbow":
-                    Texture = GFX.Gameplay["danger/crystal/fg_white03"];
+                    Texture = RainbowSprite.Value;
                     break;
                 default:
-                    Texture = GFX.Gameplay["danger/crystal/fg_blue03"];
+                    Texture = BlueSprite.Value;
                     break;
                 }
             }
-        }
-
-        public override void Render() {
             Texture.DrawCentered(Position);
         }
+
+        public override Rectangle Hitbox => MiscHelper.RectangleCentered(Position, RedSprite.Value.Width, RedSprite.Value.Height);
 
         public static PlacementList Placements = new PlacementList()
         {
@@ -54,6 +64,11 @@ namespace Starforge.Vanilla.Entities {
             {
                 ["dust"] = true
             }
+        };
+
+        public override PropertyList Properties => new PropertyList() {
+            new Property("color", PropertyType.String, "The color of the spinner"),
+            new Property("dust", PropertyType.Bool, "Whether this is a dust bunny or speen")
         };
     }
 }

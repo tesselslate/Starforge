@@ -96,5 +96,19 @@ namespace Starforge.Util {
         public static Color Vect3ToColor(System.Numerics.Vector3 v) {
             return new Color(v.X, v.Y, v.Z);
         }
+
+        // Returns a Rectangle that is centered around x and y with width w and height h
+        public static Rectangle RectangleCentered(int x, int y, int w, int h) {
+            return new Rectangle(x - w / 2, y - h / 2, w, h);
+        }
+
+        public static Rectangle RectangleCentered(float x, float y, int w, int h) {
+            return RectangleCentered((int)x, (int)y, w, h);
+        }
+
+        public static Rectangle RectangleCentered(Vector2 pos, int w, int h) {
+            return RectangleCentered(pos.X, pos.Y, w, h);
+        }
+
     }
 }

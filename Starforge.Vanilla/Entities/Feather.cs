@@ -2,6 +2,7 @@
 using Starforge.Map;
 using Starforge.Mod.API;
 using Starforge.Mod.Content;
+using Starforge.Util;
 using System;
 
 namespace Starforge.Vanilla.Entities {
@@ -18,6 +19,8 @@ namespace Starforge.Vanilla.Entities {
             }
         }
 
+        public override Rectangle Hitbox => MiscHelper.RectangleCentered(Position, Sprite.Value.Width, Sprite.Value.Height);
+
         public static PlacementList Placements = new PlacementList()
         {
             new Placement("Feather"),
@@ -25,6 +28,10 @@ namespace Starforge.Vanilla.Entities {
             {
                 ["shielded"] = true
             }
+        };
+
+        public override PropertyList Properties => new PropertyList() {
+            new Property("shielded", PropertyType.Bool, "Whether this feather has a shield or not")
         };
     }
 }

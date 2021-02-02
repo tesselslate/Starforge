@@ -25,5 +25,6 @@ namespace Starforge.Vanilla.Entities {
         {
             new Placement("Water")
         };
+
     }
 }

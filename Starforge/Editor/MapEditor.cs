@@ -162,6 +162,7 @@ namespace Starforge.Editor {
             if (State.SelectedRoom != null) {
                 Vector2 rm = Camera.ScreenToReal(Input.Mouse.GetVectorPos());
                 State.TilePointer = new Point((int)Math.Floor((rm.X - State.SelectedRoom.X) / 8), (int)Math.Floor((rm.Y - State.SelectedRoom.Y) / 8));
+                State.PixelPointer = new Point((int)Math.Floor(rm.X - State.SelectedRoom.X), (int)Math.Floor(rm.Y - State.SelectedRoom.Y));
             }
         }
 

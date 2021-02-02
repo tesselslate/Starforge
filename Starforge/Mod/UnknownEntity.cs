@@ -19,5 +19,7 @@ namespace Starforge.Mod {
             );
             GFX.Draw.BorderedRectangle(renderPos, BGColor, OutlineColor);
         }
+
+        public override PropertyList Properties { get { return new PropertyList(); } }
     }
 }
