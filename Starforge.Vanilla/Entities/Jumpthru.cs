@@ -75,5 +75,9 @@ namespace Starforge.Vanilla.Entities {
                 ["texture"] = "wood"
             }
         };
+
+        public override PropertyList Properties => new PropertyList() {
+            new Property("texture", new string[]{"cliffside", "core", "dream", "moon", "reflection", "temple", "templeB", "wood"}, "The style the Jumpthru has")
+        };
     }
 }

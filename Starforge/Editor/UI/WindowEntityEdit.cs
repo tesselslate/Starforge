@@ -50,7 +50,12 @@ namespace Starforge.Editor.UI {
         public bool AddEntry(Entity entity, Property property) {
             switch (property.Type) {
             case PropertyType.String:
-                return AddEntryString(entity, property);
+                if (property.List) {
+                    return AddEntryStringList(entity, property);
+                }
+                else {
+                    return AddEntryString(entity, property);
+                }
             case PropertyType.Integer:
                 return AddEntryInt(entity, property);
             case PropertyType.Float:
@@ -98,6 +103,27 @@ namespace Starforge.Editor.UI {
             UIHelper.Tooltip(property.Description);
             bool changed = (string)entity.Attributes[property.Name] != outString;
             entity.Attributes[property.Name] = outString;
+
+            return changed;
+        }
+
+        public bool AddEntryStringList(Entity entity, Property property) {
+            if (!entity.Attributes.ContainsKey(property.Name)) {
+                entity.Attributes[property.Name] = "";
+            }
+            int Index = 0;
+            for (int i = 0; i < property.Values.Length; ++i) {
+                if (property.Values[i].ToLower() == (string)entity.Attributes[property.Name]) {
+                    Index = i;
+                    break;
+                }
+            }
+            int IndexBefore = Index;
+            ImGui.SetNextItemWidth(100f);
+            ImGui.ListBox(MiscHelper.CleanCamelCase(property.Name), ref Index, property.DisplayValues, property.DisplayValues.Length);
+            UIHelper.Tooltip(property.Description);
+            bool changed = IndexBefore != Index;
+            entity.Attributes[property.Name] = property.Values[Index];
 
             return changed;
         }
