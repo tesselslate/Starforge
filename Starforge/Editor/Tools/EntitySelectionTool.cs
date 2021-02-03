@@ -72,31 +72,43 @@ namespace Starforge.Editor.Tools {
             UpdatedPosition.X = SelectedEntity.Position.X;
             UpdatedPosition.Y = SelectedEntity.Position.Y;
 
-            if ((HeldRegion & EntityRegion.Left) == EntityRegion.Left) {
+            int XEnd = (int)SelectedEntity.Position.X + SelectedEntity.Width;
+            int YEnd = (int)SelectedEntity.Position.Y + SelectedEntity.Height;
+
+            if ((HeldRegion & EntityRegion.Left) != 0) {
                 // Update left side of the entity to mouse position
-                int XEnd = (int)SelectedEntity.Position.X + SelectedEntity.Width;
                 UpdatedPosition.X = MiscHelper.GetMousePosition().X;
-                SelectedEntity.Width = XEnd - (int)UpdatedPosition.X;
+                SelectedEntity.Width = XEnd - (int)UpdatedPosition.X; 
             }
-            if ((HeldRegion & EntityRegion.Right) == EntityRegion.Right) {
+            if ((HeldRegion & EntityRegion.Right) != 0) {
                 // Update left side of the entity to mouse position
-                SelectedEntity.Width = (MiscHelper.GetMousePosition().X + 1) - (int)SelectedEntity.Position.X;
+                SelectedEntity.Width = MiscHelper.GetMousePositionCeil().X - (int)SelectedEntity.Position.X;
             }
-            if ((HeldRegion & EntityRegion.Top) == EntityRegion.Top) {
+            if ((HeldRegion & EntityRegion.Top) != 0) {
                 // Update top side of the entity to mouse position
-                int YEnd = (int)SelectedEntity.Position.Y + SelectedEntity.Height;
                 UpdatedPosition.Y = MiscHelper.GetMousePosition().Y;
                 SelectedEntity.Height = YEnd - (int)UpdatedPosition.Y;
             }
-            if ((HeldRegion & EntityRegion.Bottom) == EntityRegion.Bottom) {
+            if ((HeldRegion & EntityRegion.Bottom) != 0) {
                 // Update bottom side of the entity to mouse position
-                SelectedEntity.Height = (MiscHelper.GetMousePosition().Y + 1) - (int)SelectedEntity.Position.Y;
+                SelectedEntity.Height = MiscHelper.GetMousePositionCeil().Y - (int)SelectedEntity.Position.Y;
             }
             if (HeldRegion == EntityRegion.Middle) {
                 // Update location
                 UpdatedPosition.X = MiscHelper.GetMousePosition().X - ClickOffset.X;
                 UpdatedPosition.Y = MiscHelper.GetMousePosition().Y - ClickOffset.Y;
             }
+
+            int MinSize;
+            if (EditorState.PixelPerfect()) {
+                MinSize = 1;
+            }
+            else {
+                MinSize = 8;
+            }
+
+            SelectedEntity.Height = (int)MathHelper.Max(SelectedEntity.Height, MinSize);
+            SelectedEntity.Width = (int)MathHelper.Max(SelectedEntity.Width, MinSize);
 
             SelectedEntity.Position = UpdatedPosition;
             MapEditor.Instance.Renderer.GetRoom(SelectedEntity.Room).Dirty = true;

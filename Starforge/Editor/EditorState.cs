@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Starforge.Core;
 using Starforge.Editor.Actions;
 using Starforge.Map;
 using System.Collections.Generic;
@@ -48,6 +49,9 @@ namespace Starforge.Editor {
         /// A list of previously undone actions which can be reapplied.
         /// </summary>
         public Stack<EditorAction> FutureActions;
+
+        /// <returns>Whether or not the Editor is in "Pixel Perfect" mode, meaning placements are not limited to the tile grid</returns>
+        public static bool PixelPerfect() => Input.Keyboard.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftControl) || Input.Keyboard.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.RightControl);
 
         /// <returns>Whether or not there are changes that can be redone.</returns>
         public bool CanRedo() => FutureActions.Count > 0;

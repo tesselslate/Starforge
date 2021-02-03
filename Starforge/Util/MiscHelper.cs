@@ -123,12 +123,26 @@ namespace Starforge.Util {
 
         // Returns Mouse TilePointer * 8 or if Ctrl is pressed returns PixelPointer
         public static Point GetMousePosition() {
-            if (Input.Keyboard.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftControl) || Input.Keyboard.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.RightControl)) {
+            if (EditorState.PixelPerfect()) {
                 return MapEditor.Instance.State.PixelPointer;
             }
             Point Result;
             Result.X = MapEditor.Instance.State.TilePointer.X * 8;
             Result.Y = MapEditor.Instance.State.TilePointer.Y * 8;
+            return Result;
+        }
+
+        // Same as GetMousePosition, but rounds the tile or pixel up
+        public static Point GetMousePositionCeil() {
+            Point Result;
+            if (EditorState.PixelPerfect()) {
+                Result.X = MapEditor.Instance.State.PixelPointer.X + 1;
+                Result.Y = MapEditor.Instance.State.PixelPointer.Y + 1;
+            }
+            else {
+                Result.X = (MapEditor.Instance.State.TilePointer.X + 1) * 8;
+                Result.Y = (MapEditor.Instance.State.TilePointer.Y + 1) * 8;
+            }
             return Result;
         }
     }

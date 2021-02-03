@@ -42,23 +42,35 @@ namespace Starforge.Editor.Tools {
         }
 
         private void HandleClick() {
-            Start = MapEditor.Instance.State.TilePointer;
+            Start = MiscHelper.GetMousePosition();
         }
 
         private void HandleDrag() {
             if (HeldEntity.StretchableX) {
-                Hold.X = (int)MathHelper.Min(Start.X, MapEditor.Instance.State.TilePointer.X) * 8;
-                Hold.Width = (Math.Abs(Start.X - MapEditor.Instance.State.TilePointer.X) + 1) * 8;
+                Hold.X = (int)MathHelper.Min(Start.X, MiscHelper.GetMousePosition().X); 
+                Hold.Width = Math.Abs(Start.X - MiscHelper.GetMousePosition().X);
+                if (EditorState.PixelPerfect()) {
+                    Hold.Width += 1;
+                }
+                else {
+                    Hold.Width += 8;
+                }
             } else {
-                Hold.X = Start.X * 8;
+                Hold.X = Start.X;
                 Hold.Width = 0;
             }
 
             if (HeldEntity.StretchableY) {
-                Hold.Y = (int)MathHelper.Min(Start.Y, MapEditor.Instance.State.TilePointer.Y) * 8;
-                Hold.Height = (Math.Abs(Start.Y - MapEditor.Instance.State.TilePointer.Y) + 1) * 8;
+                Hold.Y = (int)MathHelper.Min(Start.Y, MiscHelper.GetMousePosition().Y);
+                Hold.Height = Math.Abs(Start.Y - MiscHelper.GetMousePosition().Y);
+                if (EditorState.PixelPerfect()) {
+                    Hold.Height += 1;
+                }
+                else {
+                    Hold.Height += 8;
+                }
             } else {
-                Hold.Y = Start.Y * 8;
+                Hold.Y = Start.Y;
                 Hold.Height = 0;
             }
 
@@ -77,12 +89,12 @@ namespace Starforge.Editor.Tools {
                 entity
             ));
 
-            Hold = new Rectangle(MapEditor.Instance.State.TilePointer.X * 8, MapEditor.Instance.State.TilePointer.Y * 8, 8, 8);
+            Hold = new Rectangle(MiscHelper.GetMousePosition().X, MiscHelper.GetMousePosition().Y, 8, 8);
             HeldEntity.SetArea(Hold);
         }
 
         private void HandleMove() {
-            Hold = new Rectangle(MapEditor.Instance.State.TilePointer.X * 8, MapEditor.Instance.State.TilePointer.Y * 8, 8, 8);
+            Hold = new Rectangle(MiscHelper.GetMousePosition().X, MiscHelper.GetMousePosition().Y, 8, 8);
             HeldEntity.SetArea(Hold);
         }
     }
