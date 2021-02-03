@@ -135,6 +135,9 @@ namespace Starforge.Editor.Tools {
         }
 
         private void HandleRightClick() {
+            if (SelectedEntity == null) {
+                return;
+            }
             if (!SelectedEntity.ContainsPosition(MapEditor.Instance.State.PixelPointer)) {
                 return;
             }
@@ -185,6 +188,9 @@ namespace Starforge.Editor.Tools {
     }
 
     // Names for the different corners and sides of the entity that can be dragged
+    // The values are such that the corners are just a combination of the two sides, e.g. TopLeft = Top | Left
+    // Outside is the 0 Element, i.e. for every x: x | Outside = Outside
+    // Middle is the 1 Element, i.e. for every x: x | Middle = x
     public enum EntityRegion {
         Outside = -1,
         Middle = 0,
