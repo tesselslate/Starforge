@@ -2,7 +2,6 @@
 using Starforge.Map;
 using Starforge.Mod.API;
 using Starforge.Mod.Content;
-using Starforge.Util;
 using System;
 
 namespace Starforge.Vanilla.Entities {
@@ -28,6 +27,10 @@ namespace Starforge.Vanilla.Entities {
         public static PlacementList Placements = new PlacementList()
         {
             new Placement("Intro Car")
+        };
+
+        public override PropertyList Properties => new PropertyList() {
+            new Property("hasRoadAndBarriers", PropertyType.Bool, "")
         };
     }
 }

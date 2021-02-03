@@ -42,6 +42,7 @@ namespace Starforge.Mod.API {
 
     public enum PropertyType {
         String,
+        Char,
         Integer,
         Float,
         Bool

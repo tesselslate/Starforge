@@ -69,6 +69,8 @@ namespace Starforge.Editor.UI {
                 else {
                     return AddEntryString(entity, property);
                 }
+            case PropertyType.Char:
+                return AddEntryChar(entity, property);
             case PropertyType.Integer:
                 return AddEntryInt(entity, property);
             case PropertyType.Float:
@@ -81,7 +83,21 @@ namespace Starforge.Editor.UI {
             }
         }
 
-        public bool AddEntryInt(Entity entity, Property property) {
+        private bool AddEntryChar(Entity entity, Property property) {
+            if (!entity.Attributes.ContainsKey(property.Name)) {
+                entity.Attributes[property.Name] = 0;
+            }
+            int outInt = (int)entity.Attributes[property.Name];
+            ImGui.InputInt(MiscHelper.CleanCamelCase(property.Name), ref outInt);
+            UIHelper.Tooltip(property.Description);
+            if (outInt > char.MaxValue) outInt = char.MaxValue;
+            bool changed = (int)entity.Attributes[property.Name] != outInt;
+            entity.Attributes[property.Name] = (char)outInt;
+
+            return changed;
+        }
+
+        private bool AddEntryInt(Entity entity, Property property) {
             if (!entity.Attributes.ContainsKey(property.Name)) {
                 entity.Attributes[property.Name] = 0;
             }
@@ -94,7 +110,7 @@ namespace Starforge.Editor.UI {
             return changed;
         }
 
-        public bool AddEntryFloat(Entity entity, Property property) {
+        private bool AddEntryFloat(Entity entity, Property property) {
             if (!entity.Attributes.ContainsKey(property.Name)) {
                 entity.Attributes[property.Name] = 0;
             }
@@ -107,7 +123,7 @@ namespace Starforge.Editor.UI {
             return changed;
         }
 
-        public bool AddEntryString(Entity entity, Property property) {
+        private bool AddEntryString(Entity entity, Property property) {
             if (!entity.Attributes.ContainsKey(property.Name)) {
                 entity.Attributes[property.Name] = "";
             }
@@ -121,7 +137,7 @@ namespace Starforge.Editor.UI {
             return changed;
         }
 
-        public bool AddEntryStringList(Entity entity, Property property) {
+        private bool AddEntryStringList(Entity entity, Property property) {
             if (!entity.Attributes.ContainsKey(property.Name)) {
                 entity.Attributes[property.Name] = "";
             }
@@ -142,7 +158,7 @@ namespace Starforge.Editor.UI {
             return changed;
         }
 
-        public bool AddEntryBool(Entity entity, Property property) {
+        private bool AddEntryBool(Entity entity, Property property) {
             if (!entity.Attributes.ContainsKey(property.Name)) {
                 entity.Attributes[property.Name] = false;
             }

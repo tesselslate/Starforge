@@ -24,14 +24,21 @@ namespace Starforge.Vanilla.Entities {
         public static PlacementList Placements = new PlacementList()
         {
             new Placement("Feather"),
-            new Placement("Feather (Shielded)")
-            {
+            new Placement("Feather (Shielded)") {
                 ["shielded"] = true
+            },
+            new Placement("Feather (Single Use)") {
+                ["singleUse"] = true
+            },
+            new Placement("Feather (Shielded, Single Use") {
+                ["shielded"] = true,
+                ["singleUse"] = true
             }
         };
 
         public override PropertyList Properties => new PropertyList() {
-            new Property("shielded", PropertyType.Bool, "Whether this feather has a shield or not")
+            new Property("shielded", PropertyType.Bool, "Whether this feather has a shield or not"),
+            new Property("singleUse", PropertyType.Bool, "Whether the feather is single use")
         };
     }
 }

@@ -68,7 +68,8 @@ namespace Starforge.Vanilla.Entities {
 
         public override PropertyList Properties => new PropertyList() {
             new Property("color", new string[] {"blue", "purple", "rainbow", "red"}, "The color of the spinner"),
-            new Property("dust", PropertyType.Bool, "Whether this is a dust bunny or speen")
+            new Property("dust", PropertyType.Bool, "Whether this is a dust bunny or speen"),
+            new Property("attachToSolid", PropertyType.Bool, "Whether to attach this to a solid in range")
         };
     }
 }

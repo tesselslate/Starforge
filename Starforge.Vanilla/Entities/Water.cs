@@ -26,5 +26,9 @@ namespace Starforge.Vanilla.Entities {
             new Placement("Water")
         };
 
+        public override PropertyList Properties => new PropertyList() {
+            new Property("hasBottom", PropertyType.Bool, "Whether this Water has a bottom")
+        };
+
     }
 }

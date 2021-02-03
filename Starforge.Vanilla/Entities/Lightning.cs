@@ -27,5 +27,9 @@ namespace Starforge.Vanilla.Entities {
             new Placement("Lightning")
         };
 
+        public override PropertyList Properties => new PropertyList() {
+            new Property("moveTime", PropertyType.Float, "How long the lightning takes for one movement Cycle")
+        };
+
     }
 }
