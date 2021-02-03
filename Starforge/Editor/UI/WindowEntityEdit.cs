@@ -112,7 +112,7 @@ namespace Starforge.Editor.UI {
 
         private bool AddEntryFloat(Entity entity, Property property) {
             if (!entity.Attributes.ContainsKey(property.Name)) {
-                entity.Attributes[property.Name] = 0;
+                entity.Attributes[property.Name] = 0f;
             }
             float outFloat = (float)entity.Attributes[property.Name];
             ImGui.InputFloat(MiscHelper.CleanCamelCase(property.Name), ref outFloat);

@@ -1,26 +1,31 @@
 ﻿using Starforge.Core;
 using Starforge.Map;
 using Starforge.Editor.UI;
-using System.Drawing;
 using System.Collections.Generic;
 using Starforge.Util;
 using Starforge.Editor.Actions;
 using Microsoft.Xna.Framework;
+using Starforge.Mod.Content;
 
 namespace Starforge.Editor.Tools {
 
     using Attributes = Dictionary<string, object>;
 
     public class EntitySelectionTool : Tool {
-        Entity SelectedEntity = null;
-        EntityRegion HeldRegion = EntityRegion.Outside;
-        System.Drawing.Point ClickOffset;
-        Attributes InitialAttributes;
+
+        private Rectangle Hint = new Rectangle(-8, -8, 8, 8);
+
+        private Entity SelectedEntity = null;
+        private EntityRegion HeldRegion = EntityRegion.Outside;
+        private System.Drawing.Point ClickOffset;
+        private Attributes InitialAttributes;
 
         public override string GetName() => "Entity Selection";
 
         public override void Render() {
-            //nothing to render
+            if (SelectedEntity != null) {
+                GFX.Draw.BorderedRectangle(SelectedEntity.Hitbox, Settings.ToolColor * 0.2f, Settings.ToolColor * 0.5f);
+            }
         }
 
         public override void Update() {
@@ -59,8 +64,8 @@ namespace Starforge.Editor.Tools {
                 return;
             }
             // remember where in the entity we started clicking
-            ClickOffset.X = MapEditor.Instance.State.PixelPointer.X - (int)SelectedEntity.Position.X;
-            ClickOffset.Y = MapEditor.Instance.State.PixelPointer.Y - (int)SelectedEntity.Position.Y;
+            ClickOffset.X = MiscHelper.GetMousePosition().X - (int)SelectedEntity.Position.X;
+            ClickOffset.Y = MiscHelper.GetMousePosition().Y - (int)SelectedEntity.Position.Y;
         }
 
         private void HandleLeftDrag() {
