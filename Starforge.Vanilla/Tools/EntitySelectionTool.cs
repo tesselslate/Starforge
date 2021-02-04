@@ -57,6 +57,10 @@ namespace Starforge.Vanilla.Tools {
 
         public override bool CanSelectLayer() => false;
 
+        public void Deselect() {
+            SelectedEntity = null;
+        }
+
         private void HandleLeftClick() {
             if (SelectedEntity == null) {
                 SelectedEntity = MapEditor.Instance.State.SelectedRoom.Entities.Find(e => e.ContainsPosition(MapEditor.Instance.State.PixelPointer));
@@ -157,7 +161,7 @@ namespace Starforge.Vanilla.Tools {
         }
 
         public void HandleSelectedEntity(Entity SelectedEntity) {
-            Engine.CreateWindow(new WindowEntityEdit(SelectedEntity));
+            Engine.CreateWindow(new WindowEntityEdit(this, SelectedEntity));
         }
 
         public void UpdateCursor() {

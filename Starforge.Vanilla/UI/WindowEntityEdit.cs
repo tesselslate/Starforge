@@ -5,6 +5,7 @@ using Starforge.Util;
 using Starforge.Editor.UI;
 using Starforge.Editor;
 using Starforge.Vanilla.Actions;
+using Starforge.Vanilla.Tools;
 using System.Collections.Generic;
 
 namespace Starforge.Vanilla.UI {
@@ -12,15 +13,16 @@ namespace Starforge.Vanilla.UI {
     using Attributes = Dictionary<string, object>;
 
     public class WindowEntityEdit : Window {
-        public string MapName = "";
-        private bool Done = false;
+
         private Entity SelectedEntity;
+        private EntitySelectionTool Tool;
 
         private Attributes InitialAttributes;
 
-        public WindowEntityEdit(Entity Entity) {
+        public WindowEntityEdit(EntitySelectionTool tool, Entity Entity) {
             SelectedEntity = Entity;
             InitialAttributes = MiscHelper.CloneDictionary(Entity.Attributes);
+            Tool = tool;
         }
 
         public override void Render() {
@@ -43,22 +45,31 @@ namespace Starforge.Vanilla.UI {
             ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 2f);
             ImGui.PopStyleVar();
 
-            if (Done = ImGui.Button("OK", new System.Numerics.Vector2(25f, 20f))) {
+            if (ImGui.Button("Delete", new System.Numerics.Vector2(60f, 20f))) {
+                MapEditor.Instance.State.Apply(new EntityRemovalAction(
+                    MapEditor.Instance.State.SelectedRoom,
+                    SelectedEntity
+                ));
+                Tool.Deselect();
                 Visible = false;
-                Done = true;
+            }
+            UIHelper.Tooltip("Delete this Entity");
+
+            ImGui.SameLine();
+            if (ImGui.Button("OK", new System.Numerics.Vector2(25f, 20f))) {
+                MapEditor.Instance.State.Apply(new EntityEditAction(
+                    MapEditor.Instance.State.SelectedRoom,
+                    SelectedEntity,
+                    InitialAttributes,
+                    MiscHelper.CloneDictionary(SelectedEntity.Attributes)
+                ));
+                Visible = false;
             }
 
             ImGui.EndPopup();
         }
 
         public override void End() {
-            MapEditor.Instance.State.Apply(new EntityEditAction(
-                MapEditor.Instance.State.SelectedRoom,
-                SelectedEntity,
-                InitialAttributes,
-                MiscHelper.CloneDictionary(SelectedEntity.Attributes)
-            ));
-            if (!Done) return;
         }
 
         // Returns true if the property was changed
