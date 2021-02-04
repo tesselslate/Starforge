@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Starforge.Editor.Tools;
 using Starforge.Mod.API;
 using System;
 using System.Collections.Generic;
@@ -115,4 +114,22 @@ namespace Starforge.Map {
 
         public abstract void Render();
     }
+
+    // Names for the different corners and sides of the entity that can be dragged
+    // The values are such that the corners are just a combination of the two sides, e.g. TopLeft = Top | Left
+    // Outside is the 0 Element, i.e. for every x: x | Outside = Outside
+    // Middle is the 1 Element, i.e. for every x: x | Middle = x
+    public enum EntityRegion {
+        Outside = -1,
+        Middle = 0,
+        Top = 1 << 0,
+        Bottom = 1 << 1,
+        Left = 1 << 2,
+        Right = 1 << 3,
+        TopLeft = Top | Left,
+        TopRight = Top | Right,
+        BottomLeft = Bottom | Left,
+        BottomRight = Bottom | Right
+    }
+
 }

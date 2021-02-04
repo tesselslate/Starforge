@@ -1,6 +1,7 @@
 ﻿using Starforge.Map;
+using Starforge.Editor.Actions;
 
-namespace Starforge.Editor.Actions {
+namespace Starforge.Vanilla.Actions {
     public class EntityPlacementAction : EditorAction {
         private Entity Entity;
 

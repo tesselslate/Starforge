@@ -1,11 +1,13 @@
 ﻿using ImGuiNET;
-using Starforge.Editor.Actions;
 using Starforge.Map;
 using Starforge.Mod.API;
 using Starforge.Util;
+using Starforge.Editor.UI;
+using Starforge.Editor;
+using Starforge.Vanilla.Actions;
 using System.Collections.Generic;
 
-namespace Starforge.Editor.UI {
+namespace Starforge.Vanilla.UI {
 
     using Attributes = Dictionary<string, object>;
 

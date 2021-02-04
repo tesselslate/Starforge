@@ -1,16 +1,19 @@
 ﻿using Starforge.Core;
 using Starforge.Map;
-using Starforge.Editor.UI;
-using System.Collections.Generic;
 using Starforge.Util;
-using Starforge.Editor.Actions;
-using Microsoft.Xna.Framework;
+using Starforge.Editor;
+using Starforge.Vanilla.Actions;
 using Starforge.Mod.Content;
+using Starforge.Mod.API;
+using Starforge.Vanilla.UI;
+using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 
-namespace Starforge.Editor.Tools {
+namespace Starforge.Vanilla.Tools {
 
     using Attributes = Dictionary<string, object>;
 
+    [ToolDefinition("Entity Selection")]
     public class EntitySelectionTool : Tool {
 
         private Rectangle Hint = new Rectangle(-8, -8, 8, 8);
@@ -21,12 +24,6 @@ namespace Starforge.Editor.Tools {
         private Attributes InitialAttributes;
 
         public override string GetName() => "Entity Selection";
-
-        public override void Render() {
-            if (SelectedEntity != null) {
-                GFX.Draw.BorderedRectangle(SelectedEntity.Hitbox, Settings.ToolColor * 0.2f, Settings.ToolColor * 0.5f);
-            }
-        }
 
         public override void Update() {
             UpdateCursor();
@@ -47,6 +44,18 @@ namespace Starforge.Editor.Tools {
                 HandleLeftDrag();
             }
         }
+
+        public override void Render() {
+            if (SelectedEntity != null) {
+                GFX.Draw.BorderedRectangle(SelectedEntity.Hitbox, Settings.ToolColor * 0.2f, Settings.ToolColor * 0.5f);
+            }
+        }
+
+        public override void RenderGUI() {
+            // No GUI to render
+        }
+
+        public override bool CanSelectLayer() => false;
 
         private void HandleLeftClick() {
             if (SelectedEntity == null) {
@@ -185,23 +194,6 @@ namespace Starforge.Editor.Tools {
             }
         }
 
-    }
-
-    // Names for the different corners and sides of the entity that can be dragged
-    // The values are such that the corners are just a combination of the two sides, e.g. TopLeft = Top | Left
-    // Outside is the 0 Element, i.e. for every x: x | Outside = Outside
-    // Middle is the 1 Element, i.e. for every x: x | Middle = x
-    public enum EntityRegion {
-        Outside = -1,
-        Middle = 0,
-        Top = 1 << 0,
-        Bottom = 1 << 1,
-        Left = 1 << 2,
-        Right = 1 << 3,
-        TopLeft = Top | Left,
-        TopRight = Top | Right,
-        BottomLeft = Bottom | Left,
-        BottomRight = Bottom | Right
     }
 
 }

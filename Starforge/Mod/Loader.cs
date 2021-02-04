@@ -1,9 +1,11 @@
 ﻿using Starforge.Core;
+using Starforge.Editor;
 using Starforge.Map;
 using Starforge.Mod.API;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace Starforge.Mod {
@@ -19,11 +21,19 @@ namespace Starforge.Mod {
         /// <param name="asm">The assembly to load.</param>
         public static void LoadPluginAssembly(Assembly asm) {
             try {
-                foreach (Type type in asm.GetTypes()) {
+                foreach (Type type in asm.GetTypes().Where((type) => !type.IsAbstract)) {
                     if (type.IsSubclassOf(typeof(Entity))) {
                         if (type.GetCustomAttribute<EntityDefinitionAttribute>() != null || type.GetCustomAttribute<TriggerDefinitionAttribute>() != null) {
                             EntityRegistry.Register(type);
                         } else {
+                            Logger.Log(LogLevel.Warning, $"Assembly {asm.GetName()} contains {type} without an appropriate definition attribute");
+                        }
+                    }
+                    if (type.IsSubclassOf(typeof(Tool))) {
+                        if (type.GetCustomAttribute<ToolDefinitionAttribute>() != null) {
+                            ToolManager.Register(type);
+                        }
+                        else {
                             Logger.Log(LogLevel.Warning, $"Assembly {asm.GetName()} contains {type} without an appropriate definition attribute");
                         }
                     }

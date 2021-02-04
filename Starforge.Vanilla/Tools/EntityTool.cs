@@ -1,12 +1,22 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ImGuiNET;
+using Microsoft.Xna.Framework;
 using Starforge.Core;
-using Starforge.Editor.Actions;
+using Starforge.Editor;
 using Starforge.Map;
+using Starforge.Mod;
+using Starforge.Mod.API;
 using Starforge.Util;
+using Starforge.Vanilla.Actions;
 using System;
 
-namespace Starforge.Editor.Tools {
+namespace Starforge.Vanilla.Tools {
+    [ToolDefinition("Entity")]
     public class EntityTool : Tool {
+        /// <summary>
+        /// The currently selected entity placement.
+        /// </summary>
+        public static Placement SelectedEntity;
+
         public Entity HeldEntity;
 
         private Point Start;
@@ -15,13 +25,15 @@ namespace Starforge.Editor.Tools {
         private Rectangle Hold = new Rectangle(-64, -64, 0, 0);
 
         public override string GetName() => "Entities";
-
+        public override bool CanSelectLayer() => false;
         public override void Render() {
-            if (HeldEntity != null) HeldEntity.Render();
+            HeldEntity?.Render();
         }
 
         public override void Update() {
             Room r = MapEditor.Instance.State.SelectedRoom;
+
+            SelectedEntity ??= EntityRegistry.EntityPlacements[0];
 
             if (HeldEntity != null) {
                 HeldEntity.Room = r;
@@ -31,13 +43,13 @@ namespace Starforge.Editor.Tools {
                 else if (Input.Mouse.LeftUnclick) HandleUnclick();
                 else HandleMove();
             } else {
-                HeldEntity = ToolManager.SelectedEntity.Create(r);
+                HeldEntity = SelectedEntity.Create(r);
                 HeldEntity.SetArea(Hold);
             }
         }
 
         public void UpdateHeldEntity() {
-            HeldEntity = ToolManager.SelectedEntity.Create(MapEditor.Instance.State.SelectedRoom);
+            HeldEntity = SelectedEntity.Create(MapEditor.Instance.State.SelectedRoom);
             HeldEntity.SetArea(Hold);
         }
 
@@ -80,9 +92,13 @@ namespace Starforge.Editor.Tools {
         private void HandleUnclick() {
             HeldEntity.SetArea(Hold);
 
-            Entity entity = ToolManager.SelectedEntity.Create(MapEditor.Instance.State.SelectedRoom);
-            if (HeldEntity.StretchableX || HeldEntity.StretchableY) entity.SetArea(Hold);
-            else entity.Position = HeldEntity.Position;
+            Entity entity = SelectedEntity.Create(MapEditor.Instance.State.SelectedRoom);
+            if (HeldEntity.StretchableX || HeldEntity.StretchableY) {
+                entity.SetArea(Hold);
+            }
+            else {
+                entity.Position = HeldEntity.Position;
+            }
 
             MapEditor.Instance.State.Apply(new EntityPlacementAction(
                 MapEditor.Instance.State.SelectedRoom,
@@ -96,6 +112,22 @@ namespace Starforge.Editor.Tools {
         private void HandleMove() {
             Hold = new Rectangle(MiscHelper.GetMousePosition().X, MiscHelper.GetMousePosition().Y, 8, 8);
             HeldEntity.SetArea(Hold);
+        }
+
+        public override void RenderGUI() {
+            ImGui.Text("Entities");
+            ImGui.SetNextItemWidth(235f);
+
+            SelectedEntity ??= EntityRegistry.EntityPlacements[0];
+
+            if (ImGui.ListBoxHeader("EntitiesList", EntityRegistry.EntityPlacements.Count, MapEditor.Instance.ToolListWindow.VisibleItemsCount)) {
+                foreach (Placement placement in EntityRegistry.EntityPlacements) {
+                    if (ImGui.Selectable(placement.Name, placement == SelectedEntity)) {
+                        SelectedEntity = placement;
+                        UpdateHeldEntity();
+                    }
+                }
+            }
         }
     }
 }

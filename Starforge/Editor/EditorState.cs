@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Starforge.Core;
-using Starforge.Editor.Actions;
 using Starforge.Map;
+using Starforge.Editor.Actions;
 using System.Collections.Generic;
 using System.IO;
 

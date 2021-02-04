@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using Starforge.Editor.Tools;
+using Starforge.Editor;
 using Starforge.Map;
 
-namespace Starforge.Editor.Actions {
+namespace Starforge.Vanilla.Actions {
     public class TileRectangleAction : TileAction {
         private Rectangle Area;
 
@@ -43,7 +43,5 @@ namespace Starforge.Editor.Actions {
             if (changed) DrawableRoom.Dirty = true;
             return changed;
         }
-
-        public override ToolType GetToolType() => ToolType.TileRectangle;
     }
 }

@@ -1,24 +1,17 @@
 ﻿using Microsoft.Xna.Framework;
 using Starforge.Core;
-using Starforge.Editor.Actions;
+using Starforge.Editor;
 using Starforge.Map;
-using Starforge.Mod.Content;
+using Starforge.Mod.API;
+using Starforge.Vanilla.Actions;
 
-namespace Starforge.Editor.Tools {
-    public class TileRectangleTool : Tool {
-        /// <remarks>The hint is set out of bounds (beyond upleft corner) so the hint does not appear when first selecting the tool.</remarks>
-        private Rectangle Hint = new Rectangle(-8, -8, 8, 8);
-
+namespace Starforge.Vanilla.Tools {
+    [ToolDefinition("TileRectangle")]
+    public class TileRectangleTool : TileTool {
         private Rectangle Hold = new Rectangle(-1, -1, 0, 0);
         private Point Start;
 
         public override string GetName() => "Tiles (Rectangle)";
-
-        public override void Render() {
-            GFX.Draw.BorderedRectangle(Hint, Settings.ToolColor * 0.5f, Settings.ToolColor);
-            Hint.X = MapEditor.Instance.State.TilePointer.X * 8;
-            Hint.Y = MapEditor.Instance.State.TilePointer.Y * 8;
-        }
 
         public override void Update() {
             if (Input.Mouse.LeftClick) HandleClick();

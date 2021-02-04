@@ -1,10 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
+using Starforge.Editor;
+using Starforge.Editor.Actions;
 using Starforge.Editor.Render;
-using Starforge.Editor.Tools;
 using Starforge.Map;
 using System.Collections.Generic;
 
-namespace Starforge.Editor.Actions {
+namespace Starforge.Vanilla.Actions {
     public abstract class TileAction : EditorAction {
         protected ToolLayer Layer { get; }
         protected short Tileset;
@@ -25,8 +26,6 @@ namespace Starforge.Editor.Actions {
             if (t == 0) Tileset = TileGrid.TILE_AIR;
             else Tileset = (short)Tiler.GetTilesetList()[t - 1].ID;
         }
-
-        public abstract ToolType GetToolType();
 
         public override bool Undo() {
             bool changed = false;

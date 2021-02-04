@@ -1,7 +1,8 @@
 ﻿using Starforge.Map;
+using Starforge.Editor.Actions;
 using System.Collections.Generic;
 
-namespace Starforge.Editor.Actions {
+namespace Starforge.Vanilla.Actions {
     using Attributes = Dictionary<string, object>;
 
     public class EntityEditAction : EditorAction {
