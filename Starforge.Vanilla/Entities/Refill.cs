@@ -20,8 +20,7 @@ namespace Starforge.Vanilla.Entities {
         }
         public override Rectangle Hitbox => MiscHelper.RectangleCentered(Position, OneDashSprite.Value.Width, OneDashSprite.Value.Height);
 
-        public static PlacementList Placements = new PlacementList()
-        {
+        public static PlacementList Placements = new PlacementList() {
             new Placement("Refill"),
             new Placement("Refill (Two Dashes)")
             {

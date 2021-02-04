@@ -6,6 +6,7 @@ using Starforge.Editor.UI;
 using Starforge.Editor;
 using Starforge.Vanilla.Actions;
 using Starforge.Vanilla.Tools;
+using System;
 using System.Collections.Generic;
 
 namespace Starforge.Vanilla.UI {
@@ -76,12 +77,7 @@ namespace Starforge.Vanilla.UI {
         public bool AddEntry(Entity entity, Property property) {
             switch (property.Type) {
             case PropertyType.String:
-                if (property.List) {
-                    return AddEntryStringList(entity, property);
-                }
-                else {
-                    return AddEntryString(entity, property);
-                }
+                return AddEntryString(entity, property);
             case PropertyType.Char:
                 return AddEntryChar(entity, property);
             case PropertyType.Integer:
@@ -90,6 +86,8 @@ namespace Starforge.Vanilla.UI {
                 return AddEntryFloat(entity, property);
             case PropertyType.Bool:
                 return AddEntryBool(entity, property);
+            case PropertyType.List:
+                return AddEntryList(entity, property);
             default:
                 ImGui.Text("Unknown property type of property: " + property.Name);
                 return false;
@@ -100,12 +98,12 @@ namespace Starforge.Vanilla.UI {
             if (!entity.Attributes.ContainsKey(property.Name)) {
                 entity.Attributes[property.Name] = 0;
             }
-            int outInt = (int)entity.Attributes[property.Name];
+            int outInt = Convert.ToInt32(entity.Attributes[property.Name]);
             ImGui.InputInt(MiscHelper.CleanCamelCase(property.Name), ref outInt);
             UIHelper.Tooltip(property.Description);
             if (outInt > char.MaxValue) outInt = char.MaxValue;
-            bool changed = (int)entity.Attributes[property.Name] != outInt;
-            entity.Attributes[property.Name] = (char)outInt;
+            bool changed = Convert.ToInt32(entity.Attributes[property.Name]) != outInt;
+            entity.Attributes[property.Name] = Convert.ToChar(outInt);
 
             return changed;
         }
@@ -150,23 +148,33 @@ namespace Starforge.Vanilla.UI {
             return changed;
         }
 
-        private bool AddEntryStringList(Entity entity, Property property) {
+        private bool AddEntryList(Entity entity, Property property) {
             if (!entity.Attributes.ContainsKey(property.Name)) {
                 entity.Attributes[property.Name] = "";
             }
-            int Index = 0;
-            for (int i = 0; i < property.Values.Length; ++i) {
-                if (property.Values[i].ToLower() == (string)entity.Attributes[property.Name]) {
-                    Index = i;
-                    break;
+            if (property.SelectedEntry == null) {
+                // find selected entry
+                foreach (string name in property.DisplayValues) {
+                    if (property.Values[name].Equals(entity.Attributes[property.Name])) {
+                        property.SelectedEntry = name;
+                        break;
+                    }
                 }
             }
+            int Index = 0;
+            for (int i = 0; i < property.DisplayValues.Length; ++i) {
+                if (property.DisplayValues[i] == property.SelectedEntry) {
+                    Index = i;
+                }
+            }
+            
             int IndexBefore = Index;
             ImGui.SetNextItemWidth(100f);
             ImGui.ListBox(MiscHelper.CleanCamelCase(property.Name), ref Index, property.DisplayValues, property.DisplayValues.Length);
             UIHelper.Tooltip(property.Description);
             bool changed = IndexBefore != Index;
-            entity.Attributes[property.Name] = property.Values[Index];
+            property.SelectedEntry = property.DisplayValues[Index];
+            entity.Attributes[property.Name] = property.Values[property.DisplayValues[Index]];
 
             return changed;
         }

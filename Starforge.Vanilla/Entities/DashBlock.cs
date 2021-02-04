@@ -2,6 +2,7 @@
 using Starforge.Editor.Render;
 using Starforge.Map;
 using Starforge.Mod.API;
+using System.Collections.Generic;
 
 namespace Starforge.Vanilla.Entities {
     [EntityDefinition("dashBlock")]
@@ -34,7 +35,12 @@ namespace Starforge.Vanilla.Entities {
         };
 
         public override PropertyList Properties => new PropertyList() {
-            new Property("tiletype", PropertyType.Char, "The tile the block is. 1 is dirt, 3 is ice, 6 is stone and 9 is wood"),
+            new Property("tiletype", new Dictionary<string, object>() {
+                ["Dirt"] = '1',
+                ["Ice"] = '3',
+                ["Stone"] = '6',
+                ["Wood"] = '9'
+            }, "The tiletype the block is made of"),
             new Property("blendin", PropertyType.Bool, ""),
             new Property("permanent", PropertyType.Bool, ""),
             new Property("canDash", PropertyType.Bool, "")
