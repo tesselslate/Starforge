@@ -113,16 +113,19 @@ namespace Starforge.Vanilla.Tools {
                 UpdatedPosition.Y = MiscHelper.GetMousePosition().Y - ClickOffset.Y;
             }
 
-            int MinSize;
-            if (EditorState.PixelPerfect()) {
-                MinSize = 1;
-            }
-            else {
-                MinSize = 8;
-            }
+            if (HeldRegion != EntityRegion.Middle) {
+                //don't resize to minimum size when only moving, no matter what
+                int MinSize;
+                if (EditorState.PixelPerfect()) {
+                    MinSize = 1;
+                }
+                else {
+                    MinSize = 8;
+                }
 
-            SelectedEntity.Height = (int)MathHelper.Max(SelectedEntity.Height, MinSize);
-            SelectedEntity.Width = (int)MathHelper.Max(SelectedEntity.Width, MinSize);
+                SelectedEntity.Width = (int)MathHelper.Max(SelectedEntity.Width, MinSize);
+                SelectedEntity.Height = (int)MathHelper.Max(SelectedEntity.Height, MinSize);
+            }
 
             SelectedEntity.Position = UpdatedPosition;
             MapEditor.Instance.Renderer.GetRoom(SelectedEntity.Room).Dirty = true;
