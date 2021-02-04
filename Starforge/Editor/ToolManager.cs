@@ -15,7 +15,11 @@ namespace Starforge.Editor {
         /// <summary>
         /// The currently selected tool.
         /// </summary>
-        public static Tool SelectedTool;
+        public static Tool SelectedTool {
+            get => _selectedTool ??= Tools["TileBrush"];
+            set => _selectedTool = value;
+        }
+        private static Tool _selectedTool;
 
         /// <summary>
         /// The currently selected tool layer (background/foreground).
@@ -42,14 +46,10 @@ namespace Starforge.Editor {
         }
 
         public static void Render() {
-            if (SelectedTool == null)
-                SelectedTool = Tools["TileBrush"];
             SelectedTool.Render();
         }
 
         public static void Update() {
-            if (SelectedTool == null)
-                SelectedTool = Tools["TileBrush"];
             SelectedTool.Update();
         }
 
