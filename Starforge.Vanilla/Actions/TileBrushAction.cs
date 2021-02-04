@@ -3,7 +3,7 @@ using Starforge.Editor.Tools;
 using Starforge.Map;
 using System.Collections.Generic;
 
-namespace Starforge.Editor.Actions {
+namespace Starforge.Vanilla.Actions {
     public class TileBrushAction : TileAction {
         private HashSet<Point> Points;
 
@@ -30,7 +30,5 @@ namespace Starforge.Editor.Actions {
             if (changed) DrawableRoom.Dirty = true;
             return changed;
         }
-
-        public override ToolType GetToolType() => ToolType.TileBrush;
     }
 }

@@ -25,7 +25,7 @@ namespace Starforge.Editor {
 
         // Windows and UI elements
         internal WindowRoomList RoomListWindow;
-        internal WindowToolList ToolListWindow;
+        public WindowToolList ToolListWindow;
         private ShortcutManager Shortcuts;
 
         public bool AcceptToolInput { get; private set; } = false;
