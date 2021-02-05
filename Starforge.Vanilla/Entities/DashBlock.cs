@@ -21,25 +21,25 @@ namespace Starforge.Vanilla.Entities {
         public static PlacementList Placements = new PlacementList()
         {
             new Placement("Dash Block (Dirt)") {
-                ["tiletype"] = '1'
+                ["tiletype"] = "1"
             },
             new Placement("Dash Block (Ice)") {
-                ["tiletype"] = '3'
+                ["tiletype"] = "3"
             },
             new Placement("Dash Block (Stone)") {
-                ["tiletype"] = '6'
+                ["tiletype"] = "6"
             },
             new Placement("Dash Block (Wood)") {
-                ["tiletype"] = '9'
+                ["tiletype"] = "9"
             }
         };
 
         public override PropertyList Properties => new PropertyList() {
             new Property("tiletype", new OrderedDictionary() {
-                { "Dirt", '1' },
-                { "Ice", '3' },
-                { "Stone", '6' },
-                { "Wood", '9' }
+                { "Dirt", "1" },
+                { "Ice", "3" },
+                { "Stone", "6" },
+                { "Wood", "9" }
             }, "The tiletype the block is made of"),
             new Property("blendin", PropertyType.Bool, ""),
             new Property("permanent", PropertyType.Bool, ""),

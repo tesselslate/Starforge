@@ -29,7 +29,9 @@ namespace Starforge.Map {
         /// <returns>The decoded string.</returns>
         public static string DecodeRLE(byte[] rle) {
             Builder.Clear();
-            for (int i = 0; i < rle.Length; i += 2) Builder.Append((char)rle[i + 1], rle[i]);
+            for (int i = 0; i < rle.Length; i += 2) {
+                Builder.Append((char)rle[i + 1], rle[i]);
+            }
 
             return Builder.ToString();
         }
@@ -59,7 +61,9 @@ namespace Starforge.Map {
 
                 byte[] res = new byte[pos];
                 fixed (byte* resptr = &res[0]) {
-                    for (int i = 0; i < pos; i++) resptr[i] = ptr[i];
+                    for (int i = 0; i < pos; i++) {
+                        resptr[i] = ptr[i];
+                    }
                 }
 
                 return res;
@@ -72,11 +76,15 @@ namespace Starforge.Map {
         /// <param name="reader">The BinaryReader reading from the map binary file.</param>
         /// <returns>The parsed map.</returns>
         public static MapElement ReadMapBinary(BinaryReader reader) {
-            if (reader.ReadString() != "CELESTE MAP") throw new InvalidDataException("Map does not start with CELESTE MAP header");
+            if (reader.ReadString() != "CELESTE MAP") {
+                throw new InvalidDataException("Map does not start with CELESTE MAP header");
+            }
             string package = reader.ReadString();
 
             ReadLookup = new string[reader.ReadInt16()];
-            for (int i = 0; i < ReadLookup.Length; i++) ReadLookup[i] = reader.ReadString();
+            for (int i = 0; i < ReadLookup.Length; i++) {
+                ReadLookup[i] = reader.ReadString();
+            }
 
             Reader = reader;
 
@@ -131,7 +139,9 @@ namespace Starforge.Map {
             }
 
             short childCount = Reader.ReadInt16();
-            for (int i = 0; i < childCount; i++) el.Children.Add(ReadMapElement());
+            for (int i = 0; i < childCount; i++) {
+                el.Children.Add(ReadMapElement());
+            }
 
             return el;
         }
@@ -151,7 +161,9 @@ namespace Starforge.Map {
             writer.Write("CELESTE MAP");
             writer.Write(el.Package);
             writer.Write((short)WriteLookup.Count);
-            foreach (string str in WriteLookup.Keys) writer.Write(str);
+            foreach (string str in WriteLookup.Keys) {
+                writer.Write(str);
+            }
 
             WriteMapElement(el);
             writer.Flush();
@@ -178,27 +190,33 @@ namespace Starforge.Map {
                         Writer.Write((byte)ValueType.RLE);
                         Writer.Write((short)res.Length);
                         Writer.Write(res);
-                    } else {
+                    }
+                    else {
                         Writer.Write((byte)ValueType.String);
                         Writer.Write(pair.Value.ToString());
                     }
-                } else {
+                }
+                else {
                     if (pair.Value is bool) {
                         Writer.Write((byte)ValueType.Boolean);
                         Writer.Write((bool)pair.Value);
-                    } else if (pair.Value is int) {
+                    }
+                    else if (pair.Value is int) {
                         CompressNumber((int)pair.Value);
-                    } else if (pair.Value is float) {
+                    }
+                    else if (pair.Value is float) {
                         float val = (float)pair.Value;
 
                         // Compress to a byte/short/int if whole
                         if (val % 1 == 0) {
                             CompressNumber((int)val);
-                        } else {
+                        }
+                        else {
                             Writer.Write((byte)ValueType.Float);
                             Writer.Write((float)pair.Value);
                         }
-                    } else {
+                    }
+                    else {
                         WriteLookupValue(pair.Value.ToString(), true);
                     }
                 }
@@ -213,33 +231,45 @@ namespace Starforge.Map {
 
             foreach (KeyValuePair<string, object> pair in el.Attributes) {
                 // Add attribute keys
-                if (!WriteLookup.ContainsKey(pair.Key) && pair.Key != null) WriteLookup.Add(pair.Key, WriteLookupCounter++);
+                if (!WriteLookup.ContainsKey(pair.Key) && pair.Key != null) {
+                    WriteLookup.Add(pair.Key, WriteLookupCounter++);
+                }
 
                 // Add attribute values
-                if (pair.Value is string && pair.Key != "innerText" && !WriteLookup.ContainsKey(pair.Value.ToString()) && pair.Key != null) WriteLookup.Add(pair.Value.ToString(), WriteLookupCounter++);
+                if (pair.Value is string && pair.Key != "innerText" && !WriteLookup.ContainsKey(pair.Value.ToString()) && pair.Key != null) {
+                    WriteLookup.Add(pair.Value.ToString(), WriteLookupCounter++);
+                }
             }
 
-            foreach (MapElement child in el.Children) CreateLookupTable(child);
+            foreach (MapElement child in el.Children) {
+                CreateLookupTable(child);
+            }
         }
 
         public static void CompressNumber(int num) {
             if (num >= 0 && num <= byte.MaxValue) {
                 Writer.Write((byte)ValueType.Byte);
                 Writer.Write((byte)num);
-            } else if (num >= short.MinValue && num <= short.MaxValue) {
+            }
+            else if (num >= short.MinValue && num <= short.MaxValue) {
                 Writer.Write((byte)ValueType.Short);
                 Writer.Write((short)num);
-            } else {
+            }
+            else {
                 Writer.Write((byte)ValueType.Integer);
                 Writer.Write(num);
             }
         }
 
         public static void WriteLookupValue(string value, bool writeType) {
-            if (writeType) Writer.Write((byte)ValueType.Lookup);
+            if (writeType) {
+                Writer.Write((byte)ValueType.Lookup);
+            }
             short lval = WriteLookup[value];
 
-            if (lval < 0) throw new KeyNotFoundException($"Could not find lookup value {value}");
+            if (lval < 0) {
+                throw new KeyNotFoundException($"Could not find lookup value {value}");
+            }
             Writer.Write(lval);
         }
     }
