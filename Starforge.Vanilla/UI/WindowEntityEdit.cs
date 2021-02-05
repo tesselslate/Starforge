@@ -7,6 +7,7 @@ using Starforge.Editor;
 using Starforge.Vanilla.Actions;
 using Starforge.Vanilla.Tools;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Starforge.Vanilla.UI {
@@ -149,32 +150,41 @@ namespace Starforge.Vanilla.UI {
         }
 
         private bool AddEntryList(Entity entity, Property property) {
+            if (property.Values.Count == 0) {
+                return false;
+            }
             if (!entity.Attributes.ContainsKey(property.Name)) {
                 entity.Attributes[property.Name] = "";
             }
+
+            string SelectedEntryBefore = property.SelectedEntry;
             if (property.SelectedEntry == null) {
                 // find selected entry
-                foreach (string name in property.DisplayValues) {
-                    if (property.Values[name].Equals(entity.Attributes[property.Name])) {
-                        property.SelectedEntry = name;
+                foreach (DictionaryEntry pair in property.Values) {
+                    property.SelectedEntry ??= pair.Key.ToString();
+                    if (property.Values[pair.Key].Equals(entity.Attributes[property.Name])) {
+                        property.SelectedEntry = pair.Key.ToString();
                         break;
                     }
                 }
             }
-            int Index = 0;
-            for (int i = 0; i < property.DisplayValues.Length; ++i) {
-                if (property.DisplayValues[i] == property.SelectedEntry) {
-                    Index = i;
-                }
-            }
-            
-            int IndexBefore = Index;
+
             ImGui.SetNextItemWidth(100f);
-            ImGui.ListBox(MiscHelper.CleanCamelCase(property.Name), ref Index, property.DisplayValues, property.DisplayValues.Length);
+            if (ImGui.BeginCombo(MiscHelper.CleanCamelCase(property.Name), property.SelectedEntry)) {
+                foreach (DictionaryEntry pair in property.Values) {
+                    if (ImGui.Selectable(pair.Key.ToString())) {
+                        property.SelectedEntry = pair.Key.ToString();
+                    }
+                    if (pair.Key.ToString() == property.SelectedEntry) {
+                        ImGui.SetItemDefaultFocus();
+                    }
+                }
+                ImGui.EndCombo();
+            }
+
             UIHelper.Tooltip(property.Description);
-            bool changed = IndexBefore != Index;
-            property.SelectedEntry = property.DisplayValues[Index];
-            entity.Attributes[property.Name] = property.Values[property.DisplayValues[Index]];
+            bool changed = property.SelectedEntry != SelectedEntryBefore;
+            entity.Attributes[property.Name] = property.Values[property.SelectedEntry];
 
             return changed;
         }
