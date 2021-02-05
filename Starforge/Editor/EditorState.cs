@@ -156,12 +156,15 @@ namespace Starforge.Editor {
                 }
             }
 
-            using (FileStream stream = new FileStream(LoadedPath, FileMode.Truncate)) {
-                using (BinaryWriter writer = new BinaryWriter(stream)) {
-                    MapPacker.WriteMapBinary(writer, LoadedLevel.Encode());
-                    Unsaved = false;
-                }
-            }
+            // first write the binary into memory. This way, in case of a crash, the map binary on disc doesn't get corrupted.
+            using MemoryStream memStream = new MemoryStream();
+            using BinaryWriter writer = new BinaryWriter(memStream);
+            MapPacker.WriteMapBinary(writer, LoadedLevel.Encode());
+
+            // map written successfully, now save it
+            File.WriteAllBytes(LoadedPath, memStream.ToArray());
+
+            Unsaved = false;
         }
     }
 }
