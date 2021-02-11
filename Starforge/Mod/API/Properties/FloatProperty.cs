@@ -22,15 +22,6 @@ namespace Starforge.Mod.API.Properties
             }
             UIHelper.Tooltip(Description);
 
-            //if (!entity.Attributes.ContainsKey(Name))
-            //{
-            //    entity.Attributes[Name] = DefaultValue;
-            //}
-
-
-            //bool changed = Convert.ToInt32(entity.Attributes[Name]) != outInt;
-            //entity.Attributes[property.Name] = outInt;
-
             return changed;
         }
     }
