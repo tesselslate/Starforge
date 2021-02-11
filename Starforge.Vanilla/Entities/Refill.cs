@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Starforge.Map;
 using Starforge.Mod.API;
+using Starforge.Mod.API.Properties;
 using Starforge.Mod.Content;
 using Starforge.Util;
 using System;
@@ -29,8 +30,8 @@ namespace Starforge.Vanilla.Entities {
         };
 
         public override PropertyList Properties => new PropertyList() {
-                new Property("twoDash", PropertyType.Bool, "Whether this is a two dash or normal crystal"),
-                new Property("oneUse", PropertyType.Bool, "Whether this dash refill is single use or will respawn")
+            new BoolProperty("twoDash", false, "Whether this is a two dash or normal crystal"),
+            new BoolProperty("oneUse", false, "Whether this dash refill is single use or will respawn")
         };
     }
 }

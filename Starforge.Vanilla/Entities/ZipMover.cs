@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Starforge.Map;
 using Starforge.Mod.API;
+using Starforge.Mod.API.Properties;
 using Starforge.Mod.Content;
 using Starforge.Util;
 using System;
@@ -107,7 +108,7 @@ namespace Starforge.Entities {
         }
 
         public override PropertyList Properties => new PropertyList() {
-            new Property("theme", new string[] { "Normal", "Moon" }, "The theme this Zip Mover should use")
+            new ListProperty("theme", new string[] { "Normal", "Moon" }, false, "Normal", "The theme this Zip Mover should use")
         };
 
         public static PlacementList Placements = new PlacementList() {

@@ -1,0 +1,37 @@
+﻿using ImGuiNET;
+using Starforge.Map;
+using Starforge.Util;
+using System;
+using System.Collections.Generic;
+
+namespace Starforge.Mod.API.Properties
+{
+    public class FloatProperty : Property
+    {
+        public FloatProperty(string name, float defaultValue, string description) : base(name, defaultValue, description) { }
+
+        public override bool RenderGUI(Entity mainEntity, List<Entity> entities) {
+            bool changed = false;
+
+            float outFloat = mainEntity.GetFloat(Name, (float)DefaultValue);
+            if (ImGui.InputFloat(MiscHelper.CleanCamelCase(Name), ref outFloat)) {
+                changed = true;
+                foreach (var entity in entities) {
+                    entity.Attributes[Name] = outFloat;
+                }
+            }
+            UIHelper.Tooltip(Description);
+
+            //if (!entity.Attributes.ContainsKey(Name))
+            //{
+            //    entity.Attributes[Name] = DefaultValue;
+            //}
+
+
+            //bool changed = Convert.ToInt32(entity.Attributes[Name]) != outInt;
+            //entity.Attributes[property.Name] = outInt;
+
+            return changed;
+        }
+    }
+}

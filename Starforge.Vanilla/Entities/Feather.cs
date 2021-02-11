@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Starforge.Map;
 using Starforge.Mod.API;
+using Starforge.Mod.API.Properties;
 using Starforge.Mod.Content;
 using Starforge.Util;
 using System;
@@ -37,8 +38,8 @@ namespace Starforge.Vanilla.Entities {
         };
 
         public override PropertyList Properties => new PropertyList() {
-            new Property("shielded", PropertyType.Bool, "Whether this feather has a shield or not"),
-            new Property("singleUse", PropertyType.Bool, "Whether the feather is single use")
+            new BoolProperty("shielded", false, "Whether this feather has a shield or not"),
+            new BoolProperty("singleUse", false, "Whether the feather is single use")
         };
     }
 }

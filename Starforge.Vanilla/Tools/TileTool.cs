@@ -2,7 +2,9 @@
 using Microsoft.Xna.Framework;
 using Starforge.Core;
 using Starforge.Editor;
+using Starforge.Editor.UI;
 using Starforge.Mod.Content;
+using System.Linq;
 
 namespace Starforge.Vanilla.Tools {
     /// <summary>
@@ -11,8 +13,10 @@ namespace Starforge.Vanilla.Tools {
     public abstract class TileTool : Tool {
         /// <remarks>The hint is set out of bounds (beyond upleft corner) so the hint does not appear when first selecting the tool.</remarks>
         protected Rectangle Hint = new Rectangle(-8, -8, 8, 8);
+        private ToolLayer[] selectableLayers = new ToolLayer[] { ToolLayer.Foreground, ToolLayer.Background };
+        public override ToolLayer[] GetSelectableLayers() => selectableLayers;
 
-        public override bool CanSelectLayer() => true;
+        public override string GetSearchGroup() => "Tile";
 
         public override void Render() {
             GFX.Draw.BorderedRectangle(Hint, Settings.ToolColor * 0.5f, Settings.ToolColor);
@@ -24,19 +28,23 @@ namespace Starforge.Vanilla.Tools {
         public override void RenderGUI() {
             ImGui.Text("Tilesets");
             ImGui.SetNextItemWidth(235f);
+
+            string search = MapEditor.Instance.ToolListWindow.Searches[GetSearchGroup()];
             var toolListWindow = MapEditor.Instance.ToolListWindow;
+
             if (ToolManager.SelectedLayer == ToolLayer.Background) {
                 if (ImGui.ListBoxHeader("TilesetsList", toolListWindow.BGTilesets.Count, toolListWindow.VisibleItemsCount)) {
-                    for (int i = 0; i < toolListWindow.BGTilesets.Count; i++) {
-                        if (ImGui.Selectable(toolListWindow.BGTilesets[i], ToolManager.BGTileset == i)) ToolManager.BGTileset = i;
-                    }
+                    WindowToolList.CreateSelectables(search, toolListWindow.BGTilesets.OrderBy((s) => s), (item) => {
+                        if (ImGui.Selectable(item, ToolManager.BGTileset == toolListWindow.BGTilesets.IndexOf(item))) ToolManager.BGTileset = toolListWindow.BGTilesets.IndexOf(item);
+                    });
                     ImGui.ListBoxFooter();
                 }
-            } else {
+            }
+            else {
                 if (ImGui.ListBoxHeader("TilesetsList", toolListWindow.FGTilesets.Count, toolListWindow.VisibleItemsCount)) {
-                    for (int i = 0; i < toolListWindow.FGTilesets.Count; i++) {
-                        if (ImGui.Selectable(toolListWindow.FGTilesets[i], ToolManager.FGTileset == i)) ToolManager.FGTileset = i;
-                    }
+                    WindowToolList.CreateSelectables(search, toolListWindow.FGTilesets.OrderBy((s) => s), (item) => {
+                        if (ImGui.Selectable(item, ToolManager.FGTileset == toolListWindow.FGTilesets.IndexOf(item))) ToolManager.FGTileset = toolListWindow.FGTilesets.IndexOf(item); 
+                    });
                     ImGui.ListBoxFooter();
                 }
             }

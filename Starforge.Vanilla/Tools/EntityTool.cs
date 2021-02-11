@@ -2,12 +2,15 @@
 using Microsoft.Xna.Framework;
 using Starforge.Core;
 using Starforge.Editor;
+using Starforge.Editor.UI;
 using Starforge.Map;
 using Starforge.Mod;
 using Starforge.Mod.API;
 using Starforge.Util;
 using Starforge.Vanilla.Actions;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Starforge.Vanilla.Tools {
     [ToolDefinition("Entity")]
@@ -24,8 +27,11 @@ namespace Starforge.Vanilla.Tools {
         /// <remarks>The hold is set out of bounds (beyond upleft corner) so the entity does not appear when first selecting the tool.</remarks>
         private Rectangle Hold = new Rectangle(-64, -64, 0, 0);
 
+        private List<string> PlacementNames;
+
         public override string GetName() => "Entities";
-        public override bool CanSelectLayer() => false;
+        public override string GetSearchGroup() => "Entities";
+        public override ToolLayer[] GetSelectableLayers() => null;
         public override void Render() {
             HeldEntity?.Render();
         }
@@ -118,15 +124,18 @@ namespace Starforge.Vanilla.Tools {
             ImGui.Text("Entities");
             ImGui.SetNextItemWidth(235f);
 
-            SelectedEntity ??= EntityRegistry.EntityPlacements[0];
+            string search = MapEditor.Instance.ToolListWindow.Searches[GetSearchGroup()];
+            var toolListWindow = MapEditor.Instance.ToolListWindow;
 
+            SelectedEntity ??= EntityRegistry.EntityPlacements[0];
+            PlacementNames ??= EntityRegistry.EntityPlacements.ConvertAll((p) => p.Name).OrderBy((p) => p).ToList();
             if (ImGui.ListBoxHeader("EntitiesList", EntityRegistry.EntityPlacements.Count, MapEditor.Instance.ToolListWindow.VisibleItemsCount)) {
-                foreach (Placement placement in EntityRegistry.EntityPlacements) {
-                    if (ImGui.Selectable(placement.Name, placement == SelectedEntity)) {
-                        SelectedEntity = placement;
+                WindowToolList.CreateSelectables(search, PlacementNames, (item) => {
+                    if (ImGui.Selectable(item, SelectedEntity.Name == item)) {
+                        SelectedEntity = EntityRegistry.EntityPlacements.Find((p) => p.Name == item);
                         UpdateHeldEntity();
                     }
-                }
+                });
             }
         }
     }

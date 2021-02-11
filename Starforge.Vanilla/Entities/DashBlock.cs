@@ -2,6 +2,7 @@
 using Starforge.Editor.Render;
 using Starforge.Map;
 using Starforge.Mod.API;
+using Starforge.Mod.API.Properties;
 using System.Collections.Specialized;
 
 namespace Starforge.Vanilla.Entities {
@@ -35,15 +36,10 @@ namespace Starforge.Vanilla.Entities {
         };
 
         public override PropertyList Properties => new PropertyList() {
-            new Property("tiletype", new OrderedDictionary() {
-                { "Dirt", "1" },
-                { "Ice", "3" },
-                { "Stone", "6" },
-                { "Wood", "9" }
-            }, "The tiletype the block is made of"),
-            new Property("blendin", PropertyType.Bool, ""),
-            new Property("permanent", PropertyType.Bool, ""),
-            new Property("canDash", PropertyType.Bool, "")
+            new TilesetProperty("tiletype", TilesetProperty.TilesetLayer.FG, "The tiletype the block is made of"),
+            new BoolProperty("blendin", true, "Whether this block blends into other FG tiles."),
+            new BoolProperty("permanent", true, "Whether this block disappears forever after a being broken"),
+            new BoolProperty("canDash", true, "Whether it's possible to dash into this block to break it")
         };
 
     }

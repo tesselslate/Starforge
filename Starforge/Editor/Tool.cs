@@ -6,11 +6,13 @@
         public abstract void Update();
         public abstract void Render();
         public abstract void RenderGUI();
-        public abstract bool CanSelectLayer();
+        public abstract ToolLayer[] GetSelectableLayers();
+        public abstract string GetSearchGroup();
     }
 
     public enum ToolLayer {
         Background,
-        Foreground
+        Foreground,
+        Entity
     }
 }

@@ -26,7 +26,7 @@ namespace Starforge.Vanilla.Actions {
                 Entity.Attributes[pair.Key] = PostEdit[pair.Key];
             }
 
-            this.DrawableRoom.Dirty = true;
+            DrawableRoom.Dirty = true;
             return true;
         }
 
@@ -39,7 +39,7 @@ namespace Starforge.Vanilla.Actions {
                 Entity.Attributes[pair.Key] = PreEdit[pair.Key];
             }
 
-            this.DrawableRoom.Dirty = true;
+            DrawableRoom.Dirty = true;
             return true;
         }
     }
