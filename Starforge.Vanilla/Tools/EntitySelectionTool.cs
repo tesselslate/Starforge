@@ -70,8 +70,7 @@ namespace Starforge.Vanilla.Tools {
         public override void Render() {
             if (ImGuiNET.ImGui.IsMouseDoubleClicked(ImGuiNET.ImGuiMouseButton.Left)) {
                 Entity clicked;
-                if ((clicked = SelectedEntities.Find((e) => e.ContainsPosition(MapEditor.Instance.State.PixelPointer))) != null)
-                {
+                if ((clicked = SelectedEntities.Find((e) => e.ContainsPosition(MapEditor.Instance.State.PixelPointer))) != null) {
                     Type clickedType = clicked.GetType();
                     Select(MapEditor.Instance.State.SelectedRoom.Entities.Where((e) => e.GetType() == clickedType).ToList());
                 }

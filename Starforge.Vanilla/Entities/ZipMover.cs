@@ -21,24 +21,26 @@ namespace Starforge.Entities {
             ZipMoverTheme theme = Themes.Value[GetString("theme", "Normal")];
 
             // TODO: Use something like a OnPlaced() callback instead
-            if (Nodes == null || Nodes.Count == 0 || !Room.Entities.Contains(this))
-                Nodes = new List<Vector2>(1) { Position + new Vector2(Width + 8f, 0) };
+            if (Nodes == null || Nodes.Count == 0 || !Room.Entities.Contains(this)) {
+                Nodes = new List<Vector2> { Position + new Vector2(Width + 8f, 0) };
+            }
 
             #region path
             Vector2 center = new Vector2(Width / 2f, Height / 2f);
-            Vector2 pathFrom = Position + center;
-            Vector2 pathTo = Nodes[0] + center;
+            Vector2 pathBegin = Position + center;
+            Vector2 pathEnd = Nodes[0] + new Vector2(8f, 8f);
 
-            Vector2 rotation = pathTo - pathFrom;
-            if (rotation != Vector2.Zero)
+            Vector2 rotation = pathEnd - pathBegin;
+            if (rotation != Vector2.Zero) {
                 rotation.Normalize();
-
+            }
+            
             Vector2 offset = rotation.Perpendicular() * 3f;
             Vector2 offset2 = -rotation.Perpendicular() * 4f;
-            GFX.Draw.Line(pathFrom + offset, pathTo + offset, RopeColor);
-            GFX.Draw.Line(pathFrom + offset2, pathTo + offset2, RopeColor);
+            GFX.Draw.Line(pathBegin + offset, pathEnd + offset, RopeColor);
+            GFX.Draw.Line(pathBegin + offset2, pathEnd + offset2, RopeColor);
             // draw the cog at the end of the path
-            theme.Cog.DrawCentered(pathTo);
+            theme.Cog.DrawCentered(pathEnd);
             #endregion
 
             // background
