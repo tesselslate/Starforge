@@ -19,9 +19,10 @@ namespace Starforge.Vanilla.Tools {
     [ToolDefinition("Entity Selection")]
     public class EntitySelectionTool : Tool {
         private Rectangle Hold = new Rectangle(-1, -1, 0, 0);
+        private bool Dragging = false;
         private Point Start;
         private List<Entity> SelectedEntities = new List<Entity>();
-        private List<Point> ClickOffsets = new List<Point>();
+        private List<Point> ClickOffsets;
         private EntityRegion HeldRegion = EntityRegion.Outside;
         private List<Attributes> InitialAttributes;
 
@@ -29,14 +30,20 @@ namespace Starforge.Vanilla.Tools {
         public override string GetSearchGroup() => "Selection";
 
         public override void Update() {
+            // reset stuff if for some reason it didn't
+            if (!Input.Mouse.HasAny()) {
+                HeldRegion = EntityRegion.Outside;
+                Hold = new Rectangle(-1, -1, 0, 0);
+                Dragging = false;
+                Start = Point.Zero;
+
+                ClickOffsets = null;
+                InitialAttributes = null;
+            }
             UpdateCursor();
 
             if (Input.Mouse.RightClick) {
                 HandleRightClick();
-            }
-
-            if (Input.Mouse.LeftUnclick) {
-                HandleLeftUnclick();
             }
 
             if (Input.Mouse.LeftClick) {
@@ -45,6 +52,10 @@ namespace Starforge.Vanilla.Tools {
 
             if (Input.Mouse.LeftHold) {
                 HandleLeftDrag();
+            }
+
+            if (Input.Mouse.LeftUnclick) {
+                HandleLeftUnclick();
             }
 
             if (Input.Keyboard.Pressed(Keys.Delete)) {
@@ -78,8 +89,7 @@ namespace Starforge.Vanilla.Tools {
             ClickOffsets = new List<Point>();
             InitialAttributes = new List<Attributes>(SelectedEntities.Count);
             // remember where in the entity we started clicking
-            for (int i = 0; i < SelectedEntities.Count; i++)
-            {
+            for (int i = 0; i < SelectedEntities.Count; i++) {
                 ClickOffsets.Add(new Point(MiscHelper.GetMousePosition().X - (int)SelectedEntities[i].Position.X, MiscHelper.GetMousePosition().Y - (int)SelectedEntities[i].Position.Y));
                 InitialAttributes.Add(MiscHelper.CloneDictionary(SelectedEntities[i].Attributes));
             }
@@ -93,40 +103,33 @@ namespace Starforge.Vanilla.Tools {
 
         public void Deselect() {
             SelectedEntities.Clear();
+            HeldRegion = EntityRegion.Outside;
             ClickOffsets = new List<Point>();
         }
 
         private void HandleLeftClick() {
-            if (true) {
-                Start = MapEditor.Instance.State.TilePointer;
-                Entity clicked = MapEditor.Instance.State.SelectedRoom.Entities.Find(e => e.ContainsPosition(MapEditor.Instance.State.PixelPointer) && !SelectedEntities.Contains(e));
-                if (clicked != null) {
-                    Deselect();
-                    Select(new List<Entity>() { clicked });
-                }
+            Start = MapEditor.Instance.State.TilePointer;
+            Entity clicked = MapEditor.Instance.State.SelectedRoom.Entities.Find(e => e.ContainsPosition(MapEditor.Instance.State.PixelPointer));
+
+            if (!SelectedEntities.Contains(clicked)) {
+                // if clicked outside of selected entities
+                Deselect();
+                return;
             }
 
-            if (SelectedEntities.Count == 0) {
-                return;
+            // else start dragging
+            if (SelectedEntities.Count == 1) {
+                HeldRegion = SelectedEntities[0].GetEntityRegion(MapEditor.Instance.State.PixelPointer);
+            }
+            else if (SelectedEntities.Count > 1) {
+                HeldRegion = EntityRegion.Middle;
             }
 
             InitialAttributes = new List<Attributes>(SelectedEntities.Count);
             for (int i = 0; i < SelectedEntities.Count; i++) {
                 InitialAttributes.Add(MiscHelper.CloneDictionary(SelectedEntities[i].Attributes));
             }
-            // start dragging
 
-            HeldRegion = SelectedEntities[0].GetEntityRegion(MapEditor.Instance.State.PixelPointer);
-            if (!SelectedEntities.Exists((e) => e.ContainsPosition(MapEditor.Instance.State.PixelPointer))) {
-                //let go of currently held entity
-                HeldRegion = EntityRegion.Outside;
-                Deselect();
-
-                HandleLeftClick();
-                return;
-            }
-            if (SelectedEntities.Count > 1)
-                HeldRegion = EntityRegion.Middle;
             // remember where in the entity we started clicking
             ClickOffsets = new List<Point>();
             for (int i = 0; i < SelectedEntities.Count; i++) {
@@ -135,9 +138,13 @@ namespace Starforge.Vanilla.Tools {
         }
 
         private void HandleLeftDrag() {
-            if (HeldRegion == EntityRegion.Outside || SelectedEntities.Count == 0) {
-                Point tp = MapEditor.Instance.State.TilePointer;
+            Point tp = MapEditor.Instance.State.TilePointer;
 
+            if (Math.Abs(tp.X - Start.X) >= 4 || Math.Abs(tp.Y - Start.Y) >= 4) {
+                Dragging = true;
+            }
+
+            if (HeldRegion == EntityRegion.Outside || SelectedEntities.Count == 0) {
                 Point tl = new Point(
                     (int)MathHelper.Min(Start.X, tp.X),
                     (int)MathHelper.Min(Start.Y, tp.Y)
@@ -215,27 +222,42 @@ namespace Starforge.Vanilla.Tools {
         }
 
         private void HandleLeftUnclick() {
-            // make action of movement thus far
-            // Only create action if anything actually changed
-            if (SelectedEntities.Count > 0 && InitialAttributes != null) {
-                List<Attributes> attrs = new List<Attributes>();
-                foreach (var item in SelectedEntities) {
-                    attrs.Add(MiscHelper.CloneDictionary(item.Attributes));
+            // can only select new entities when none are selected
+            if (SelectedEntities.Count == 0) {
+                if (Dragging) {
+                    var collisionRect = new Rectangle(Hold.X * 8, Hold.Y * 8, Hold.Width * 8, Hold.Height * 8);
+                    Select(MapEditor.Instance.State.SelectedRoom.Entities.Where(e => e.Hitbox.Intersects(collisionRect)).ToList());
                 }
-                MapEditor.Instance.State.Apply(new BulkEntityEditAction(
-                    MapEditor.Instance.State.SelectedRoom,
-                    SelectedEntities,
-                    InitialAttributes,
-                    attrs
-                ));
+                else {
+                    Entity clicked = MapEditor.Instance.State.SelectedRoom.Entities.Find(e => e.ContainsPosition(MapEditor.Instance.State.PixelPointer) && !SelectedEntities.Contains(e));
+                    if (clicked != null) {
+                        Select(new List<Entity> { clicked });
+                    }
+                }
+
+                Hold = new Rectangle(MapEditor.Instance.State.TilePointer.X, MapEditor.Instance.State.TilePointer.Y, 0, 0);
+            }
+            else {
+                // make action of movement thus far
+                // Only create action if anything actually changed
+                if (SelectedEntities.Count > 0 && InitialAttributes != null) {
+                    List<Attributes> attrs = new List<Attributes>();
+                    foreach (var item in SelectedEntities) {
+                        attrs.Add(MiscHelper.CloneDictionary(item.Attributes));
+                    }
+                    MapEditor.Instance.State.Apply(new BulkEntityEditAction(
+                        MapEditor.Instance.State.SelectedRoom,
+                        SelectedEntities,
+                        InitialAttributes,
+                        attrs
+                    ));
+                }
             }
 
-            var collisionRect = new Rectangle(Hold.X * 8, Hold.Y * 8, Hold.Width * 8, Hold.Height * 8);
-            if (SelectedEntities.Count == 0) {
-                SelectedEntities = MapEditor.Instance.State.SelectedRoom.Entities.Where(e => e.Hitbox.Intersects(collisionRect)).ToList();
-            }
-            Hold = new Rectangle(MapEditor.Instance.State.TilePointer.X, MapEditor.Instance.State.TilePointer.Y, 0, 0);
             HeldRegion = EntityRegion.Outside;
+            UpdateCursor();
+            Dragging = false;
+
         }
 
         private void HandleRightClick() {
@@ -254,6 +276,7 @@ namespace Starforge.Vanilla.Tools {
         }
 
         public void UpdateCursor() {
+            SDL2.SDL.SDL_SystemCursor updatedCursor = SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_ARROW;
             if (SelectedEntities.Count == 1) {
                 EntityRegion Region;
                 if (HeldRegion != EntityRegion.Outside) {
@@ -262,26 +285,25 @@ namespace Starforge.Vanilla.Tools {
                 else {
                     Region = SelectedEntities[0].GetEntityRegion(MapEditor.Instance.State.PixelPointer);
                 }
-                switch (Region)
-                {
+                switch (Region) {
                 case EntityRegion.TopLeft:
                 case EntityRegion.BottomRight:
-                    UIHelper.SetCursor(SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZENWSE);
+                    updatedCursor = SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZENWSE;
                     break;
                 case EntityRegion.TopRight:
                 case EntityRegion.BottomLeft:
-                    UIHelper.SetCursor(SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZENESW);
+                    updatedCursor = SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZENESW;
                     break;
                 case EntityRegion.Left:
                 case EntityRegion.Right:
-                    UIHelper.SetCursor(SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZEWE);
+                    updatedCursor = SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZEWE;
                     break;
                 case EntityRegion.Top:
                 case EntityRegion.Bottom:
-                    UIHelper.SetCursor(SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZENS);
+                    updatedCursor = SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZENS;
                     break;
                 case EntityRegion.Middle:
-                    UIHelper.SetCursor(SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZEALL);
+                    updatedCursor = SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZEALL;
                     break;
                 default:
                     break;
@@ -290,9 +312,10 @@ namespace Starforge.Vanilla.Tools {
             else if (SelectedEntities.Count > 1) {
                 Entity held;
                 if ((held = SelectedEntities.Find((e) => e.ContainsPosition(MapEditor.Instance.State.PixelPointer))) != null) {
-                    UIHelper.SetCursor(SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZEALL);
+                    updatedCursor = SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZEALL;
                 }
             }
+            UIHelper.SetCursor(updatedCursor);
         }
     }
 }

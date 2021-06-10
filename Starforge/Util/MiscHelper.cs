@@ -121,7 +121,7 @@ namespace Starforge.Util {
             return ret;
         }
 
-        // Returns Mouse TilePointer * 8 or if Ctrl is pressed returns PixelPointer
+        // Returns Mouse TilePointer * 8 or if in pixel perfect mode returns PixelPointer
         public static Point GetMousePosition() {
             if (EditorState.PixelPerfect()) {
                 return MapEditor.Instance.State.PixelPointer;

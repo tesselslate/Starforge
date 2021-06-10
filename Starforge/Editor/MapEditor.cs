@@ -113,8 +113,6 @@ namespace Starforge.Editor {
             if (io.WantCaptureMouse || io.WantCaptureKeyboard) {
                 UIHelper.SetCursor(Engine.GUIRenderer.Cursors[ImGui.GetMouseCursor()]);
                 return;
-            } else {
-                UIHelper.SetCursor();
             }
 
             //////////////////////

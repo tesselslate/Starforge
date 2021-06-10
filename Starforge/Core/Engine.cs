@@ -163,8 +163,12 @@ namespace Starforge.Core {
             // Set render target back to the window so we don't accidentally render UI content on top of a room.
             GraphicsDevice.SetRenderTarget(null);
             for (int i = 0; i < Windows.Count; i++) {
-                if (Windows[i].Visible) Windows[i].Render();
-                else DeleteWindow(Windows[i]);
+                if (Windows[i].Visible) {
+                    Windows[i].Render();
+                }
+                else {
+                    DeleteWindow(Windows[i]);
+                }
             }
 
             Menubar.Render();
@@ -174,11 +178,13 @@ namespace Starforge.Core {
         protected override void Update(GameTime gt) {
             base.Update(gt);
 
-            if (!IsActive) SuppressDraw();
+            if (!IsActive) {
+                SuppressDraw();
+            }
 
             Input.Update();
+
             Scene.Update(gt);
-            Input.UpdatePrevious();
         }
 
         protected override void Initialize() {
