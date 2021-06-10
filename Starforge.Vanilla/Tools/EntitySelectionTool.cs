@@ -262,7 +262,6 @@ namespace Starforge.Vanilla.Tools {
             HeldRegion = EntityRegion.Outside;
             UpdateCursor();
             Dragging = false;
-
         }
 
         private void HandleRightClick() {

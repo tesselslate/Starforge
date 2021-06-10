@@ -37,8 +37,7 @@ namespace Starforge.Mod.API.Properties {
             if (ImGui.BeginCombo(MiscHelper.CleanCamelCase(Name), MiscHelper.CleanCamelCase(tilesets.Find((t) => t.ID.ToString() == outString).Path))) {
                 foreach (Tileset tileset in tilesets) {
                     if (ImGui.Selectable(MiscHelper.CleanCamelCase(tileset.Path), outString == tileset.ID.ToString())) {
-                        foreach (var entity in entities)
-                        {
+                        foreach (var entity in entities) {
                             entity.Attributes[Name] = tileset.ID.ToString();
                         }
                     }

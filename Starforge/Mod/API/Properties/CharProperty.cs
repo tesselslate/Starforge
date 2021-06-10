@@ -3,10 +3,10 @@ using Starforge.Map;
 using Starforge.Util;
 using System.Collections.Generic;
 
-namespace Starforge.Mod.API.Properties
-{
-    public class CharProperty : Property
-    {
+namespace Starforge.Mod.API.Properties {
+
+    public class CharProperty : Property {
+
         public CharProperty(string name, char defaultValue, string description) : base(name, defaultValue, description) { }
 
         public override bool RenderGUI(Entity mainEntity, List<Entity> entities) {
@@ -14,8 +14,9 @@ namespace Starforge.Mod.API.Properties
 
             int outInt = mainEntity.GetInt(Name, (int)DefaultValue);
             if (ImGui.InputInt(MiscHelper.CleanCamelCase(Name), ref outInt)) {
-                if (outInt > char.MaxValue) 
+                if (outInt > char.MaxValue) {
                     outInt = char.MaxValue;
+                }
                 changed = true;
                 foreach (var entity in entities) {
                     entity.Attributes[Name] = outInt;
