@@ -6,18 +6,16 @@ using ImGuiNET;
 using Starforge.Util;
 using System.Collections;
 
-namespace Starforge.Mod.API.Properties
-{
-    public class ListProperty : Property
-    {
-        public ListProperty(string name, OrderedDictionary values, bool allowManualInput, object defaultValue, string description) : base(name, defaultValue, description)
-        {
+namespace Starforge.Mod.API.Properties {
+
+    public class ListProperty : Property {
+
+        public ListProperty(string name, OrderedDictionary values, bool allowManualInput, object defaultValue, string description) : base(name, defaultValue, description) {
             AllowManualInput = allowManualInput;
             Values = values;
         }
 
-        public ListProperty(string name, string[] values, bool allowManualInput, string defaultValue, string description) : base(name, defaultValue, description)
-        {
+        public ListProperty(string name, string[] values, bool allowManualInput, string defaultValue, string description) : base(name, defaultValue, description) {
             Values = new OrderedDictionary();
             AllowManualInput = allowManualInput;
             foreach (string v in values) {

@@ -2,14 +2,13 @@
 using Starforge.Editor;
 using Starforge.Map;
 using Starforge.Util;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 
-namespace Starforge.Mod.API.Properties
-{
-    public class TilesetProperty : Property
-    {
+namespace Starforge.Mod.API.Properties {
+
+    public class TilesetProperty : Property {
+
         public enum TilesetLayer {
             FG,
             BG

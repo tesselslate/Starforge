@@ -1,11 +1,12 @@
 ﻿using ImGuiNET;
 using Starforge.Map;
 using Starforge.Util;
-using System;
 using System.Collections.Generic;
 
 namespace Starforge.Mod.API.Properties {
+
     public class IntProperty : Property {
+
         public IntProperty(string name, int defaultValue, string description) : base(name, defaultValue, description) { }
 
         public override bool RenderGUI(Entity mainEntity, List<Entity> entities) {

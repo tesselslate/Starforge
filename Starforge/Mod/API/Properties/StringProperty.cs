@@ -4,7 +4,9 @@ using Starforge.Util;
 using System.Collections.Generic;
 
 namespace Starforge.Mod.API.Properties {
+
     public class StringProperty : Property {
+
         public StringProperty(string name, string defaultValue, string description) : base(name, defaultValue, description) { }
 
         public override bool RenderGUI(Entity mainEntity, List<Entity> entities) {

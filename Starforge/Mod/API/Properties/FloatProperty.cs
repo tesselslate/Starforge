@@ -1,13 +1,12 @@
 ﻿using ImGuiNET;
 using Starforge.Map;
 using Starforge.Util;
-using System;
 using System.Collections.Generic;
 
-namespace Starforge.Mod.API.Properties
-{
-    public class FloatProperty : Property
-    {
+namespace Starforge.Mod.API.Properties {
+
+    public class FloatProperty : Property {
+
         public FloatProperty(string name, float defaultValue, string description) : base(name, defaultValue, description) { }
 
         public override bool RenderGUI(Entity mainEntity, List<Entity> entities) {

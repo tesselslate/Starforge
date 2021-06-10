@@ -4,9 +4,10 @@ using Starforge.Util;
 using System.Collections.Generic;
 
 namespace Starforge.Mod.API.Properties {
-    public class BoolProperty : Property {
-        public BoolProperty(string name, bool defaultValue, string description) : base(name, defaultValue, description) { }
 
+    public class BoolProperty : Property {
+
+        public BoolProperty(string name, bool defaultValue, string description) : base(name, defaultValue, description) { }
 
         public override bool RenderGUI(Entity mainEntity, List<Entity> entities) {
             bool changed = false;
