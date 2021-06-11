@@ -34,7 +34,7 @@ namespace Starforge.Vanilla.UI {
         public override void Render() {
             ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 2f);
             ImGui.OpenPopup("Editing Entity");
-            ImGui.BeginPopupModal("Editing Entity", ref Visible, ImGuiWindowFlags.None);
+            ImGui.BeginPopupModal("Editing Entity", ref Visible, ImGuiWindowFlags.AlwaysAutoResize);
 
             bool changed = false;
             Type firstType = MainEntity.GetType();
