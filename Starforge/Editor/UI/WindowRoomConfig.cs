@@ -55,10 +55,12 @@ namespace Starforge.Editor.UI {
 
             ImGui.SetNextItemWidth(50f);
             ImGui.InputInt("X", ref Meta.Bounds.X, 0, 0);
+            UIHelper.Tooltip("The horizontal position of the room, in tiles.");
 
             ImGui.SameLine();
             ImGui.SetNextItemWidth(50f);
             ImGui.InputInt("Y", ref Meta.Bounds.Y, 0, 0);
+            UIHelper.Tooltip("The vertical position of the room, in tiles.");
 
             ImGui.SetNextItemWidth(50f);
             ImGui.InputInt("W", ref Meta.Bounds.Width, 0, 0);

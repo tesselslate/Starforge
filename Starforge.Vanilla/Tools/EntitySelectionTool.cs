@@ -244,18 +244,20 @@ namespace Starforge.Vanilla.Tools {
             }
             else {
                 // make action of movement thus far
-                // Only create action if anything actually changed
-                if (SelectedEntities.Count > 0 && InitialAttributes != null) {
-                    List<Attributes> attrs = new List<Attributes>();
-                    foreach (var item in SelectedEntities) {
-                        attrs.Add(MiscHelper.CloneDictionary(item.Attributes));
+                if (Start != MapEditor.Instance.State.TilePointer) {
+                    // Only create action if anything actually changed
+                    if (SelectedEntities.Count > 0 && InitialAttributes != null) {
+                        List<Attributes> attrs = new List<Attributes>();
+                        foreach (var item in SelectedEntities) {
+                            attrs.Add(MiscHelper.CloneDictionary(item.Attributes));
+                        }
+                        MapEditor.Instance.State.Apply(new BulkEntityEditAction(
+                            MapEditor.Instance.State.SelectedRoom,
+                            SelectedEntities,
+                            InitialAttributes,
+                            attrs
+                        ));
                     }
-                    MapEditor.Instance.State.Apply(new BulkEntityEditAction(
-                        MapEditor.Instance.State.SelectedRoom,
-                        SelectedEntities,
-                        InitialAttributes,
-                        attrs
-                    ));
                 }
             }
 
