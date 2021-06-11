@@ -18,7 +18,8 @@ namespace Starforge.Vanilla.Tools {
 
     [ToolDefinition("Entity Selection")]
     public class EntitySelectionTool : Tool {
-        private Rectangle Hold = new Rectangle(-1, -1, 0, 0);
+        private readonly static Rectangle DefaultHold = new Rectangle(-1, -1, 0, 0);
+        private Rectangle Hold = DefaultHold;
         private bool Dragging = false;
         private Point Start;
         private List<Entity> SelectedEntities = new List<Entity>();
@@ -65,6 +66,18 @@ namespace Starforge.Vanilla.Tools {
                 ));
                 Deselect();
             }
+        }
+
+        public override void RoomChanged() {
+            // reset state
+            HeldRegion = EntityRegion.Outside;
+            Hold = DefaultHold;
+            Dragging = false;
+            Start = Point.Zero;
+
+            ClickOffsets = null;
+            InitialAttributes = null;
+            SelectedEntities.Clear();
         }
 
         public override void Render() {

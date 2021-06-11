@@ -11,12 +11,19 @@ namespace Starforge.Vanilla.Tools {
     /// A base class for any tile-based tools. Implements Render, RenderGUI and CanSelectLayer.
     /// </summary>
     public abstract class TileTool : Tool {
+        private readonly static Rectangle DefaultHint = new Rectangle(-8, -8, 8, 8);
+
         /// <remarks>The hint is set out of bounds (beyond upleft corner) so the hint does not appear when first selecting the tool.</remarks>
-        protected Rectangle Hint = new Rectangle(-8, -8, 8, 8);
+        protected Rectangle Hint = DefaultHint;
         private ToolLayer[] selectableLayers = new ToolLayer[] { ToolLayer.Foreground, ToolLayer.Background };
+
         public override ToolLayer[] GetSelectableLayers() => selectableLayers;
 
         public override string GetSearchGroup() => "Tile";
+
+        public override void RoomChanged() {
+            Hint = DefaultHint;
+        }
 
         public override void Render() {
             GFX.Draw.BorderedRectangle(Hint, Settings.ToolColor * 0.5f, Settings.ToolColor);

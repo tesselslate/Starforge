@@ -4,6 +4,7 @@
 
         public abstract string GetName();
         public abstract void Update();
+        public abstract void RoomChanged();
         public abstract void Render();
         public abstract void RenderGUI();
         public abstract ToolLayer[] GetSelectableLayers();

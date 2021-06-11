@@ -25,7 +25,9 @@ namespace Starforge.Vanilla.Tools {
         private Point Start;
 
         /// <remarks>The hold is set out of bounds (beyond upleft corner) so the entity does not appear when first selecting the tool.</remarks>
-        private Rectangle Hold = new Rectangle(-64, -64, 0, 0);
+        private readonly static Rectangle DefaultHold = new Rectangle(-64, -64, 0, 0);
+
+        private Rectangle Hold = DefaultHold;
 
         private List<string> PlacementNames;
 
@@ -52,6 +54,12 @@ namespace Starforge.Vanilla.Tools {
                 HeldEntity = SelectedEntity.Create(r);
                 HeldEntity.SetArea(Hold);
             }
+        }
+
+        public override void RoomChanged() {
+            HeldEntity = null;
+            Start = Point.Zero;
+            Hold = DefaultHold;
         }
 
         public void UpdateHeldEntity() {
