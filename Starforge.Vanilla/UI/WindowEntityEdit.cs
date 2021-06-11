@@ -65,7 +65,7 @@ namespace Starforge.Vanilla.UI {
             UIHelper.Tooltip("Delete this Entity");
 
             ImGui.SameLine();
-            if (ImGui.Button("OK", new System.Numerics.Vector2(25f, 20f))) {
+            if (ImGui.Button("OK", new System.Numerics.Vector2(35f, 20f))) {
                 var newAttrs = new List<Attributes>(SelectedEntities.Count);
                 for (int i = 0; i < SelectedEntities.Count; i++) {
                     newAttrs.Add(MiscHelper.CloneDictionary(SelectedEntities[i].Attributes));

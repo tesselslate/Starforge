@@ -1,5 +1,6 @@
 ﻿using Starforge.Map;
 using Starforge.Editor.Actions;
+using Starforge.Util;
 using System.Collections.Generic;
 
 namespace Starforge.Vanilla.Actions {
@@ -21,11 +22,10 @@ namespace Starforge.Vanilla.Actions {
             if (Entities == null) {
                 return false;
             }
+
             for (int i = 0; i < Entities.Count; i++) {
                 Entity entity = Entities[i];
-                foreach (KeyValuePair<string, object> pair in PostEdit[i]) {
-                    entity.Attributes[pair.Key] = pair.Value;
-                }
+                entity.Attributes = MiscHelper.CloneDictionary(PostEdit[i]);
             }
 
             DrawableRoom.Dirty = true;
@@ -39,9 +39,7 @@ namespace Starforge.Vanilla.Actions {
 
             for (int i = 0; i < Entities.Count; i++) {
                 Entity entity = Entities[i];
-                foreach (KeyValuePair<string, object> pair in PreEdit[i]) {
-                    entity.Attributes[pair.Key] = pair.Value;
-                }
+                entity.Attributes = MiscHelper.CloneDictionary(PreEdit[i]);
             }
 
             DrawableRoom.Dirty = true;
