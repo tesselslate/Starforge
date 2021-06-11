@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Starforge.Map;
 using Starforge.Mod.API;
+using Starforge.Mod.API.Properties;
 using Starforge.Mod.Content;
 using System;
 
@@ -17,9 +18,20 @@ namespace Starforge.Vanilla.Entities {
             bodySprite.Value.Draw(new Vector2(Position.X - (bodySprite.Value.Width / 2) + 8f, Position.Y - bodySprite.Value.Height));
         }
 
+        public override Rectangle Hitbox => new Rectangle(
+            (int)(Position.X - (bodySprite.Value.Width / 2) + 8f),
+            (int)(Position.Y - bodySprite.Value.Height),
+            bodySprite.Value.Width,
+            bodySprite.Value.Height
+        );
+
         public static PlacementList Placements = new PlacementList()
         {
             new Placement("Intro Car")
+        };
+
+        public override PropertyList Properties => new PropertyList() {
+            new BoolProperty("hasRoadAndBarriers", false, "Whether this car should create the road and barriers")
         };
     }
 }

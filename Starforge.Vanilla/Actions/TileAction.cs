@@ -2,7 +2,6 @@
 using Starforge.Editor;
 using Starforge.Editor.Actions;
 using Starforge.Editor.Render;
-using Starforge.Editor.Tools;
 using Starforge.Map;
 using System.Collections.Generic;
 

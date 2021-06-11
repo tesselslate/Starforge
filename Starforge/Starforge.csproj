@@ -29,20 +29,22 @@
 	<ItemGroup>
 		<EmbeddedResource Include="../assets/logo_256.png" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Reference Include="FNA">
+	    <HintPath>../lib/FNA/bin/Release/FNA.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
 
 	
 	
 	<!-- Dependencies -->
-	<ItemGroup>
-		<Reference Include="../lib/FNA/bin/x64/Release/netstandard2.0/FNA.dll" />
-	</ItemGroup>
 
 	
 	
 	<!-- Native Dependencies -->
 	<Target Condition="$([MSBuild]::IsOSPlatform(Windows))" Name="CopyNative-Windows" AfterTargets="AfterBuild">
-		<Copy SourceFiles="$(SolutionDir)/lib/prebuilt/win-x64/FNA3D.dll" DestinationFolder="$(OutDir)"/>
-		<Copy SourceFiles="$(SolutionDir)/lib/prebuilt/win-x64/SDL2.dll" DestinationFolder="$(OutDir)"/>
-		<Copy SourceFiles="$(SolutionDir)/lib/prebuilt/win-x64/nfd_d.dll" DestinationFolder="$(OutDir)"/>
+		<Copy SourceFiles="$(SolutionDir)/lib/prebuilt/win-x64/FNA3D.dll" DestinationFolder="$(OutDir)" />
+		<Copy SourceFiles="$(SolutionDir)/lib/prebuilt/win-x64/SDL2.dll" DestinationFolder="$(OutDir)" />
+		<Copy SourceFiles="$(SolutionDir)/lib/prebuilt/win-x64/nfd_d.dll" DestinationFolder="$(OutDir)" />
 	</Target>
 </Project>

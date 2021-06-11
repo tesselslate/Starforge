@@ -2,6 +2,7 @@
 using Starforge.Map;
 using Starforge.Mod.API;
 using Starforge.Mod.Content;
+using Starforge.Util;
 using System;
 
 namespace Starforge.Vanilla.Entities {
@@ -17,9 +18,12 @@ namespace Starforge.Vanilla.Entities {
             Texture.Value.DrawCentered(pos);
         }
 
+        public override Rectangle Hitbox => MiscHelper.RectangleCentered(Position.X, Position.Y - 16f, Texture.Value.Width, Texture.Value.Height);
+
         public static PlacementList Placements = new PlacementList()
         {
             new Placement("Player (Spawn Point)")
         };
+
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Starforge.Map;
 using Starforge.Mod.API;
+using Starforge.Mod.API.Properties;
 using Starforge.Mod.Content;
+using Starforge.Util;
 using System;
 
 namespace Starforge.Vanilla.Entities {
@@ -18,13 +20,26 @@ namespace Starforge.Vanilla.Entities {
             }
         }
 
+        public override Rectangle Hitbox => MiscHelper.RectangleCentered(Position, Sprite.Value.Width, Sprite.Value.Height);
+
         public static PlacementList Placements = new PlacementList()
         {
             new Placement("Feather"),
-            new Placement("Feather (Shielded)")
-            {
+            new Placement("Feather (Shielded)") {
                 ["shielded"] = true
+            },
+            new Placement("Feather (Single Use)") {
+                ["singleUse"] = true
+            },
+            new Placement("Feather (Shielded, Single Use") {
+                ["shielded"] = true,
+                ["singleUse"] = true
             }
+        };
+
+        public override PropertyList Properties => new PropertyList() {
+            new BoolProperty("shielded", false, "Whether this feather has a shield or not"),
+            new BoolProperty("singleUse", false, "Whether the feather is single use")
         };
     }
 }

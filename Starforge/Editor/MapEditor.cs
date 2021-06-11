@@ -41,7 +41,9 @@ namespace Starforge.Editor {
             ToolListWindow = new WindowToolList(BGAutotiler, FGAutotiler);
 
             List<string> roomNames = new List<string>();
-            foreach (Room room in State.LoadedLevel.Rooms) roomNames.Add(room.Name);
+            foreach (Room room in State.LoadedLevel.Rooms) {
+                roomNames.Add(room.Name);
+            }
             RoomListWindow.RoomNames = roomNames.ToArray();
 
             Engine.CreateWindow(RoomListWindow);
@@ -113,8 +115,6 @@ namespace Starforge.Editor {
             if (io.WantCaptureMouse || io.WantCaptureKeyboard) {
                 UIHelper.SetCursor(Engine.GUIRenderer.Cursors[ImGui.GetMouseCursor()]);
                 return;
-            } else {
-                UIHelper.SetCursor();
             }
 
             //////////////////////
@@ -162,6 +162,7 @@ namespace Starforge.Editor {
             if (State.SelectedRoom != null) {
                 Vector2 rm = Camera.ScreenToReal(Input.Mouse.GetVectorPos());
                 State.TilePointer = new Point((int)Math.Floor((rm.X - State.SelectedRoom.X) / 8), (int)Math.Floor((rm.Y - State.SelectedRoom.Y) / 8));
+                State.PixelPointer = new Point((int)Math.Floor(rm.X - State.SelectedRoom.X), (int)Math.Floor(rm.Y - State.SelectedRoom.Y));
             }
         }
 
@@ -234,11 +235,14 @@ namespace Starforge.Editor {
 
             // Rerender previously selected room
             if (State.SelectedRoom != null) Renderer.SelectedRoom.Dirty = true;
+            ToolManager.SelectedTool.RoomChanged();
             State.SelectedRoom = State.LoadedLevel.Rooms[index];
 
             Renderer.SetSelected(State.LoadedLevel.Rooms[index]);
 
-            if (!moveCamera) return;
+            if (!moveCamera) {
+                return;
+            }
             Camera.Zoom = 1f;
             Camera.GotoCentered(new Vector2(-State.SelectedRoom.Meta.Bounds.Center.X, -State.SelectedRoom.Meta.Bounds.Center.Y));
         }

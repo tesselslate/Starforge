@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Starforge.Map;
 using Starforge.Mod.API;
+using Starforge.Mod.API.Properties;
 using Starforge.Mod.Content;
+using Starforge.Util;
 using System;
 
 namespace Starforge.Vanilla.Entities {
@@ -17,14 +19,19 @@ namespace Starforge.Vanilla.Entities {
             texture.DrawOutlineCentered(Position, Color.Black);
             texture.DrawCentered(Position);
         }
+        public override Rectangle Hitbox => MiscHelper.RectangleCentered(Position, OneDashSprite.Value.Width, OneDashSprite.Value.Height);
 
-        public static PlacementList Placements = new PlacementList()
-        {
+        public static PlacementList Placements = new PlacementList() {
             new Placement("Refill"),
             new Placement("Refill (Two Dashes)")
             {
                 ["twoDash"] = true
             }
+        };
+
+        public override PropertyList Properties => new PropertyList() {
+            new BoolProperty("twoDash", false, "Whether this is a two dash or normal crystal"),
+            new BoolProperty("oneUse", false, "Whether this dash refill is single use or will respawn")
         };
     }
 }

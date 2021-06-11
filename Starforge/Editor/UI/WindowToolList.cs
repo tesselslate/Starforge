@@ -1,10 +1,11 @@
 ﻿using ImGuiNET;
 using Starforge.Core;
-using Starforge.Editor.Tools;
 using Starforge.Mod;
 using Starforge.Mod.API;
 using Starforge.Util;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Starforge.Editor.UI {
     public class WindowToolList : Window {
@@ -14,6 +15,7 @@ namespace Starforge.Editor.UI {
         public Dictionary<string, Placement> Placements;
 
         public List<string> Tools;
+        public Dictionary<string, string> Searches;
 
         public string SelectedTool;
         public int VisibleItemsCount = 0;
@@ -31,6 +33,12 @@ namespace Starforge.Editor.UI {
             foreach (string tool in ToolManager.Tools.Keys) if (!Tools.Contains(tool)) Tools.Add(tool);
 
             SelectedTool = "TileBrush";
+            Searches = new Dictionary<string, string>();
+            foreach (string tool in Tools) {
+                string searchGroup = ToolManager.Tools[tool].GetSearchGroup();
+                if (!Searches.ContainsKey(searchGroup))
+                    Searches.Add(searchGroup, "");
+            }
         }
 
         public void UpdateListHeight() {
@@ -73,23 +81,41 @@ namespace Starforge.Editor.UI {
             }
 
             // Layer list
-            if (ToolManager.SelectedTool.CanSelectLayer()) {
+            var layers = ToolManager.SelectedTool.GetSelectableLayers();
+            if (layers != null) {
                 ImGui.NewLine();
                 ImGui.Text("Layer");
                 ImGui.SetNextItemWidth(130f);
-                if (ImGui.ListBoxHeader("LayersList", 2, 2)) {
-                    if (ImGui.Selectable("Background", ToolManager.SelectedLayer == ToolLayer.Background)) ToolManager.SelectedLayer = ToolLayer.Background;
-                    if (ImGui.Selectable("Foreground", ToolManager.SelectedLayer == ToolLayer.Foreground)) ToolManager.SelectedLayer = ToolLayer.Foreground;
+                if (ImGui.ListBoxHeader("LayersList", layers.Length, layers.Length)) {
+                    foreach (var layer in layers) {
+                        if (ImGui.Selectable(layer.ToString(), ToolManager.SelectedLayer == layer)) ToolManager.SelectedLayer = layer;
+                    }
                     ImGui.ListBoxFooter();
                 }
             }
 
             ImGui.NextColumn();
 
+            string toolSearchGroup = ToolManager.Tools[SelectedTool].GetSearchGroup();
+            string search = Searches[toolSearchGroup];
+            ImGui.InputText("Search", ref search, 2048);
+            Searches[toolSearchGroup] = search;
             // Tile/entity/etc list
             ToolManager.SelectedTool.RenderGUI();
 
             ImGui.NextColumn();
+        }
+
+        public static bool IsDirectlySearchedFor(string search, string toCheck) => search == "" || toCheck.ToLower().StartsWith(search);
+        public static bool IsIndirectlySearchedFor(string search, string toCheck) => search != "" && !IsDirectlySearchedFor(search, toCheck) && toCheck.ToLower().Contains(search);
+
+        public static void CreateSelectables(string search, IEnumerable<string> names, Action<string> createSelectable) {
+            foreach (var item in names.Where((s) => IsDirectlySearchedFor(search, s))) {
+                createSelectable(item);
+            }
+            foreach (var item in names.Where((s) => IsIndirectlySearchedFor(search, s))) {
+                createSelectable(item);
+            }
         }
     }
 }

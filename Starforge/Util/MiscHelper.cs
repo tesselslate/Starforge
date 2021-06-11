@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using Starforge.Core;
+using Starforge.Editor;
 using Starforge.Map;
 using System;
 using System.Collections.Generic;
@@ -95,6 +97,53 @@ namespace Starforge.Util {
 
         public static Color Vect3ToColor(System.Numerics.Vector3 v) {
             return new Color(v.X, v.Y, v.Z);
+        }
+
+        // Returns a Rectangle that is centered around x and y with width w and height h
+        public static Rectangle RectangleCentered(int x, int y, int w, int h) {
+            return new Rectangle(x - w / 2, y - h / 2, w, h);
+        }
+
+        public static Rectangle RectangleCentered(float x, float y, int w, int h) {
+            return RectangleCentered((int)x, (int)y, w, h);
+        }
+
+        public static Rectangle RectangleCentered(Vector2 pos, int w, int h) {
+            return RectangleCentered(pos.X, pos.Y, w, h);
+        }
+
+        // Copies a Dictionary, copying every element
+        public static Dictionary<TKey, object> CloneDictionary<TKey>(Dictionary<TKey, object> original) {
+            Dictionary<TKey, object> ret = new Dictionary<TKey, object>(original.Count, original.Comparer);
+            foreach (KeyValuePair<TKey, object> entry in original) {
+                ret.Add(entry.Key, entry.Value);
+            }
+            return ret;
+        }
+
+        // Returns Mouse TilePointer * 8 or if in pixel perfect mode returns PixelPointer
+        public static Point GetMousePosition() {
+            if (EditorState.PixelPerfect()) {
+                return MapEditor.Instance.State.PixelPointer;
+            }
+            Point Result;
+            Result.X = MapEditor.Instance.State.TilePointer.X * 8;
+            Result.Y = MapEditor.Instance.State.TilePointer.Y * 8;
+            return Result;
+        }
+
+        // Same as GetMousePosition, but rounds the tile or pixel up
+        public static Point GetMousePositionCeil() {
+            Point Result;
+            if (EditorState.PixelPerfect()) {
+                Result.X = MapEditor.Instance.State.PixelPointer.X + 1;
+                Result.Y = MapEditor.Instance.State.PixelPointer.Y + 1;
+            }
+            else {
+                Result.X = (MapEditor.Instance.State.TilePointer.X + 1) * 8;
+                Result.Y = (MapEditor.Instance.State.TilePointer.Y + 1) * 8;
+            }
+            return Result;
         }
     }
 }

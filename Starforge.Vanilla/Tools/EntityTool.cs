@@ -2,13 +2,15 @@
 using Microsoft.Xna.Framework;
 using Starforge.Core;
 using Starforge.Editor;
-using Starforge.Editor.Actions;
-using Starforge.Editor.Tools;
+using Starforge.Editor.UI;
 using Starforge.Map;
 using Starforge.Mod;
 using Starforge.Mod.API;
 using Starforge.Util;
+using Starforge.Vanilla.Actions;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Starforge.Vanilla.Tools {
     [ToolDefinition("Entity")]
@@ -23,19 +25,23 @@ namespace Starforge.Vanilla.Tools {
         private Point Start;
 
         /// <remarks>The hold is set out of bounds (beyond upleft corner) so the entity does not appear when first selecting the tool.</remarks>
-        private Rectangle Hold = new Rectangle(-64, -64, 0, 0);
+        private readonly static Rectangle DefaultHold = new Rectangle(-64, -64, 0, 0);
+
+        private Rectangle Hold = DefaultHold;
+
+        private List<string> PlacementNames;
 
         public override string GetName() => "Entities";
-        public override bool CanSelectLayer() => false;
+        public override string GetSearchGroup() => "Entities";
+        public override ToolLayer[] GetSelectableLayers() => null;
         public override void Render() {
-            if (HeldEntity != null) HeldEntity.Render();
+            HeldEntity?.Render();
         }
 
         public override void Update() {
             Room r = MapEditor.Instance.State.SelectedRoom;
 
-            if (SelectedEntity == null)
-                SelectedEntity = EntityRegistry.EntityPlacements[0];
+            SelectedEntity ??= EntityRegistry.EntityPlacements[0];
 
             if (HeldEntity != null) {
                 HeldEntity.Room = r;
@@ -50,29 +56,47 @@ namespace Starforge.Vanilla.Tools {
             }
         }
 
+        public override void RoomChanged() {
+            HeldEntity = null;
+            Start = Point.Zero;
+            Hold = DefaultHold;
+        }
+
         public void UpdateHeldEntity() {
             HeldEntity = SelectedEntity.Create(MapEditor.Instance.State.SelectedRoom);
             HeldEntity.SetArea(Hold);
         }
 
         private void HandleClick() {
-            Start = MapEditor.Instance.State.TilePointer;
+            Start = MiscHelper.GetMousePosition();
         }
 
         private void HandleDrag() {
             if (HeldEntity.StretchableX) {
-                Hold.X = (int)MathHelper.Min(Start.X, MapEditor.Instance.State.TilePointer.X) * 8;
-                Hold.Width = (Math.Abs(Start.X - MapEditor.Instance.State.TilePointer.X) + 1) * 8;
+                Hold.X = (int)MathHelper.Min(Start.X, MiscHelper.GetMousePosition().X); 
+                Hold.Width = Math.Abs(Start.X - MiscHelper.GetMousePosition().X);
+                if (EditorState.PixelPerfect()) {
+                    Hold.Width += 1;
+                }
+                else {
+                    Hold.Width += 8;
+                }
             } else {
-                Hold.X = Start.X * 8;
+                Hold.X = Start.X;
                 Hold.Width = 0;
             }
 
             if (HeldEntity.StretchableY) {
-                Hold.Y = (int)MathHelper.Min(Start.Y, MapEditor.Instance.State.TilePointer.Y) * 8;
-                Hold.Height = (Math.Abs(Start.Y - MapEditor.Instance.State.TilePointer.Y) + 1) * 8;
+                Hold.Y = (int)MathHelper.Min(Start.Y, MiscHelper.GetMousePosition().Y);
+                Hold.Height = Math.Abs(Start.Y - MiscHelper.GetMousePosition().Y);
+                if (EditorState.PixelPerfect()) {
+                    Hold.Height += 1;
+                }
+                else {
+                    Hold.Height += 8;
+                }
             } else {
-                Hold.Y = Start.Y * 8;
+                Hold.Y = Start.Y;
                 Hold.Height = 0;
             }
 
@@ -83,20 +107,24 @@ namespace Starforge.Vanilla.Tools {
             HeldEntity.SetArea(Hold);
 
             Entity entity = SelectedEntity.Create(MapEditor.Instance.State.SelectedRoom);
-            if (HeldEntity.StretchableX || HeldEntity.StretchableY) entity.SetArea(Hold);
-            else entity.Position = HeldEntity.Position;
+            if (HeldEntity.StretchableX || HeldEntity.StretchableY) {
+                entity.SetArea(Hold);
+            }
+            else {
+                entity.Position = HeldEntity.Position;
+            }
 
             MapEditor.Instance.State.Apply(new EntityPlacementAction(
                 MapEditor.Instance.State.SelectedRoom,
                 entity
             ));
 
-            Hold = new Rectangle(MapEditor.Instance.State.TilePointer.X * 8, MapEditor.Instance.State.TilePointer.Y * 8, 8, 8);
+            Hold = new Rectangle(MiscHelper.GetMousePosition().X, MiscHelper.GetMousePosition().Y, 8, 8);
             HeldEntity.SetArea(Hold);
         }
 
         private void HandleMove() {
-            Hold = new Rectangle(MapEditor.Instance.State.TilePointer.X * 8, MapEditor.Instance.State.TilePointer.Y * 8, 8, 8);
+            Hold = new Rectangle(MiscHelper.GetMousePosition().X, MiscHelper.GetMousePosition().Y, 8, 8);
             HeldEntity.SetArea(Hold);
         }
 
@@ -104,16 +132,18 @@ namespace Starforge.Vanilla.Tools {
             ImGui.Text("Entities");
             ImGui.SetNextItemWidth(235f);
 
-            if (SelectedEntity == null)
-                SelectedEntity = EntityRegistry.EntityPlacements[0];
+            string search = MapEditor.Instance.ToolListWindow.Searches[GetSearchGroup()];
+            var toolListWindow = MapEditor.Instance.ToolListWindow;
 
+            SelectedEntity ??= EntityRegistry.EntityPlacements[0];
+            PlacementNames ??= EntityRegistry.EntityPlacements.ConvertAll((p) => p.Name).OrderBy((p) => p).ToList();
             if (ImGui.ListBoxHeader("EntitiesList", EntityRegistry.EntityPlacements.Count, MapEditor.Instance.ToolListWindow.VisibleItemsCount)) {
-                foreach (Placement placement in EntityRegistry.EntityPlacements) {
-                    if (ImGui.Selectable(placement.Name, placement == SelectedEntity)) {
-                        SelectedEntity = placement;
+                WindowToolList.CreateSelectables(search, PlacementNames, (item) => {
+                    if (ImGui.Selectable(item, SelectedEntity.Name == item)) {
+                        SelectedEntity = EntityRegistry.EntityPlacements.Find((p) => p.Name == item);
                         UpdateHeldEntity();
                     }
-                }
+                });
             }
         }
     }

@@ -2,6 +2,8 @@
 using Starforge.Editor.Render;
 using Starforge.Map;
 using Starforge.Mod.API;
+using Starforge.Mod.API.Properties;
+using System.Collections.Specialized;
 
 namespace Starforge.Vanilla.Entities {
     [EntityDefinition("dashBlock")]
@@ -19,10 +21,26 @@ namespace Starforge.Vanilla.Entities {
 
         public static PlacementList Placements = new PlacementList()
         {
-            new Placement("Dash Block")
-            {
+            new Placement("Dash Block (Dirt)") {
+                ["tiletype"] = "1"
+            },
+            new Placement("Dash Block (Ice)") {
                 ["tiletype"] = "3"
+            },
+            new Placement("Dash Block (Stone)") {
+                ["tiletype"] = "6"
+            },
+            new Placement("Dash Block (Wood)") {
+                ["tiletype"] = "9"
             }
         };
+
+        public override PropertyList Properties => new PropertyList() {
+            new TilesetProperty("tiletype", TilesetProperty.TilesetLayer.FG, "The tiletype the block is made of"),
+            new BoolProperty("blendin", true, "Whether this block blends into other FG tiles."),
+            new BoolProperty("permanent", true, "Whether this block disappears forever after a being broken"),
+            new BoolProperty("canDash", true, "Whether it's possible to dash into this block to break it")
+        };
+
     }
 }

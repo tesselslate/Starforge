@@ -1,6 +1,5 @@
 ﻿using Starforge.Core;
 using Starforge.Editor;
-using Starforge.Editor.Tools;
 using Starforge.Map;
 using Starforge.Mod.API;
 using System;

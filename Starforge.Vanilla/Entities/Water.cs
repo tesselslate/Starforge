@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Starforge.Map;
 using Starforge.Mod.API;
+using Starforge.Mod.API.Properties;
 using Starforge.Mod.Content;
 
 namespace Starforge.Vanilla.Entities {
@@ -25,5 +26,10 @@ namespace Starforge.Vanilla.Entities {
         {
             new Placement("Water")
         };
+
+        public override PropertyList Properties => new PropertyList() {
+            new BoolProperty("hasBottom", false, "Whether this Water has a bottom surface")
+        };
+
     }
 }

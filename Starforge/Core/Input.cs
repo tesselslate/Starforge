@@ -7,8 +7,11 @@ namespace Starforge.Core {
     /// Contains information about the current keyboard/mouse state.
     /// </summary>
     public static class Input {
-        private static MouseState    PreviousMouse = default;
-        private static KeyboardState PreviousKeyboard = default;
+        private static MouseState PreviousMouseState = default;
+        private static KeyboardState PreviousKeyboardState = default;
+
+        private static MouseState CurrentMouseState = default;
+        private static KeyboardState CurrentKeyboardState = default;
 
         public static MouseInput     Mouse;
         public static KeyboardInput  Keyboard;
@@ -22,17 +25,16 @@ namespace Starforge.Core {
         /// Updates the current mouse/keyboard states.
         /// </summary>
         public static void Update() {
-            Mouse = new MouseInput(Microsoft.Xna.Framework.Input.Mouse.GetState(), PreviousMouse);
-            Keyboard = new KeyboardInput(Microsoft.Xna.Framework.Input.Keyboard.GetState(), PreviousKeyboard);
+            PreviousMouseState = CurrentMouseState;
+            PreviousKeyboardState = CurrentKeyboardState;
+
+            CurrentMouseState = Microsoft.Xna.Framework.Input.Mouse.GetState();
+            CurrentKeyboardState = Microsoft.Xna.Framework.Input.Keyboard.GetState();
+
+            Mouse = new MouseInput(CurrentMouseState, PreviousMouseState);
+            Keyboard = new KeyboardInput(CurrentKeyboardState, PreviousKeyboardState);
         }
 
-        /// <summary>
-        /// Updates the previous internal states.
-        /// </summary>
-        public static void UpdatePrevious() {
-            PreviousMouse = Microsoft.Xna.Framework.Input.Mouse.GetState();
-            PreviousKeyboard = Microsoft.Xna.Framework.Input.Keyboard.GetState();
-        }
     }
 
     public struct MouseInput {

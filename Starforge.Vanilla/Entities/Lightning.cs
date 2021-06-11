@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Starforge.Map;
 using Starforge.Mod.API;
+using Starforge.Mod.API.Properties;
 using Starforge.Mod.Content;
 using Starforge.Util;
 
@@ -26,5 +27,10 @@ namespace Starforge.Vanilla.Entities {
         {
             new Placement("Lightning")
         };
+
+        public override PropertyList Properties => new PropertyList() {
+            new FloatProperty("moveTime", 1f, "How long the lightning takes for one movement cycle")
+        };
+
     }
 }

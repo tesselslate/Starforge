@@ -2,7 +2,6 @@
 using Starforge.Map;
 using Starforge.Mod.API;
 using Starforge.Mod.Content;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 

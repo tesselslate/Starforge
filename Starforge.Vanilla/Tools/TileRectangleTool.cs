@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Starforge.Core;
 using Starforge.Editor;
-using Starforge.Editor.Tools;
 using Starforge.Map;
 using Starforge.Mod.API;
 using Starforge.Vanilla.Actions;
@@ -9,18 +8,34 @@ using Starforge.Vanilla.Actions;
 namespace Starforge.Vanilla.Tools {
     [ToolDefinition("TileRectangle")]
     public class TileRectangleTool : TileTool {
-        private Rectangle Hold = new Rectangle(-1, -1, 0, 0);
+        private readonly static Rectangle DefaultHold = new Rectangle(-1, -1, 0, 0);
+
+        private Rectangle Hold = DefaultHold;
         private Point Start;
 
         public override string GetName() => "Tiles (Rectangle)";
 
         public override void Update() {
-            if (Input.Mouse.LeftClick) HandleClick();
-            else if (Input.Mouse.LeftHold) HandleDrag();
-            else if (Input.Mouse.LeftUnclick) HandleUnclick();
-            else if (Input.Mouse.Moved) HandleMove();
+            if (Input.Mouse.LeftClick) {
+                HandleClick();
+            }
+            else if (Input.Mouse.LeftHold) {
+                HandleDrag();
+            }
+            else if (Input.Mouse.LeftUnclick) {
+                HandleUnclick();
+            }
+            else if (Input.Mouse.Moved) {
+                HandleMove();
+            }
 
             Hint = new Rectangle(Hold.X * 8, Hold.Y * 8, Hold.Width * 8, Hold.Height * 8);
+        }
+
+        public override void RoomChanged() {
+            Start = Point.Zero;
+            Hold = DefaultHold;
+            base.RoomChanged();
         }
 
         private void HandleMove() {

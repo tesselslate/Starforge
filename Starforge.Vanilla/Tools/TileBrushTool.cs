@@ -1,6 +1,5 @@
 ﻿using Starforge.Core;
 using Starforge.Editor;
-using Starforge.Editor.Tools;
 using Starforge.Map;
 using Starforge.Mod.API;
 using Starforge.Vanilla.Actions;
@@ -13,9 +12,15 @@ namespace Starforge.Vanilla.Tools {
         public override string GetName() => "Tiles (Brush)";
 
         public override void Update() {
-            if (Input.Mouse.LeftClick) HandleClick();
-            if (Input.Mouse.LeftHold) HandleDrag();
-            if (Input.Mouse.LeftUnclick) HandleUnclick();
+            if (Input.Mouse.LeftClick) {
+                HandleClick();
+            }
+            if (Input.Mouse.LeftHold) {
+                HandleDrag(); 
+            }
+            if (Input.Mouse.LeftUnclick) {
+                HandleUnclick();
+            }
         }
 
         private void HandleClick() {
