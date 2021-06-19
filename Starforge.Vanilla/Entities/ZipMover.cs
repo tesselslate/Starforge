@@ -110,7 +110,8 @@ namespace Starforge.Entities {
         }
 
         public override PropertyList Properties => new PropertyList() {
-            new ListProperty("theme", new string[] { "Normal", "Moon" }, false, "Normal", "The theme this Zip Mover should use")
+            new ListProperty("theme", new string[] { "Normal", "Moon" }, false, "Normal", "The theme this Zip Mover should use"),
+            new NodeProperty(new Vector2(4f, 4f), "Where the zipper goes", new Range<uint>(1, 1))
         };
 
         public static PlacementList Placements = new PlacementList() {
